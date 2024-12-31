@@ -9,7 +9,8 @@ using Twilio.TwiML.Messaging;
 namespace EscrowApi.Controllers
 {
     [ApiController]
-    [Route("api/UserDetails")]
+    [Route("api/userdetails")]
+    [Authorize]
     public class UserDetailsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,8 +19,8 @@ namespace EscrowApi.Controllers
         {
             _context = context;
         }
-        [HttpPost]
-        [Route("SaveUserDetails")]
+
+        [HttpPost("save-user-details")]
         public async Task<IActionResult> SaveUserDetails([FromBody] UserDetailsDto userDetailsDto)
         {
             if (userDetailsDto == null)
@@ -51,8 +52,7 @@ namespace EscrowApi.Controllers
             return Ok(new { Success = true, Message = "User details saved successfully." });
         }
 
-        [HttpGet]
-        [Route("GetUserDetails")]
+        [HttpGet("get-user-details")]        
         public async Task<IActionResult> GetUserDetails(string loginMethod, string emailId)
         {
             if (string.IsNullOrEmpty(loginMethod) || string.IsNullOrEmpty(emailId))
@@ -73,8 +73,7 @@ namespace EscrowApi.Controllers
             return Ok(userDetails);
         }
 
-        [HttpPost]
-        [Route("UpdateUserDetails")]
+        [HttpPost("update-user-details")]
         public async Task<IActionResult> UpdateUserDetails([FromBody] UserDetailsDto userDetailsDto)
         {
             if (userDetailsDto == null || string.IsNullOrEmpty(userDetailsDto.EmailAddress))

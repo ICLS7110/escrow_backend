@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EscrowApi", "LoginWithOtpOtpLoginApi\EscrowApi.csproj", "{D385BAA2-5B80-41E6-A7A9-96011ABC1756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EscrowApi", "LoginWithOtpOtpLoginApi\EscrowApi.csproj", "{D385BAA2-5B80-41E6-A7A9-96011ABC1756}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EscrowTestProject", "EscrowTestProject\EscrowTestProject.csproj", "{1D8E150A-9807-41FC-B08B-733E4CE9B360}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{D385BAA2-5B80-41E6-A7A9-96011ABC1756}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D385BAA2-5B80-41E6-A7A9-96011ABC1756}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D385BAA2-5B80-41E6-A7A9-96011ABC1756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D8E150A-9807-41FC-B08B-733E4CE9B360}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D8E150A-9807-41FC-B08B-733E4CE9B360}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D8E150A-9807-41FC-B08B-733E4CE9B360}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D8E150A-9807-41FC-B08B-733E4CE9B360}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {181FC3FC-DF3E-4200-8611-73244576D9D5}
 	EndGlobalSection
 EndGlobal

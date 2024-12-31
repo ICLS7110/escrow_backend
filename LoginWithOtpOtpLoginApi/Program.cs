@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Abstractions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using OtpLoginApi.Data;
 using OtpLoginApi.Models;
 using OtpLoginApi.Services;
@@ -42,6 +43,16 @@ builder.Services.AddOpenIddict()
                .AddEphemeralSigningKey();
         options.UseAspNetCore()
                .EnableTokenEndpointPassthrough();
+        //enable client_credentials grant_tupe support on server level
+        /*options.AllowClientCredentialsFlow();
+        //specify token endpoint uri
+        options.SetTokenEndpointUris("token");
+        //secret registration
+        options.AddDevelopmentEncryptionCertificate();
+        options.AddDevelopmentSigningCertificate();
+        options.DisableAccessTokenEncryption();
+        //the asp request handlers configuration itself
+        options.UseAspNetCore().EnableTokenEndpointPassthrough();*/
     })
     .AddValidation(options =>
     {
@@ -69,6 +80,23 @@ builder.Services.AddCors(options =>
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = int.MaxValue;
+});
+
+// Add authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.Authority = "https://localhost:7017";
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true
+    };
 });
 
 // Add controllers and Swagger for API documentation
