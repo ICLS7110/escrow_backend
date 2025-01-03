@@ -1,0 +1,13 @@
+﻿{
+  "applications": {
+    "EscrowAPI.Web": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44355",
+      "path": "../../../src/EscrowAPI.Web/EscrowAPI.Web.csproj",
+      "kubernetesService": ".*-web$",
+      "execution": {
+        "order": 2
+      }
+    }
+  }
+}

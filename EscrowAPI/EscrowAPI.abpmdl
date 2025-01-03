@@ -1,0 +1,105 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.0.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.0.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.0.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.0.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.0.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.0.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.0.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.0.1",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "EscrowAPI.Application": {
+      "path": "src/EscrowAPI.Application/EscrowAPI.Application.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.Application.Tests": {
+      "path": "test/EscrowAPI.Application.Tests/EscrowAPI.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "EscrowAPI.Domain.Shared": {
+      "path": "src/EscrowAPI.Domain.Shared/EscrowAPI.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.Application.Contracts": {
+      "path": "src/EscrowAPI.Application.Contracts/EscrowAPI.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.HttpApi": {
+      "path": "src/EscrowAPI.HttpApi/EscrowAPI.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.HttpApi.Client": {
+      "path": "src/EscrowAPI.HttpApi.Client/EscrowAPI.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.Web": {
+      "path": "src/EscrowAPI.Web/EscrowAPI.Web.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.Web.Tests": {
+      "path": "test/EscrowAPI.Web.Tests/EscrowAPI.Web.Tests.abppkg",
+      "folder": "test"
+    },
+    "EscrowAPI.EntityFrameworkCore.Tests": {
+      "path": "test/EscrowAPI.EntityFrameworkCore.Tests/EscrowAPI.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "EscrowAPI.EntityFrameworkCore": {
+      "path": "src/EscrowAPI.EntityFrameworkCore/EscrowAPI.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.TestBase": {
+      "path": "test/EscrowAPI.TestBase/EscrowAPI.TestBase.abppkg",
+      "folder": "test"
+    },
+    "EscrowAPI.Domain.Tests": {
+      "path": "test/EscrowAPI.Domain.Tests/EscrowAPI.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "EscrowAPI.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/EscrowAPI.HttpApi.Client.ConsoleTestApp/EscrowAPI.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "EscrowAPI.DbMigrator": {
+      "path": "src/EscrowAPI.DbMigrator/EscrowAPI.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "EscrowAPI.Domain": {
+      "path": "src/EscrowAPI.Domain/EscrowAPI.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}
