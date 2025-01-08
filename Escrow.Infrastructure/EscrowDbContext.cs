@@ -1,4 +1,4 @@
-﻿using Escrow.Domain.UserPanel;
+﻿using Escrow.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Escrow.Infrastructure
 {
-    public class EscrowDbContext : IdentityDbContext<ApplicationUser>
+    public class EscrowDbContext : IdentityDbContext<User>
     {
         public EscrowDbContext(DbContextOptions<EscrowDbContext> options) : base(options) { }
-        public DbSet<UserDetails> UserDetails { get; set; }
+        public DbSet<User> UserDetails { get; set; }
     }
 }

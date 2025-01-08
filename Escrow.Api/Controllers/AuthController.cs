@@ -1,6 +1,6 @@
 ﻿using Escrow.Application.Dto;
 using Escrow.Application.Services;
-using Escrow.Domain.UserPanel;
+using Escrow.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Concurrent;
 using System.Security.Claims;
@@ -12,6 +12,7 @@ using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authorization;
+using Escrow.Domain.Entities.Twilio;
 
 namespace Escrow.Api.Controllers
 {
@@ -19,14 +20,14 @@ namespace Escrow.Api.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IOpenIddictTokenManager _tokenManager;
         private readonly TwilioSettings _twilioSettings;
         private readonly PhoneNumberValidationService _phoneNumberValidationService;
 
         private static readonly ConcurrentDictionary<string, (string otp, DateTime expiry)> _otpStore = new();
 
-        public AuthController(UserManager<ApplicationUser> userManager, IOpenIddictTokenManager tokenManager, IOptions<TwilioSettings> twilioSettings, PhoneNumberValidationService phoneNumberValidationService)
+        public AuthController(UserManager<User> userManager, IOpenIddictTokenManager tokenManager, IOptions<TwilioSettings> twilioSettings, PhoneNumberValidationService phoneNumberValidationService)
         {
             _userManager = userManager;
             _tokenManager = tokenManager;
@@ -56,7 +57,7 @@ namespace Escrow.Api.Controllers
             var user = await _userManager.FindByNameAsync(request.MobileNumber);
             if (user == null)
             {
-                user = new ApplicationUser { UserName = request.MobileNumber, PhoneNumber = request.MobileNumber };
+                user = new User { MobileNumber = request.MobileNumber };
                 await _userManager.CreateAsync(user);
             }
 
@@ -151,8 +152,8 @@ namespace Escrow.Api.Controllers
 
 
             var identity = new ClaimsIdentity("otp");
-            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.Id));
-            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Username, user.UserName));
+            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.EmailAddress));
+            identity.AddClaim(new Claim(OpenIddictConstants.Claims.Username, user.MobileNumber));
 
             var principal = new ClaimsPrincipal(identity);
 
@@ -160,7 +161,7 @@ namespace Escrow.Api.Controllers
             var token = await _tokenManager.CreateAsync(new OpenIddictTokenDescriptor
             {
                 Principal = principal,
-                Subject = user.Id,
+                Subject = user.EmailAddress,
                 CreationDate= DateTime.UtcNow,
                 ExpirationDate = DateTime.UtcNow.AddDays(1),
                 Type = OpenIddictConstants.TokenTypes.Bearer

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MediatR;
 
-namespace Escrow.Domain.UserPanel
+namespace Escrow.Domain.Common
 {
-    public class CardDetail
+    public abstract class BaseEvent : INotification
     {
+
     }
 }

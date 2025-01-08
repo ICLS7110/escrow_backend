@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Escrow.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Escrow.Domain.UserPanel
+namespace Escrow.Domain.Entities.UserPanel
 {
-    public class UserDetails
+    public class User : BaseAuditableEntity
     {
-        public int Id { get; set; }
+        public int UserId { get; set; }
         public string FullName { get; set; }
         public string EmailAddress { get; set; }
+        public string MobileNumber { get; set; }
         public string Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
 

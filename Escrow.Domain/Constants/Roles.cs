@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
-namespace Escrow.Domain.UserPanel
+namespace Escrow.Domain.Constants
 {
-    public class ApplicationUser: IdentityUser
+    public abstract class Roles
     {
-
+        public const string Administrator = nameof(Administrator);
     }
 }
