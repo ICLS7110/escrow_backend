@@ -1,6 +1,5 @@
 using Escrow.Application.Services;
-using Escrow.Domain.UserPanel;
-using Escrow.Infrastructure;
+using Escrow.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Entity Framework and OpenIddict
 builder.Services.AddDbContext<EscrowDbContext>(options =>
-{
+{ 
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.UseOpenIddict(); // For OpenIddict integration
 });

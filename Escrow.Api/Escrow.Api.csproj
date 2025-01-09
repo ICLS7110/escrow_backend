@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Escrow.Application\Escrow.Application.csproj" />
-    <ProjectReference Include="..\Escrow.Infrastructure\Escrow.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
