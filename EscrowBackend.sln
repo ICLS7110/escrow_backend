@@ -5,11 +5,15 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escrow.Api", "Escrow.Api\Escrow.Api.csproj", "{39D13C59-2431-405A-AF40-FFED942806EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escrow.Domain", "Escrow.Domain\Escrow.Domain.csproj", "{D18123BB-7CE2-4ECE-8AE1-C8976BA46299}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escrow.Domain", "Escrow.Domain\Escrow.Domain.csproj", "{D18123BB-7CE2-4ECE-8AE1-C8976BA46299}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escrow.Application", "Escrow.Application\Escrow.Application.csproj", "{0F7B26A9-6E58-4583-801E-C0458CB8E827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escrow.Application", "Escrow.Application\Escrow.Application.csproj", "{0F7B26A9-6E58-4583-801E-C0458CB8E827}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escrow.Infrastructure", "Escrow.Infrastructure\Escrow.Infrastructure.csproj", "{A6473A39-3D88-4C4E-A596-A9301506A0EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escrow.Infrastructure", "Escrow.Infrastructure\Escrow.Infrastructure.csproj", "{A6473A39-3D88-4C4E-A596-A9301506A0EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escrow.AppHost", "Escrow.AppHost\Escrow.AppHost.csproj", "{A307F86F-C1C1-4C0E-B25B-6BA91AD9D996}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8F10B6F2-E9FB-4B56-8889-E7E3DC836522}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,10 @@ Global
 		{A6473A39-3D88-4C4E-A596-A9301506A0EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6473A39-3D88-4C4E-A596-A9301506A0EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6473A39-3D88-4C4E-A596-A9301506A0EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A307F86F-C1C1-4C0E-B25B-6BA91AD9D996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A307F86F-C1C1-4C0E-B25B-6BA91AD9D996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A307F86F-C1C1-4C0E-B25B-6BA91AD9D996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A307F86F-C1C1-4C0E-B25B-6BA91AD9D996}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

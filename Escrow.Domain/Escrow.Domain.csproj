@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -28,6 +29,12 @@
     <PackageReference Include="OpenIddict.Validation" Version="6.0.0" />
     <PackageReference Include="OpenIddict.Validation.AspNetCore" Version="6.0.0" />
     <PackageReference Include="Twilio" Version="7.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Enums\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="ValueObjects\" />
   </ItemGroup>
 
 </Project>
