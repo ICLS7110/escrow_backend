@@ -12,8 +12,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Escrow.Infrastructure", "Escrow.Infrastructure\Escrow.Infrastructure.csproj", "{A6473A39-3D88-4C4E-A596-A9301506A0EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Escrow.AppHost", "Escrow.AppHost\Escrow.AppHost.csproj", "{A307F86F-C1C1-4C0E-B25B-6BA91AD9D996}"
+<<<<<<< HEAD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8F10B6F2-E9FB-4B56-8889-E7E3DC836522}"
+=======
+>>>>>>> eb8aa87023a6d0db7073e4df1b86475f25628238
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
