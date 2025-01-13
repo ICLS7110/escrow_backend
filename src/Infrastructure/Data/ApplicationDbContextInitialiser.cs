@@ -88,7 +88,7 @@ public class ApplicationDbContextInitialiser
 
         // Default data
         // Seed, if necessary
-       /* if (!_context.TodoLists.Any())
+        if (!_context.TodoLists.Any())
         {
             _context.TodoLists.Add(new TodoList
             {
@@ -103,6 +103,6 @@ public class ApplicationDbContextInitialiser
             });
 
             await _context.SaveChangesAsync();
-        }*/
+        }
     }
 }

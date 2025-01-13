@@ -3,8 +3,9 @@ using System.Runtime.CompilerServices;
 using AutoMapper;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
-using Escrow.Api.Application.UserPanel.Queries.GetUsers;
-using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Application.TodoItems.Queries.GetTodoItemsWithPagination;
+using Escrow.Api.Application.TodoLists.Queries.GetTodos;
+using Escrow.Api.Domain.Entities;
 using NUnit.Framework;
 
 namespace Escrow.Api.Application.UnitTests.Common.Mappings;
@@ -29,7 +30,11 @@ public class MappingTests
     }
 
     [Test]
-    [TestCase(typeof(UserDetail), typeof(UserDetailDto))]
+    [TestCase(typeof(TodoList), typeof(TodoListDto))]
+    [TestCase(typeof(TodoItem), typeof(TodoItemDto))]
+    [TestCase(typeof(TodoList), typeof(LookupDto))]
+    [TestCase(typeof(TodoItem), typeof(LookupDto))]
+    [TestCase(typeof(TodoItem), typeof(TodoItemBriefDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);

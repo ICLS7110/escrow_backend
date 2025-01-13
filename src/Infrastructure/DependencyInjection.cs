@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection

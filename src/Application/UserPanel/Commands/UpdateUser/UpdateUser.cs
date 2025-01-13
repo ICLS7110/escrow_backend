@@ -16,6 +16,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
     public record UpdateUserCommand : IRequest
     {
+        public int Id { get; init; }
         public int UserId { get; init; }
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
@@ -25,7 +26,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public string? BusinessManagerName { get; set; }
         public string? BusinessEmail { get; set; }
         public string? VatId { get; set; }
-        public byte[]? ProofOfBusiness { get; set; } // File as binary
+        //public byte[]? ProofOfBusiness { get; set; } // File as binary
 
         // Bank Account Details Fields
         public string? AccountHolderName { get; set; }
@@ -59,7 +60,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.BusinessManagerName = request.BusinessManagerName;
             entity.BusinessEmail = request.BusinessEmail;
             entity.VatId = request.VatId;
-            entity.ProofOfBusiness = request.ProofOfBusiness;
+            //entity.ProofOfBusiness = request.ProofOfBusiness;
             entity.AccountHolderName = request.AccountHolderName;
             entity.IBANNumber = request.IBANNumber;
             entity.BICCode = request.BICCode;

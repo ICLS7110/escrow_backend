@@ -8,7 +8,6 @@ internal class UserDetailConfiguration : IEntityTypeConfiguration<UserDetail>
     public void Configure(EntityTypeBuilder<UserDetail> builder)
     {
         builder.Property(t => t.FullName)
-            .HasMaxLength(200)
-            .IsRequired();
+            .HasMaxLength(200);
     }
 }

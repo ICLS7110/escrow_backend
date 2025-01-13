@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Domain.Entities.UserPanel;
 public class UserDetail : BaseAuditableEntity
@@ -18,7 +17,7 @@ public class UserDetail : BaseAuditableEntity
     public string? BusinessManagerName { get; set; }
     public string? BusinessEmail { get; set; }
     public string? VatId { get; set; }
-    public byte[]? ProofOfBusiness { get; set; } // File upload
+    //public byte[]? ProofOfBusiness { get; set; } // File upload
 
     // Bank Account Details Fields
     public string? AccountHolderName { get; set; }

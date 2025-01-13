@@ -1,13 +1,6 @@
 using Escrow.Api.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Escrow.ApiDb"));
-    //options.UseOpenIddict(); // For OpenIddict integration
-});
 
 // Add services to the container.
 builder.AddKeyVaultIfConfigured();
@@ -20,7 +13,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    await app.InitialiseDatabaseAsync();
+    //await app.InitialiseDatabaseAsync();
 }
 else
 {
@@ -28,7 +21,7 @@ else
     app.UseHsts();
 }
 
-app.UseHealthChecks("/health");
+//app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
