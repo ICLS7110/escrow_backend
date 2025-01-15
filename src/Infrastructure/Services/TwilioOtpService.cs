@@ -1,0 +1,36 @@
+﻿
+using Escrow.Api.Domain.Interfaces;
+using Escrow.Api.Infrastructure.Configuration;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
+
+namespace Escrow.Api.Infrastructure.Services;
+public class TwilioOtpService : IOtpService
+{
+    private readonly TwilioSettings _twilioSettings;
+
+    public TwilioOtpService(TwilioSettings twilioSettings)
+    {
+        _twilioSettings = twilioSettings;
+    }
+
+    public string GenerateOtp()
+    {
+        var random = new Random();
+        return random.Next(100000, 999999).ToString();
+    }
+
+    public void SendOtp(string phoneNumber, string otp)
+    {
+        TwilioClient.Init(_twilioSettings.AccountSid, _twilioSettings.AuthToken);
+
+        var message = MessageResource.Create(
+            body: $"Your OTP is {otp}",
+            from: new PhoneNumber(_twilioSettings.PhoneNumber),
+            to: new PhoneNumber(phoneNumber)
+        );
+
+        Console.WriteLine($"OTP sent to {phoneNumber}: {otp}");
+    }
+}

@@ -12,13 +12,13 @@ public  class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicati
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
         //// Ensure the configuration is loaded correctly (you can also configure it to point to your correct environment)
-        //var configuration = new ConfigurationBuilder()
-        //    .SetBasePath(Directory.GetCurrentDirectory())
-        //    .AddJsonFile("appsettings.json") // Or use your specific settings file
-        //    .Build();
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+           .AddJsonFile("appsettings.json") // Or use your specific settings file
+            .Build();
 
-        //var connectionString = configuration.GetConnectionString("Escrow.ApiDb");
-        //optionsBuilder.UseNpgsql(connectionString); // Assuming you're using Npgsql, update accordingly
+        var connectionString = configuration.GetConnectionString("Escrow");
+        optionsBuilder.UseNpgsql(connectionString); // Assuming you're using Npgsql, update accordingly
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

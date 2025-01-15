@@ -3,9 +3,21 @@ using Escrow.Api.Infrastructure.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddOpenIddict()
+    .AddCore(options =>
+    {
+        options.UseEntityFrameworkCore()
+               .UseDbContext<ApplicationDbContext>();
+    })
+    .AddServer(options =>
+    {
+        options.AllowAuthorizationCodeFlow()
+               .AllowRefreshTokenFlow()
+               .SetAccessTokenLifetime(TimeSpan.FromHours(1)); // Set token expiration
+    });
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
-builder.AddInfrastructureServices();
+builder.AddInfrastructureServices(builder.Configuration);
 builder.AddWebServices();
 
 var app = builder.Build();
