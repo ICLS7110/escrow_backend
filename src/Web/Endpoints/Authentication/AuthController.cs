@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace Escrow.Api.Web.Endpoints.Authentication
 {
+
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase

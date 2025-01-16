@@ -4,15 +4,16 @@ using Escrow.Api.Infrastructure.Configuration;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
+using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Services;
 public class TwilioOtpService : IOtpService
 {
     private readonly TwilioSettings _twilioSettings;
 
-    public TwilioOtpService(TwilioSettings twilioSettings)
+    public TwilioOtpService(IOptions<TwilioSettings> twilioSettings)
     {
-        _twilioSettings = twilioSettings;
+        _twilioSettings = twilioSettings.Value;
     }
 
     public string GenerateOtp()

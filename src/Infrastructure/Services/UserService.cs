@@ -1,42 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Domain.Entities.Authentication;
 using Escrow.Api.Domain.Interfaces;
+using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
-namespace Escrow.Api.Infrastructure.Services;
-public class UserService : IUserService
+namespace Escrow.Api.Infrastructure.Services
 {
-    private readonly UserManager<IdentityUser> _userManager;
-
-    public UserService(UserManager<IdentityUser> userManager)
+    public class UserService : IUserService
     {
-        _userManager = userManager;
-    }
+        private readonly UserManager<ApplicationUser> _userManager;
 
-    public async Task<User> FindOrCreateUserAsync(string phoneNumber)
-    {
-        var user = await _userManager.FindByNameAsync(phoneNumber);
-        if (user == null)
+        public UserService(UserManager<ApplicationUser> userManager)
         {
-            user = new IdentityUser { UserName = phoneNumber, PhoneNumber = phoneNumber };
-            await _userManager.CreateAsync(user);
+            _userManager = userManager;
         }
 
-        return new User { Id = user.Id, PhoneNumber = user.PhoneNumber };
-    }
-
-    public async Task<User> FindUserAsync(string phoneNumber)
-    {
-        var user = await _userManager.FindByNameAsync(phoneNumber);
-        if (user == null)
+        public async Task<User> FindOrCreateUserAsync(string phoneNumber)
         {
-            throw new ArgumentException("User not found.");
+            var user = await _userManager.FindByNameAsync(phoneNumber);
+            if (user == null)
+            {
+                // Creating a new ApplicationUser (not IdentityUser)
+                user = new ApplicationUser { UserName = phoneNumber, PhoneNumber = phoneNumber };
+                var result = await _userManager.CreateAsync(user);
+                
+                // Check if creation was successful
+                if (!result.Succeeded)
+                {
+                    throw new InvalidOperationException("User creation failed.");
+                }
+            }
+
+            return new User { Id = user.Id, PhoneNumber = user.PhoneNumber };
         }
 
-        return new User { Id = user.Id, PhoneNumber = user.PhoneNumber };
+        public async Task<User> FindUserAsync(string phoneNumber)
+        {
+            var user = await _userManager.FindByNameAsync(phoneNumber);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+
+            return new User { Id = user.Id, PhoneNumber = user.PhoneNumber };
+        }
     }
 }

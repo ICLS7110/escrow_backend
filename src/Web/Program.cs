@@ -1,8 +1,18 @@
+using Escrow.Api.Application.Common.Services;
+using Escrow.Api.Domain.Interfaces;
+using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
+using Escrow.Api.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configure OpenIddict for token management
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
@@ -11,17 +21,29 @@ builder.Services.AddOpenIddict()
     })
     .AddServer(options =>
     {
-        options.AllowAuthorizationCodeFlow()
-               .AllowRefreshTokenFlow()
-               .SetAccessTokenLifetime(TimeSpan.FromHours(1)); // Set token expiration
+        options.AllowPasswordFlow();
+        options.AllowCustomFlow("otp");
+
+        options.SetTokenEndpointUris("/connect/token");
+        options.AddEphemeralEncryptionKey()
+               .AddEphemeralSigningKey();
+        options.UseAspNetCore()
+               .EnableTokenEndpointPassthrough();
+    })
+    .AddValidation(options =>
+    {
+        options.UseLocalServer();
+        options.UseAspNetCore();
     });
+
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
-builder.AddInfrastructureServices(builder.Configuration);
+builder.AddInfrastructureServices();
 builder.AddWebServices();
+builder.Services.AddControllers();
 
 var app = builder.Build();
-
+app.MapControllers();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -7,63 +7,76 @@ using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Data.Interceptors;
 using Escrow.Api.Infrastructure.Identity;
 using Escrow.Api.Infrastructure.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
-    public static void AddInfrastructureServices(this IHostApplicationBuilder builder, IConfiguration configuration)
+    public static void AddInfrastructureServices(this WebApplicationBuilder builder)
     {
-        // Get the connection string from appsettings.json or environment variables
-        var connectionString = configuration.GetConnectionString("Escrow");
-        Guard.Against.Null(connectionString, message: "Connection string 'Escrow' not found.");
+        // Get the connection string
+        var connectionString = builder.Configuration.GetConnectionString("Escrow");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("Connection string 'Escrow' not found.");
+        }
 
-        // Register database context and interceptors
+        // Register database interceptors
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
         // Configure TwilioSettings (from appsettings.json or environment variables)
-        builder.Services.Configure<TwilioSettings>(configuration.GetSection("TwilioSettings"));
+        var twilioSection = builder.Configuration.GetSection("TwilioSettings");
+        if (!twilioSection.Exists())
+        {
+            throw new InvalidOperationException("TwilioSettings section not found.");
+        }
+        builder.Services.Configure<TwilioSettings>(twilioSection);
 
         // Register application services
+        builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IOtpService, TwilioOtpService>();
         builder.Services.AddScoped<IOtpValidationService, PhoneNumberValidationService>();
         builder.Services.AddScoped<IOtpManagerService, OtpManagerService>();
 
-        // Register the DbContext with Npgsql and interceptors
+        // Register DbContext with Npgsql and interceptors
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.UseNpgsql(connectionString);
         });
 
-        // Register IApplicationDbContext and ApplicationDbContext initializer
+        // Register IApplicationDbContext and initializer
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
-        // Configure authentication with Bearer token scheme
-        builder.Services.AddAuthentication()
+        // Configure authentication and bearer tokens
+        builder.Services.AddAuthentication(IdentityConstants.BearerScheme)
             .AddBearerToken(IdentityConstants.BearerScheme);
 
         // Configure authorization policies
-        builder.Services.AddAuthorizationBuilder();
         builder.Services.AddAuthorization(options =>
-            options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
+        {
+            options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator));
+        });
 
         // Register Identity services
         builder.Services
             .AddIdentityCore<ApplicationUser>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddApiEndpoints();
+            .AddDefaultTokenProviders();
 
         // Register other services
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, Escrow.Api.Infrastructure.Services.NoOpEmailSender>();
+
     }
 }

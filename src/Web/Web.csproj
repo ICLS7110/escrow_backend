@@ -36,6 +36,7 @@
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <PackageReference Include="OpenIddict.Validation" />
     <PackageReference Include="OpenIddict.Validation.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Twilio" />
   </ItemGroup>
 
