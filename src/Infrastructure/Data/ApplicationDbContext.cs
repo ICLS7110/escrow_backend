@@ -2,8 +2,6 @@
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.UserPanel;
-using Escrow.Api.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Infrastructure.Data;
