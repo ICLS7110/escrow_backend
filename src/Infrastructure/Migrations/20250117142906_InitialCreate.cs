@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Escrow.Api.Infrastructure.Data.Migrations
+namespace Escrow.Api.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -67,6 +67,34 @@ namespace Escrow.Api.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TodoLists", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    EmailAddress = table.Column<string>(type: "text", nullable: true),
+                    Gender = table.Column<string>(type: "text", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    BusinessManagerName = table.Column<string>(type: "text", nullable: true),
+                    BusinessEmail = table.Column<string>(type: "text", nullable: true),
+                    VatId = table.Column<string>(type: "text", nullable: true),
+                    AccountHolderName = table.Column<string>(type: "text", nullable: true),
+                    IBANNumber = table.Column<string>(type: "text", nullable: true),
+                    BICCode = table.Column<string>(type: "text", nullable: true),
+                    LoginMethod = table.Column<string>(type: "text", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserDetails", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -203,31 +231,6 @@ namespace Escrow.Api.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "UserDetails",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(nullable: false),
-                    FullName = table.Column<string>(type: "character varying(255)", nullable: true),
-                    EmailAddress = table.Column<string>(type: "character varying(255)", nullable: true),
-                    Gender = table.Column<string>(type: "character varying(50)", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(nullable: true),
-                    BusinessManagerName = table.Column<string>(type: "character varying(255)", nullable: true),
-                    BusinessEmail = table.Column<string>(type: "character varying(255)", nullable: true),
-                    VatId = table.Column<string>(type: "character varying(100)", nullable: true),
-                    //ProofOfBusiness = table.Column<byte[]>(type: "bytea", nullable: true),
-                    AccountHolderName = table.Column<string>(type: "character varying(255)", nullable: true),
-                    IBANNumber = table.Column<string>(type: "character varying(50)", nullable: true),
-                    BICCode = table.Column<string>(type: "character varying(50)", nullable: true),
-                    LoginMethod = table.Column<string>(type: "character varying(50)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserDetails", x => x.Id);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -271,8 +274,6 @@ namespace Escrow.Api.Infrastructure.Data.Migrations
                 column: "ListId");
         }
 
-
-
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
@@ -295,6 +296,9 @@ namespace Escrow.Api.Infrastructure.Data.Migrations
                 name: "TodoItems");
 
             migrationBuilder.DropTable(
+                name: "UserDetails");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -302,8 +306,6 @@ namespace Escrow.Api.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "TodoLists");
-            migrationBuilder.DropTable(
-                name: "UserDetail");
         }
     }
 }

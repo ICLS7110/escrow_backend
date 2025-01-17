@@ -44,6 +44,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IOtpService, TwilioOtpService>();
         builder.Services.AddScoped<IOtpValidationService, PhoneNumberValidationService>();
         builder.Services.AddScoped<IOtpManagerService, OtpManagerService>();
+        builder.Services.AddScoped<OtpManagerService>();
 
         // Register DbContext with Npgsql and interceptors
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>

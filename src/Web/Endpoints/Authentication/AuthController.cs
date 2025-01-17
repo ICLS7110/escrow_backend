@@ -43,30 +43,26 @@ namespace Escrow.Api.Web.Endpoints.Authentication
         {
             try
             {
-                var user = await _userManager.FindByNameAsync(request.MobileNumber);
+                // Verify the OTP and retrieve the user ID
+                var userId = await _otpManagerService.VerifyOtpAsync(request.MobileNumber, request.Otp);
+
+                // Find the user using the retrieved user ID
+                var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                     return BadRequest(new { Error = "User not found." });
 
-                // Verify OTP
-                var isOtpValid = await _otpManagerService.VerifyOtpAsync(request.MobileNumber, request.Otp);
-                if (isOtpValid != "Valid")
-                {
-                    return BadRequest(new { Error = "Invalid OTP." });
-                }
+                // Ensure user data is populated
+                if (string.IsNullOrEmpty(user.UserName))
+                    return BadRequest(new { Error = "User data is incomplete." });
 
-                if (string.IsNullOrEmpty(user.Id) || string.IsNullOrEmpty(user.UserName))
-                {
-                    return BadRequest(new { Error = "User ID or Username is missing." });
-                }
-
+                // Create claims and identity for the token
                 var identity = new ClaimsIdentity("otp");
-
-                // Add claims safely
                 identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.Id));
                 identity.AddClaim(new Claim(OpenIddictConstants.Claims.Username, user.UserName));
 
                 var principal = new ClaimsPrincipal(identity);
 
+                // Generate the access token
                 var token = await _tokenManager.CreateAsync(new OpenIddictTokenDescriptor
                 {
                     Principal = principal,
@@ -81,9 +77,13 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                     AccessToken = token
                 });
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 return BadRequest(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Error = "An unexpected error occurred.", Details = ex.Message });
             }
         }
 

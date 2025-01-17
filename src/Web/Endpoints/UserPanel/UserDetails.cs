@@ -12,7 +12,7 @@ public class UserDetails : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         app.MapGroup(this)
-            .RequireAuthorization()
+            //.RequireAuthorization()
             .MapGet(GetUserDetails)
             .MapPost(CreateUser)
             .MapPut(UpdateUserDetail, "{id}")

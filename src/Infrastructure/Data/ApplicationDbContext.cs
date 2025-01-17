@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Infrastructure.Data;
 
-public class ApplicationDbContext : DbContext, IApplicationDbContext//IdentityDbContext<ApplicationUser>, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
