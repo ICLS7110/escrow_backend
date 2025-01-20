@@ -1,18 +1,17 @@
 ﻿using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.Common.Services;
 using Escrow.Api.Domain.Constants;
-using Escrow.Api.Domain.Interfaces;
+using Escrow.Api.Application.Authentication.Interfaces;
 using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Data.Interceptors;
 using Escrow.Api.Infrastructure.Identity;
-using Escrow.Api.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Escrow.Api.Infrastructure.Authentication.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -77,7 +76,7 @@ public static class DependencyInjection
         // Register other services
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
-        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, Escrow.Api.Infrastructure.Services.NoOpEmailSender>();
+        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, Escrow.Api.Infrastructure.Authentication.Services.EmailSender>();
 
     }
 }

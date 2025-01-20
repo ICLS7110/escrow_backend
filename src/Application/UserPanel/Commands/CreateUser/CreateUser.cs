@@ -12,7 +12,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 {
     public record CreateUserCommand : IRequest<int>
     {
-        public int UserId { get; init; }
+        public string UserId { get; init; } = string.Empty;
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? Gender { get; set; }

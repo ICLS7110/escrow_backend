@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Escrow.Api.Domain.Interfaces;
+namespace Escrow.Api.Application.Authentication.Interfaces;
 public interface IOtpService
 {
     string GenerateOtp();

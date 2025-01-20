@@ -13,7 +13,7 @@ public class UpdateUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldRequireValidTodoListId()
     {
-        var command = new UpdateUserCommand { UserId = 99, FullName = "New Title" };
+        var command = new UpdateUserCommand { UserId = "0099", FullName = "New Title" };
         await FluentActions.Invoking(() => SendAsync(command)).Should().ThrowAsync<NotFoundException>();
     }
 
@@ -32,7 +32,7 @@ public class UpdateUserDetailTests : BaseTestFixture
 
         var command = new UpdateUserCommand
         {
-            UserId = userId,
+            Id = userId,
             FullName = "Other List"
         };
 
@@ -54,7 +54,7 @@ public class UpdateUserDetailTests : BaseTestFixture
 
         var command = new UpdateUserCommand
         {
-            UserId = Convert.ToInt32(userId),
+            UserId = userId,
             FullName = "Updated List Title"
         };
 

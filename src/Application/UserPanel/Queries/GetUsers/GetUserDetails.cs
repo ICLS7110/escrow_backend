@@ -6,7 +6,7 @@ namespace Escrow.Api.Application.UserPanel.Queries.GetUsers;
 
 public record GetUserDetailsQuery : IRequest<PaginatedList<UserDetailDto>>
 {
-    public int UserId { get; init; }
+    public string UserId { get; init; } = string.Empty;
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;
 }

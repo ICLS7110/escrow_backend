@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Infrastructure.Identity;
+﻿using Escrow.Api.Domain.Entities.Authentication;
+using Escrow.Api.Infrastructure.Identity;
 
 namespace Escrow.Api.Web.Endpoints;
 

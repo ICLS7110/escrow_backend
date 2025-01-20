@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Escrow.Api.Domain.Interfaces;
-public interface IOtpManagerService
+namespace Escrow.Api.Application.Authentication.Interfaces;
+public  interface IOtpManagerService
 {
     Task RequestOtpAsync(string phoneNumber);
     Task<string> VerifyOtpAsync(string phoneNumber, string otp);

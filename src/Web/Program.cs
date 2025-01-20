@@ -1,9 +1,10 @@
-using Escrow.Api.Application.Common.Services;
-using Escrow.Api.Domain.Interfaces;
+using Escrow.Api.Infrastructure.Authentication.Services;
+using Escrow.Api.Application.Authentication.Interfaces;
 using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Escrow.Api.Domain.Entities.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,17 @@ builder.Services.AddOpenIddict()
         options.UseLocalServer();
         options.UseAspNetCore();
     });
+/*
+ * services.AddOpenIddict()
+    .AddCore(options => { //Core options // })
+    .AddServer(options =>
+     {
+         options.SetAccessTokenLifetime(TimeSpan.FromDays(1));
+
+         // Customize claims to include additional data
+         options.RegisterClaims(claim => claim.Name("user_id").Required());
+     });
+*/
 
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
@@ -61,11 +73,19 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwaggerUi(settings =>
+if (app.Environment.IsDevelopment())
 {
-    settings.Path = "/api";
-    settings.DocumentPath = "/api/specification.json";
-});
+    // Enable Swagger in Development environment
+    app.UseSwaggerUi(settings =>
+    {
+        settings.Path = "/api";
+        settings.DocumentPath = "/api/specification.json";
+    });
+}
+else
+{
+    app.UseHsts();
+}
 
 
 app.UseExceptionHandler(options => { });
@@ -76,4 +96,4 @@ app.MapEndpoints();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program {}

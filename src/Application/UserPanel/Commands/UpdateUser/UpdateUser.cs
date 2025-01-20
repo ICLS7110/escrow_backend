@@ -17,7 +17,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
     public record UpdateUserCommand : IRequest
     {
         public int Id { get; init; }
-        public int UserId { get; init; }
+        public string UserId { get; init; } = string.Empty;
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? Gender { get; set; }

@@ -1,12 +1,12 @@
 ﻿
-using Escrow.Api.Domain.Interfaces;
+using Escrow.Api.Application.Authentication.Interfaces;
 using Escrow.Api.Infrastructure.Configuration;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
 using Microsoft.Extensions.Options;
 
-namespace Escrow.Api.Infrastructure.Services;
+namespace Escrow.Api.Infrastructure.Authentication.Services;
 public class TwilioOtpService : IOtpService
 {
     private readonly TwilioSettings _twilioSettings;

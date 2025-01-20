@@ -760,8 +760,8 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "nullable": true
             },
             "x-position": 1
           },
@@ -1513,6 +1513,10 @@
             "type": "string",
             "nullable": true
           },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "gender": {
             "type": "string",
             "nullable": true
@@ -1557,8 +1561,7 @@
         "additionalProperties": false,
         "properties": {
           "userId": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "fullName": {
             "type": "string",
@@ -1616,8 +1619,7 @@
             "format": "int32"
           },
           "userId": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "fullName": {
             "type": "string",
@@ -1671,8 +1673,7 @@
         "additionalProperties": false,
         "properties": {
           "userId": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "pageNumber": {
             "type": "integer",

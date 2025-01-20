@@ -11,4 +11,6 @@ public interface IApplicationDbContext
     DbSet<UserDetail> UserDetails { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync();
+    Task<T> SaveChangesAndReturnAsync<T>(T entity) where T : class;
 }
