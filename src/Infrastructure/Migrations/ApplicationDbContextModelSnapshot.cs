@@ -28,7 +28,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
+
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -75,7 +77,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
+
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -105,7 +109,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
+
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
 
                     b.Property<string>("AccountHolderName")
                         .HasColumnType("text");
@@ -160,6 +166,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.ToTable("UserDetails");
                 });
+
 
             modelBuilder.Entity("Escrow.Api.Infrastructure.Identity.ApplicationUser", b =>
                 {
@@ -357,6 +364,7 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+
             modelBuilder.Entity("Escrow.Api.Domain.Entities.TodoItem", b =>
                 {
                     b.HasOne("Escrow.Api.Domain.Entities.TodoList", "List")
@@ -390,6 +398,7 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Navigation("Colour")
                         .IsRequired();
                 });
+
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
@@ -441,6 +450,7 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
+
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.TodoList", b =>
                 {
