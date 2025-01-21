@@ -1571,6 +1571,10 @@
             "type": "string",
             "nullable": true
           },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "gender": {
             "type": "string",
             "nullable": true

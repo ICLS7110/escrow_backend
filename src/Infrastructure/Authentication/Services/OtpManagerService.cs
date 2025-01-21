@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Authentication.Interfaces;
+using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
@@ -42,7 +43,7 @@ public class OtpManagerService : IOtpManagerService
     }
 
     // Implementing VerifyOtpAsync from IOtpManagerService
-    public async Task<string> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
+    public async Task<UserDetail> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
     {
         var phoneNumber = $"{countryCode}{mobileNumber}";
         if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
@@ -56,11 +57,11 @@ public class OtpManagerService : IOtpManagerService
 
         var user = await _userService.FindUserAsync(phoneNumber);
         if (user == null)
-            throw new ArgumentException("User not found.");
+            return new UserDetail();
 
         if (string.IsNullOrEmpty(user.UserId))
-            throw new ArgumentException("User Id is not populated.");
+            return new UserDetail();
 
-        return user.UserId;
+        return user;
     }
 }

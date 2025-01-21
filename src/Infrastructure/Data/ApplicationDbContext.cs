@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Reflection.Emit;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.UserPanel;
@@ -36,6 +37,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     {
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // Register the OpenIddict models
+        builder.UseOpenIddict();
     }
 
     public Task<int> SaveChangesAsync()

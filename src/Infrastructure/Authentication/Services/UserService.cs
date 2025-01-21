@@ -8,6 +8,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
 {
@@ -45,7 +46,8 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
         public async Task<UserDetail> FindUserAsync(string phoneNumber)
         {
-            var user = await _context.UserDetails.FindAsync(phoneNumber);
+            //var user = await _context.UserDetails.FindAsync(phoneNumber);
+            var user =  await _context.UserDetails.FirstOrDefaultAsync(x=>x.PhoneNumber == phoneNumber);
             if (user == null)
             {
                 throw new ArgumentException("User not found.");

@@ -23,14 +23,26 @@ builder.Services.AddOpenIddict()
     })
     .AddServer(options =>
     {
+        // Register the OpenIddict server handlers and options
+        options.SetTokenEndpointUris("/connect/token");
         options.AllowPasswordFlow();
+        options.AllowRefreshTokenFlow();
+        options.AcceptAnonymousClients();
+
+        options.AddEphemeralEncryptionKey()
+               .AddEphemeralSigningKey();
+
+        // Register the ASP.NET Core host and configure token validation
+        options.UseAspNetCore()
+               .EnableTokenEndpointPassthrough();
+        /*options.AllowPasswordFlow();
         options.AllowCustomFlow("otp");
 
         options.SetTokenEndpointUris("/connect/token");
         options.AddEphemeralEncryptionKey()
                .AddEphemeralSigningKey();
         options.UseAspNetCore()
-               .EnableTokenEndpointPassthrough();
+               .EnableTokenEndpointPassthrough();*/
     })
     .AddValidation(options =>
     {

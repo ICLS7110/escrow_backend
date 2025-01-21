@@ -54,24 +54,15 @@ namespace Escrow.Api.Web.Endpoints.Authentication
             try
             {
                 // Verify the OTP and retrieve the user ID
-                var userId = await _otpManagerService.VerifyOtpAsync(request.countryCode,request.MobileNumber, request.Otp);
-                if (string.IsNullOrEmpty(userId))
+                var user = await _otpManagerService.VerifyOtpAsync(request.countryCode,request.MobileNumber, request.Otp);
+                if (string.IsNullOrEmpty(user.UserId))
                     return BadRequest(new { Error = "Invalid OTP or user ID could not be retrieved." });
-
-                // Find the user using the retrieved user ID
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
-                    return BadRequest(new { Error = "User not found." });
-
-                // Ensure user data is populated
-                if (string.IsNullOrEmpty(user.Id))
-                    return BadRequest(new { Error = "User data is incomplete." });
 
                 // Create claims and identity for the token
                 var identity = new ClaimsIdentity("otp");
-                identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.Id));
+                identity.AddClaim(new Claim(OpenIddictConstants.Claims.Subject, user.UserId));
                 //identity.AddClaim(new Claim(OpenIddictConstants.Claims.PhoneNumber, user.PhoneNumber));
-                identity.AddClaim(new Claim(OpenIddictConstants.Claims.Name, user.UserName ?? string.Empty));
+                identity.AddClaim(new Claim(OpenIddictConstants.Claims.Name, user.FullName ?? string.Empty));
                 
                 //CUSTOM property in OpenIdDict
                 /*identity.AddClaim(new Claim(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty));
@@ -84,7 +75,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                 var token = await _tokenManager.CreateAsync(new OpenIddictTokenDescriptor
                 {
                     Principal = principal,
-                    Subject = user.Id,
+                    Subject = user.UserId,
                     ExpirationDate = DateTime.UtcNow.AddDays(1),
                     Type = OpenIddictConstants.TokenTypes.Bearer
                 });
