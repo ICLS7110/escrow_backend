@@ -1689,6 +1689,9 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "countryCode": {
+            "type": "string"
+          },
           "mobileNumber": {
             "type": "string"
           }
@@ -1698,6 +1701,9 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "countryCode": {
+            "type": "string"
+          },
           "mobileNumber": {
             "type": "string"
           },

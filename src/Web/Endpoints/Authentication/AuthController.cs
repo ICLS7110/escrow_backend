@@ -39,7 +39,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
         {
             try
             {
-                await _otpManagerService.RequestOtpAsync(request.MobileNumber);
+                await _otpManagerService.RequestOtpAsync(request.CountryCode,request.MobileNumber);
                 return Ok(new { Message = "OTP sent successfully." });
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
             try
             {
                 // Verify the OTP and retrieve the user ID
-                var userId = await _otpManagerService.VerifyOtpAsync(request.MobileNumber, request.Otp);
+                var userId = await _otpManagerService.VerifyOtpAsync(request.countryCode,request.MobileNumber, request.Otp);
                 if (string.IsNullOrEmpty(userId))
                     return BadRequest(new { Error = "Invalid OTP or user ID could not be retrieved." });
 

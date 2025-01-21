@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace Escrow.Api.Application.Authentication.Interfaces;
 public interface IOtpValidationService
 {
-    bool ValidatePhoneNumber(string phoneNumber);
+    Task<bool> ValidatePhoneNumberAsync(string phoneNumber);
 }

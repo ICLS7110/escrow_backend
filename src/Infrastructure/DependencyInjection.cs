@@ -36,11 +36,8 @@ public static class DependencyInjection
         {
             throw new InvalidOperationException("TwilioSettings section not found.");
         }
-        builder.Services.Configure<TwilioSettings>(twilioSection);
-
-        // Register application services
         builder.Services.AddScoped<IUserService, UserService>();
-        builder.Services.AddScoped<IOtpService, TwilioOtpService>();
+        builder.Services.AddScoped<IOtpService, SimpleOtpService>(); // Replace TwilioOtpService with SimpleOtpService
         builder.Services.AddScoped<IOtpValidationService, PhoneNumberValidationService>();
         builder.Services.AddScoped<IOtpManagerService, OtpManagerService>();
         builder.Services.AddScoped<OtpManagerService>();

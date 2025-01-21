@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace Escrow.Api.Application.Authentication.Interfaces;
 public  interface IOtpManagerService
 {
-    Task RequestOtpAsync(string phoneNumber);
-    Task<string> VerifyOtpAsync(string phoneNumber, string otp);
+    Task RequestOtpAsync(string countryCode,string phoneNumber);
+    Task<string> VerifyOtpAsync(string countryCode,string phoneNumber, string otp);
 }

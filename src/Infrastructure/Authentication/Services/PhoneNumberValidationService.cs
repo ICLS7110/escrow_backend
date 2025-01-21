@@ -1,27 +1,26 @@
-﻿using PhoneNumbers;
+﻿using System.Threading.Tasks;
+using PhoneNumbers;
 using Escrow.Api.Application.Authentication.Interfaces;
-using Twilio.Types;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
 
 public class PhoneNumberValidationService : IOtpValidationService
 {
-    public bool ValidatePhoneNumber(string phoneNumber)
+    public async Task<bool> ValidatePhoneNumberAsync(string phoneNumber)
     {
         var phoneNumberUtil = PhoneNumberUtil.GetInstance();
         try
         {
-            // Parse the phone number with the region code (null will auto-detect it)
+            // Parse the phone number with the provided country code
             PhoneNumbers.PhoneNumber number = phoneNumberUtil.Parse(phoneNumber, null);
 
             // Check if the phone number is valid
-            return phoneNumberUtil.IsValidNumber(number);
+            return await Task.FromResult(phoneNumberUtil.IsValidNumber(number));
         }
         catch (NumberParseException)
         {
             // Return false if there's an exception (invalid phone number format)
-            return false;
+            return await Task.FromResult(false);
         }
     }
 }
-

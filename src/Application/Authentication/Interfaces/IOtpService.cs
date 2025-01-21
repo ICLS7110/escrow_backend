@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace Escrow.Api.Application.Authentication.Interfaces;
 public interface IOtpService
 {
-    string GenerateOtp();
-    void SendOtp(string phoneNumber, string otp);
+    Task<string> GenerateOtpAsync();
+    Task SendOtpAsync(string phoneNumber, string otp);
 }

@@ -37,6 +37,18 @@ builder.Services.AddOpenIddict()
         options.UseLocalServer();
         options.UseAspNetCore();
     });
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://your-frontend-domain.com") // Replace with your frontend URL
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 /*
  * services.AddOpenIddict()
     .AddCore(options => { //Core options // })
@@ -56,6 +68,7 @@ builder.AddWebServices();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+app.UseCors("AllowFrontend");
 app.MapControllers();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -69,7 +82,7 @@ else
 }
 
 //app.UseHealthChecks("/health");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();

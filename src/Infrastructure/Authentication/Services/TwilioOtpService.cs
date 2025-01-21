@@ -7,7 +7,7 @@ using Twilio.Types;
 using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
-public class TwilioOtpService : IOtpService
+public class TwilioOtpService
 {
     private readonly TwilioSettings _twilioSettings;
 

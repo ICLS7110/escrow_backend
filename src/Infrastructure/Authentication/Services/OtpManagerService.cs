@@ -1,52 +1,58 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Authentication.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
+
 public class OtpManagerService : IOtpManagerService
 {
-    private static readonly ConcurrentDictionary<string, (string Otp, DateTime Expiry)> _otpStore = new();
-
+    private readonly IMemoryCache _cache;
     private readonly IOtpService _otpService;
     private readonly IOtpValidationService _validationService;
     private readonly IUserService _userService;
 
-    public OtpManagerService(IOtpService otpService, IOtpValidationService validationService, IUserService userService)
+    public OtpManagerService(
+        IOtpService otpService,
+        IOtpValidationService validationService,
+        IUserService userService,
+        IMemoryCache cache)
     {
         _otpService = otpService;
         _validationService = validationService;
         _userService = userService;
+        _cache = cache;
     }
 
     // Implementing RequestOtpAsync from IOtpManagerService
-    public async Task RequestOtpAsync(string phoneNumber)
+    public async Task RequestOtpAsync(string countryCode, string mobileNumber)
     {
-        if (!_validationService.ValidatePhoneNumber(phoneNumber))
+        var phoneNumber = $"{countryCode}{mobileNumber}";
+        var isPhoneNumberValid = await _validationService.ValidatePhoneNumberAsync(phoneNumber);
+        if (!isPhoneNumberValid)
             throw new ArgumentException("Invalid phone number.");
 
-        //await _userService.FindOrCreateUserAsync(phoneNumber);
+        var otp = await _otpService.GenerateOtpAsync();
 
-        var otp = _otpService.GenerateOtp();
-        _otpStore[phoneNumber] = (otp, DateTime.UtcNow.AddMinutes(5));
+        // Store OTP in cache with a 5-minute expiration
+        _cache.Set(phoneNumber, otp, TimeSpan.FromMinutes(5));
 
-        _otpService.SendOtp(phoneNumber, otp);
-        await Task.CompletedTask;
+        // Send the OTP
+        await _otpService.SendOtpAsync(phoneNumber, otp);
     }
 
     // Implementing VerifyOtpAsync from IOtpManagerService
-    public async Task<string> VerifyOtpAsync(string phoneNumber, string otp)
+    public async Task<string> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
     {
-        if (!_otpStore.TryGetValue(phoneNumber, out var storedOtp) || storedOtp.Expiry < DateTime.UtcNow)
+        var phoneNumber = $"{countryCode}{mobileNumber}";
+        if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
             throw new ArgumentException("OTP expired or invalid.");
 
-        if (storedOtp.Otp != otp)
+        if (storedOtp != otp)
             throw new ArgumentException("Invalid OTP.");
 
-        _otpStore.TryRemove(phoneNumber, out _);
+        // Remove OTP after successful validation
+        _cache.Remove(phoneNumber);
 
         var user = await _userService.FindUserAsync(phoneNumber);
         if (user == null)
@@ -58,4 +64,3 @@ public class OtpManagerService : IOtpManagerService
         return user.UserId;
     }
 }
-
