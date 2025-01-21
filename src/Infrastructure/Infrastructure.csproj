@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20250117142906_InitialCreate.cs" />
+    <Compile Remove="Migrations\20250117142906_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\ApplicationDbContextModelSnapshot.cs" />
     <Compile Remove="Services\NoOpEmailSender.cs" />
   </ItemGroup>
 
@@ -28,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

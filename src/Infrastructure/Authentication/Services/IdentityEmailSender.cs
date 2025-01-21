@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
-public class EmailSender : IEmailSender<ApplicationUser>
+public class IdentityEmailSender : IEmailSender<ApplicationUser>
 {
     public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink)
     {

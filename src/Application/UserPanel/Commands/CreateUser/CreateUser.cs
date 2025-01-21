@@ -59,7 +59,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 LoginMethod = request.LoginMethod
             };
 
-            entity.AddDomainEvent(new UserCreatedEvent(entity));
+            //entity.AddDomainEvent(new UserCreatedEvent(entity));
             _context.UserDetails.Add(entity);
             await _context.SaveChangesAsync(cancellationToken);
             return entity.Id;

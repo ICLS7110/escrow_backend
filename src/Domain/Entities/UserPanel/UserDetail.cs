@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Escrow.Api.Domain.Entities.UserPanel;
 public class UserDetail : BaseAuditableEntity
-{
+{    
     public string UserId { get; set; } = string.Empty;
     public string? FullName { get; set; }
     public string? EmailAddress { get; set; }

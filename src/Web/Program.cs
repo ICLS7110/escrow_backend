@@ -5,6 +5,7 @@ using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Escrow.Api.Domain.Entities.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

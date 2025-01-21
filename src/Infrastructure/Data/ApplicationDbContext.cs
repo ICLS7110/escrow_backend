@@ -5,6 +5,7 @@ using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Data;
@@ -18,16 +19,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         if (!optionsBuilder.IsConfigured)
         {
             //optionsBuilder.UseNpgsql("Escrow.ApiDb"); // Or another provider, e.g., SQL Server
-            optionsBuilder.UseNpgsql("Host=localhost;Database=Escrow.ApiDb;Username=postgres;Password=1234;Port=5433");
-                       
+            optionsBuilder.UseNpgsql("Host=103.189.173.7;Database=escrow;Username=root;Password=root@123;Persist Security Info=True");
+            //
         }
+        optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
     public DbSet<TodoList> TodoLists => Set<TodoList>();
 
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
-    public DbSet<UserDetail> UserDetails => Set<UserDetail>();
+    //public DbSet<UserDetail> UserDetails => Set<UserDetail>();
+    public DbSet<UserDetail> UserDetails { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
