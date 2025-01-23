@@ -7,8 +7,10 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
     {
         public Task<string> GenerateOtpAsync()
         {
-            var random = new Random();
-            return Task.FromResult(random.Next(100000, 999999).ToString());
+           /* var random = new Random();
+            return Task.FromResult(random.Next(100000, 999999).ToString());*/
+            // Return a static OTP for consistent testing
+            return Task.FromResult("1234");
         }
 
         public Task SendOtpAsync(string phoneNumber, string otp)
@@ -17,5 +19,6 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             Console.WriteLine($"OTP sent to {phoneNumber}: {otp}");
             return Task.CompletedTask;
         }
+
     }
 }

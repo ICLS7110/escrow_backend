@@ -53,9 +53,9 @@ builder.Services.AddOpenIddict()
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("https://your-frontend-domain.com") // Replace with your frontend URL
+        policy.AllowAnyOrigin() 
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -80,7 +80,7 @@ builder.AddWebServices();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-app.UseCors("AllowFrontend");
+app.UseCors("AllowAll");
 app.MapControllers();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

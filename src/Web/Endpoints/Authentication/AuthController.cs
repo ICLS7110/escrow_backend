@@ -40,7 +40,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
             try
             {
                 await _otpManagerService.RequestOtpAsync(request.CountryCode,request.MobileNumber);
-                return Ok(new { Message = "OTP sent successfully." });
+                return Ok(new { status=200,Message = "OTP sent successfully." });
             }
             catch (Exception ex)
             {
@@ -82,6 +82,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
 
                 return Ok(new
                 {
+                    status = 200,
                     Message = "OTP verified successfully.",
                     AccessToken = token
                 });

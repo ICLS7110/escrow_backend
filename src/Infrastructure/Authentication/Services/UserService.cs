@@ -44,16 +44,32 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             return user;
         }
 
-        public async Task<UserDetail> FindUserAsync(string phoneNumber)
+        public async Task<UserDetail?> FindUserAsync(string phoneNumber)
         {
-            //var user = await _context.UserDetails.FindAsync(phoneNumber);
-            var user =  await _context.UserDetails.FirstOrDefaultAsync(x=>x.PhoneNumber == phoneNumber);
-            if (user == null)
+            var user = await _context.UserDetails.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
+
+            // Return null if the user is not found
+            return user;
+        }
+
+
+        public async Task<UserDetail> CreateUserAsync(string phoneNumber)
+        {
+            var newUser = new UserDetail
             {
-                throw new ArgumentException("User not found.");
+                PhoneNumber = phoneNumber,
+                UserId = Guid.NewGuid().ToString()  // Generate a new unique UserId (GUID)
+            };
+
+            _context.UserDetails.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            if (newUser == null)
+            {
+                throw new InvalidOperationException("User creation failed.");
             }
 
-            return user;
+            return newUser;
         }
     }
 }

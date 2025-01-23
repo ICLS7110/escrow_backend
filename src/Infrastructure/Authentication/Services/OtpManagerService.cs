@@ -43,9 +43,31 @@ public class OtpManagerService : IOtpManagerService
     }
 
     // Implementing VerifyOtpAsync from IOtpManagerService
+    //public async Task<UserDetail> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
+    //{
+    //    var phoneNumber = $"{countryCode}{mobileNumber}";
+    //    if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
+    //        throw new ArgumentException("OTP expired or invalid.");
+
+    //    if (storedOtp != otp)
+    //        throw new ArgumentException("Invalid OTP.");
+
+    //    // Remove OTP after successful validation
+    //    _cache.Remove(phoneNumber);
+
+    //    var user = await _userService.FindUserAsync(phoneNumber);
+    //    if (user == null)
+    //        return new UserDetail();
+
+    //    if (string.IsNullOrEmpty(user.UserId))
+    //        return new UserDetail();
+
+    //    return user;
+    //}
     public async Task<UserDetail> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
     {
         var phoneNumber = $"{countryCode}{mobileNumber}";
+
         if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
             throw new ArgumentException("OTP expired or invalid.");
 
@@ -55,13 +77,27 @@ public class OtpManagerService : IOtpManagerService
         // Remove OTP after successful validation
         _cache.Remove(phoneNumber);
 
+        // Try to find the user by phone number
         var user = await _userService.FindUserAsync(phoneNumber);
+
+        // If the user doesn't exist, create a new one
         if (user == null)
-            return new UserDetail();
+        {
+            user = new UserDetail
+            {
+                UserId = Guid.NewGuid().ToString(),  // Generate new GUID as UserId
+                PhoneNumber = phoneNumber
+            };
+
+            // Save the new user to the database (assuming _userService has a CreateUserAsync method)
+            await _userService.CreateUserAsync(phoneNumber);
+        }
 
         if (string.IsNullOrEmpty(user.UserId))
-            return new UserDetail();
+            throw new ArgumentException("User ID could not be retrieved.");
 
         return user;
     }
+
+
 }

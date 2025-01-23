@@ -5,6 +5,14 @@
     <AssemblyName>Escrow.Api.Infrastructure</AssemblyName>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Migrations\20250117142906_InitialCreate.cs" />
     <Compile Remove="Migrations\20250117142906_InitialCreate.Designer.cs" />
