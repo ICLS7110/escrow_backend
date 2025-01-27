@@ -48,9 +48,9 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             var entity = await _context.UserDetails
-                .FindAsync(new object[] { request.UserId }, cancellationToken);
+                .FindAsync(new object[] { request.Id }, cancellationToken);
 
-            Guard.Against.NotFound(request.UserId, entity);
+            Guard.Against.NotFound(request.Id, entity);
 
             entity.UserId = request.UserId;
             entity.FullName = request.FullName;

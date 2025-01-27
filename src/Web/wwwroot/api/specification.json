@@ -751,39 +751,19 @@
     "/api/UserDetails": {
       "get": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "GetUserDetails",
         "parameters": [
           {
             "name": "UserId",
             "in": "query",
-            "required": true,
             "schema": {
               "type": "string",
               "nullable": true
             },
             "x-position": 1
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 3
           }
         ],
         "responses": {
@@ -792,16 +772,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfUserDetailDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetail"
+                  }
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       },
       "post": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "CreateUser",
         "requestBody": {
@@ -817,6 +806,12 @@
           "x-position": 1
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {}
+            }
+          },
           "201": {
             "description": "",
             "content": {
@@ -828,13 +823,19 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/UserDetails/{id}": {
       "put": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "UpdateUserDetail",
         "parameters": [
@@ -862,17 +863,26 @@
           "x-position": 2
         },
         "responses": {
-          "204": {
-            "description": ""
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {}
+            }
           },
           "400": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       },
       "delete": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "DeleteUser",
         "parameters": [
@@ -888,10 +898,15 @@
           }
         ],
         "responses": {
-          "204": {
+          "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/Values": {
@@ -1471,90 +1486,122 @@
           }
         }
       },
-      "PaginatedListOfUserDetailDto": {
+      "UserDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseAuditableEntity"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "emailAddress": {
+                "type": "string",
+                "nullable": true
+              },
+              "phoneNumber": {
+                "type": "string",
+                "nullable": true
+              },
+              "gender": {
+                "type": "string",
+                "nullable": true
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "businessManagerName": {
+                "type": "string",
+                "nullable": true
+              },
+              "businessEmail": {
+                "type": "string",
+                "nullable": true
+              },
+              "vatId": {
+                "type": "string",
+                "nullable": true
+              },
+              "accountHolderName": {
+                "type": "string",
+                "nullable": true
+              },
+              "ibanNumber": {
+                "type": "string",
+                "nullable": true
+              },
+              "bicCode": {
+                "type": "string",
+                "nullable": true
+              },
+              "loginMethod": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "BaseAuditableEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "created": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastModified": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastModifiedBy": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "BaseEntity": {
         "type": "object",
+        "x-abstract": true,
         "additionalProperties": false,
         "properties": {
-          "items": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "domainEvents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserDetailDto"
+              "$ref": "#/components/schemas/BaseEvent"
             }
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "hasPreviousPage": {
-            "type": "boolean"
-          },
-          "hasNextPage": {
-            "type": "boolean"
           }
         }
       },
-      "UserDetailDto": {
+      "BaseEvent": {
         "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "emailAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "gender": {
-            "type": "string",
-            "nullable": true
-          },
-          "dateOfBirth": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "businessManagerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "businessEmail": {
-            "type": "string",
-            "nullable": true
-          },
-          "vatId": {
-            "type": "string",
-            "nullable": true
-          },
-          "accountHolderName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ibanNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "bicCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "loginMethod": {
-            "type": "string",
-            "nullable": true
-          }
-        }
+        "x-abstract": true,
+        "additionalProperties": false
       },
       "CreateUserCommand": {
         "type": "object",
@@ -1677,15 +1724,8 @@
         "additionalProperties": false,
         "properties": {
           "userId": {
-            "type": "string"
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "nullable": true
           }
         }
       },
