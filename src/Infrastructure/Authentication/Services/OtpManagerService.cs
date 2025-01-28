@@ -22,7 +22,7 @@ public class OtpManagerService : IOtpManagerService
         _otpService = otpService;
         _validationService = validationService;
         _userService = userService;
-        _cache = cache;
+        _cache = cache ?? throw new ArgumentNullException(nameof(cache)); ;
     }
 
     // Implementing RequestOtpAsync from IOtpManagerService

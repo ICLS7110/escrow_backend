@@ -39,7 +39,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         // Register the OpenIddict models
-        builder.UseOpenIddict();
+        //builder.UseOpenIddict();
     }
 
     public Task<int> SaveChangesAsync()

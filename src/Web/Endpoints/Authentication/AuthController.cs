@@ -15,6 +15,8 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 using System.Text;
 using Escrow.Api.Web.Helpers;
 using System.IdentityModel.Tokens.Jwt;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Escrow.Api.Domain.Entities.UserPanel;
 
 namespace Escrow.Api.Web.Endpoints.Authentication
 {
@@ -25,31 +27,37 @@ namespace Escrow.Api.Web.Endpoints.Authentication
     {
         private readonly IOtpManagerService _otpManagerService;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IOpenIddictTokenManager _tokenManager;
+        //private readonly IOpenIddictTokenManager _tokenManager;
         private readonly ILogger<AuthController> _logger;
+        private readonly IUserService _userService;
 
         public AuthController(OtpManagerService otpManagerService, 
-            UserManager<ApplicationUser> userManager, 
-            IOpenIddictTokenManager tokenManager,
+            UserManager<ApplicationUser> userManager,
+            //IOpenIddictTokenManager tokenManager,
+            IUserService userService,
             ILogger<AuthController> logger)
         {
             _otpManagerService = otpManagerService;
             _userManager = userManager;
-            _tokenManager = tokenManager;
+            //_tokenManager = tokenManager;
+            _userService = userService;
             _logger = logger;
         }
 
         [HttpPost("request-otp")]
-        public async Task<IActionResult> RequestOtp([FromBody] RequestOtpDto request)
+        public async Task<IResult> RequestOtp([FromBody] RequestOtpDto request)
         {
             try
             {
                 await _otpManagerService.RequestOtpAsync(request.CountryCode,request.MobileNumber);
-                return Ok(new { status=200,Message = "OTP sent successfully." });
+                return TypedResults.Ok(new { Message = "OTP sent successfully.", status = 200 });
+                //return Ok(new { status=200,Message = "OTP sent successfully." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Error = ex.Message });
+                _logger.LogError(ex, "An error occurred while verifying OTP.===>" + ex.Message);
+                return TypedResults.Problem($"An error occurred: {ex.Message}");
+                //return BadRequest(new { Error = ex.Message });
             }
         }
 
@@ -115,7 +123,16 @@ namespace Escrow.Api.Web.Endpoints.Authentication
 
                 //var token = await _tokenManager.CreateAsync(tokenOptions);
                 #endregion
+
+                //Fetching user again because at the time of creation Primary key is not available due to commit transaction
+                UserDetail newUser = new UserDetail();
+                if(user.Id == 0 && !String.IsNullOrEmpty(user.PhoneNumber))
+                {
+                    var userDetail = await _userService.FindUserAsync(user.PhoneNumber);
+                    newUser = userDetail == null ? new UserDetail() : userDetail;
+                }
                 
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
@@ -137,7 +154,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                     status = 200,
                     Message = "OTP verified successfully.",
                     AccessToken = token,
-                    UserId = user.Id,
+                    UserId = String.IsNullOrEmpty(newUser.PhoneNumber) ? user.Id : newUser.Id,
                     IsProfileCompleted = user.AccountHolderName != null
                 });
 

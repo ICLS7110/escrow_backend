@@ -26,6 +26,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 // Configure OpenIddict for token management
+/*
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
@@ -63,7 +64,7 @@ builder.Services.AddOpenIddict()
 
         // Enable token validation against your application.
         //options.AddAudiences("backend-api");
-    });
+    });*/
 
 /*builder.Services.AddAuthentication(options =>
 {
