@@ -54,6 +54,7 @@
       "output": "wwwroot/api/specification.json",
       "outputType": "OpenApi3",
       "newLineBehavior": "Auto",
+      //"assembly": "bin/Debug/net6.0/Escrow.Api.Web.dll",
       "assemblyPaths": [],
       "assemblyConfig": null,
       "referencePaths": [],

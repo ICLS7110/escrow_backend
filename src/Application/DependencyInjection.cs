@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Escrow.Api.Application.Common.Behaviours;
+//using Escrow.Api.Application.Common.Services;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -19,5 +20,7 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         });
+
+
     }
 }

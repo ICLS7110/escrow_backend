@@ -55,12 +55,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -91,12 +86,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoItems/{id}": {
@@ -136,12 +126,7 @@
           "400": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
@@ -164,12 +149,7 @@
           "204": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoItems/UpdateDetail/{id}": {
@@ -209,12 +189,7 @@
           "400": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/TodoLists": {
@@ -776,39 +751,19 @@
     "/api/UserDetails": {
       "get": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "GetUserDetails",
         "parameters": [
           {
             "name": "UserId",
             "in": "query",
-            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "nullable": true
             },
             "x-position": 1
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 3
           }
         ],
         "responses": {
@@ -817,7 +772,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfUserDetailDto"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetail"
+                  }
                 }
               }
             }
@@ -831,7 +789,8 @@
       },
       "post": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "CreateUser",
         "requestBody": {
@@ -847,6 +806,12 @@
           "x-position": 1
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {}
+            }
+          },
           "201": {
             "description": "",
             "content": {
@@ -869,7 +834,8 @@
     "/api/UserDetails/{id}": {
       "put": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "UpdateUserDetail",
         "parameters": [
@@ -897,8 +863,11 @@
           "x-position": 2
         },
         "responses": {
-          "204": {
-            "description": ""
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {}
+            }
           },
           "400": {
             "description": ""
@@ -912,7 +881,8 @@
       },
       "delete": {
         "tags": [
-          "UserDetails"
+          "UserDetails",
+          "User Management"
         ],
         "operationId": "DeleteUser",
         "parameters": [
@@ -928,7 +898,7 @@
           }
         ],
         "responses": {
-          "204": {
+          "200": {
             "description": ""
           }
         },
@@ -937,6 +907,105 @@
             "JWT": []
           }
         ]
+      }
+    },
+    "/api/Values": {
+      "post": {
+        "tags": [
+          "Values"
+        ],
+        "operationId": "Values_GetUserDetails",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetUserDetailsQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/request-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Auth_RequestOtp",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/verify-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Auth_VerifyOtp",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -1417,100 +1486,139 @@
           }
         }
       },
-      "PaginatedListOfUserDetailDto": {
+      "UserDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseAuditableEntity"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "fullName": {
+                "type": "string",
+                "nullable": true
+              },
+              "emailAddress": {
+                "type": "string",
+                "nullable": true
+              },
+              "phoneNumber": {
+                "type": "string",
+                "nullable": true
+              },
+              "gender": {
+                "type": "string",
+                "nullable": true
+              },
+              "dateOfBirth": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "businessManagerName": {
+                "type": "string",
+                "nullable": true
+              },
+              "businessEmail": {
+                "type": "string",
+                "nullable": true
+              },
+              "vatId": {
+                "type": "string",
+                "nullable": true
+              },
+              "accountHolderName": {
+                "type": "string",
+                "nullable": true
+              },
+              "ibanNumber": {
+                "type": "string",
+                "nullable": true
+              },
+              "bicCode": {
+                "type": "string",
+                "nullable": true
+              },
+              "loginMethod": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "BaseAuditableEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "x-abstract": true,
+            "additionalProperties": false,
+            "properties": {
+              "created": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastModified": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "lastModifiedBy": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "BaseEntity": {
         "type": "object",
+        "x-abstract": true,
         "additionalProperties": false,
         "properties": {
-          "items": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "domainEvents": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserDetailDto"
+              "$ref": "#/components/schemas/BaseEvent"
             }
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "hasPreviousPage": {
-            "type": "boolean"
-          },
-          "hasNextPage": {
-            "type": "boolean"
           }
         }
       },
-      "UserDetailDto": {
+      "BaseEvent": {
         "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "emailAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "gender": {
-            "type": "string",
-            "nullable": true
-          },
-          "dateOfBirth": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "businessManagerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "businessEmail": {
-            "type": "string",
-            "nullable": true
-          },
-          "vatId": {
-            "type": "string",
-            "nullable": true
-          },
-          "accountHolderName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ibanNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "bicCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "loginMethod": {
-            "type": "string",
-            "nullable": true
-          }
-        }
+        "x-abstract": true,
+        "additionalProperties": false
       },
       "CreateUserCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "userId": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "fullName": {
             "type": "string",
             "nullable": true
           },
           "emailAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
             "type": "string",
             "nullable": true
           },
@@ -1562,8 +1670,7 @@
             "format": "int32"
           },
           "userId": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           "fullName": {
             "type": "string",
@@ -1609,6 +1716,43 @@
           "loginMethod": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "GetUserDetailsQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "RequestOtpDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "mobileNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "VerifyOtpDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "countryCode": {
+            "type": "string"
+          },
+          "mobileNumber": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
           }
         }
       }

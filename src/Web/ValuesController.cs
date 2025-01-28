@@ -1,5 +1,6 @@
 ﻿using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.UserPanel.Queries.GetUsers;
+using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Escrow.Api.Web;
 [ApiController]
 public class ValuesController : ControllerBase
 {
-    public async Task<Ok<PaginatedList<UserDetailDto>>> GetUserDetails(ISender sender, [AsParameters] GetUserDetailsQuery query)
+    public async Task<Ok<List<UserDetail>>> GetUserDetails(ISender sender, [AsParameters] GetUserDetailsQuery query)
     {
         var result = await sender.Send(query);
 

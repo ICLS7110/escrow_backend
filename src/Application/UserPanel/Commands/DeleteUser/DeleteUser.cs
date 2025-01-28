@@ -30,7 +30,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
 
             _context.UserDetails.Remove(entity);
 
-            entity.AddDomainEvent(new UserDeletedEvent(entity));
+            //entity.AddDomainEvent(new UserDeletedEvent(entity));
 
             await _context.SaveChangesAsync(cancellationToken);
         }

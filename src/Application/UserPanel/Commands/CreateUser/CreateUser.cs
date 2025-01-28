@@ -12,9 +12,10 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 {
     public record CreateUserCommand : IRequest<int>
     {
-        public int UserId { get; init; }
+        public string UserId { get; init; } = string.Empty;
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
+        public string? PhoneNumber { get; set; }
         public string? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         // Business Fields
@@ -47,6 +48,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 UserId = request.UserId,
                 FullName = request.FullName,
                 EmailAddress = request.EmailAddress,
+                PhoneNumber = request.PhoneNumber,
                 Gender = request.Gender,
                 DateOfBirth = request.DateOfBirth,
                 BusinessManagerName = request.BusinessManagerName,
@@ -59,7 +61,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 LoginMethod = request.LoginMethod
             };
 
-            entity.AddDomainEvent(new UserCreatedEvent(entity));
+            //entity.AddDomainEvent(new UserCreatedEvent(entity));
             _context.UserDetails.Add(entity);
             await _context.SaveChangesAsync(cancellationToken);
             return entity.Id;

@@ -21,7 +21,7 @@ public class PostgreSQLTestDatabase : ITestDatabase
             .AddEnvironmentVariables()
             .Build();
 
-        var connectionString = configuration.GetConnectionString("Escrow.ApiDb");
+        var connectionString = configuration.GetConnectionString("Escrow");
 
         Guard.Against.Null(connectionString);
 
