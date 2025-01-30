@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using OpenIddict.Validation.AspNetCore;
 using Escrow.Api.Domain.Entities.UserPanel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 
@@ -15,7 +16,22 @@ public class UserDetails : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        app.MapGroup(this)
+        var userGroup = app.MapGroup(this)
+        .RequireAuthorization() // Enable OpenIddict authorization
+        .WithOpenApi()
+        .AddEndpointFilter(async (context, next) =>
+        {
+            // Optional: Add custom authorization logic if needed
+            return await next(context);
+        });
+
+        userGroup.MapGet("/", GetUserDetails);        // Get all users  
+        userGroup.MapGet("/{id:int}", GetUserDetails); // Get user by ID  
+        userGroup.MapPost("/", CreateUser);
+        userGroup.MapPut("/{id:int}", UpdateUserDetail);
+        userGroup.MapDelete("/{id:int}", DeleteUser);
+
+        /*app.MapGroup(this)
             .RequireAuthorization()  // Enable OpenIddict authorization
             .WithTags("User Management")
             .WithOpenApi()
@@ -27,12 +43,13 @@ public class UserDetails : EndpointGroupBase
             .MapGet(GetUserDetails)
             .MapPost(CreateUser)
             .MapPut(UpdateUserDetail, "{id}")
-            .MapDelete(DeleteUser, "{id}");
+            .MapDelete(DeleteUser, "{id}");*/
     }
 
     [Authorize]
-    public async Task<Ok<List<UserDetail>>> GetUserDetails(ISender sender, [AsParameters] GetUserDetailsQuery query)
+    public async Task<Ok<List<UserDetail>>> GetUserDetails(ISender sender, int? id, [AsParameters] GetUserDetailsQuery query)
     {
+        query = new GetUserDetailsQuery { Id = id };
         var result = await sender.Send(query);
         return TypedResults.Ok(result);
     }

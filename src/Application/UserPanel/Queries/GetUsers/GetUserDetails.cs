@@ -7,7 +7,7 @@ namespace Escrow.Api.Application.UserPanel.Queries.GetUsers;
 
 public record GetUserDetailsQuery : IRequest<List<UserDetail>>
 {
-    public string? UserId { get; init; } = string.Empty;
+    public int? Id{ get; init; }
     /* public int PageNumber { get; init; } = 1;
      public int PageSize { get; init; } = 10;*/
 }
@@ -25,14 +25,14 @@ public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery
 
     public async Task<List<UserDetail>> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
     {
-        if (String.IsNullOrEmpty(request.UserId))
+        if (request.Id.HasValue)
         {
-            return await _context.UserDetails.ToListAsync(cancellationToken);
+            return await _context.UserDetails
+            .Where(x => x.Id == Convert.ToInt32(request.Id)).ToListAsync(cancellationToken);            
         }
         else
         {
-            return await _context.UserDetails
-            .Where(x => x.UserId == request.UserId).ToListAsync(cancellationToken);
+            return await _context.UserDetails.ToListAsync(cancellationToken);
         }
         
         //.OrderBy(x => x.FullName)

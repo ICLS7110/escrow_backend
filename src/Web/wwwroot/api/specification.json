@@ -751,19 +751,30 @@
     "/api/UserDetails": {
       "get": {
         "tags": [
-          "UserDetails",
-          "User Management"
+          "UserDetails"
         ],
-        "operationId": "GetUserDetails",
+        "operationId": "GetApiUserDetails",
         "parameters": [
           {
-            "name": "UserId",
+            "name": "id",
             "in": "query",
             "schema": {
-              "type": "string",
+              "type": "integer",
+              "format": "int32",
               "nullable": true
             },
             "x-position": 1
+          },
+          {
+            "name": "Id",
+            "x-originalName": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
           }
         ],
         "responses": {
@@ -789,10 +800,9 @@
       },
       "post": {
         "tags": [
-          "UserDetails",
-          "User Management"
+          "UserDetails"
         ],
-        "operationId": "CreateUser",
+        "operationId": "PostApiUserDetails",
         "requestBody": {
           "x-name": "command",
           "content": {
@@ -832,12 +842,61 @@
       }
     },
     "/api/UserDetails/{id}": {
+      "get": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "GetApiUserDetails2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetail"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
       "put": {
         "tags": [
-          "UserDetails",
-          "User Management"
+          "UserDetails"
         ],
-        "operationId": "UpdateUserDetail",
+        "operationId": "PutApiUserDetails",
         "parameters": [
           {
             "name": "id",
@@ -881,10 +940,9 @@
       },
       "delete": {
         "tags": [
-          "UserDetails",
-          "User Management"
+          "UserDetails"
         ],
-        "operationId": "DeleteUser",
+        "operationId": "DeleteApiUserDetails",
         "parameters": [
           {
             "name": "id",
@@ -1723,8 +1781,9 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "userId": {
-            "type": "string",
+          "id": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         }
