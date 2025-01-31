@@ -30,20 +30,6 @@ public class UserDetails : EndpointGroupBase
         userGroup.MapPost("/", CreateUser);
         userGroup.MapPut("/{id:int}", UpdateUserDetail);
         userGroup.MapDelete("/{id:int}", DeleteUser);
-
-        /*app.MapGroup(this)
-            .RequireAuthorization()  // Enable OpenIddict authorization
-            .WithTags("User Management")
-            .WithOpenApi()
-            .AddEndpointFilter(async (context, next) =>
-            {
-                // Optional: Add custom authorization logic if needed
-                return await next(context);
-            })
-            .MapGet(GetUserDetails)
-            .MapPost(CreateUser)
-            .MapPut(UpdateUserDetail, "{id}")
-            .MapDelete(DeleteUser, "{id}");*/
     }
 
     [Authorize]
