@@ -17,7 +17,7 @@ public class UserDetails : EndpointGroupBase
     {
         app.MapGroup(this)
             .RequireAuthorization()  // Enable OpenIddict authorization
-            .WithTags("User Management")
+            //.WithTags("User Management")
             .WithOpenApi()
             .AddEndpointFilter(async (context, next) =>
             {

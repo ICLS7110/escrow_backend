@@ -5,7 +5,7 @@
 @Password=Administrator1!
 @BearerToken=<YourToken>
 
-# POST Users Register
+# POST Users Registerx
 POST {{Web_HostAddress}}/api/Users/Register
 Content-Type: application/json
 
