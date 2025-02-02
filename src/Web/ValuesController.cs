@@ -10,11 +10,11 @@ namespace Escrow.Api.Web;
 [ApiController]
 public class ValuesController : ControllerBase
 {
-    public async Task<Ok<List<UserDetail>>> GetUserDetails(ISender sender, [AsParameters] GetUserDetailsQuery query)
-    {
-        var result = await sender.Send(query);
+    //public async Task<Ok<PaginatedList<UserDetailDto>>> GetUserDetails(ISender sender, [AsParameters] GetUserDetailsQuery query)
+    //{
+    //    var result = await sender.Send(query);
 
-        return TypedResults.Ok(result);
-    }
+    //    return TypedResults.Ok(result);
+    //}
 
 }

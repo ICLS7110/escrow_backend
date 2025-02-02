@@ -30,8 +30,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
-    //public DbSet<UserDetail> UserDetails => Set<UserDetail>();
     public DbSet<UserDetail> UserDetails { get; set; }
+
+    public DbSet<BankDetail> BankDetails => Set<BankDetail>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

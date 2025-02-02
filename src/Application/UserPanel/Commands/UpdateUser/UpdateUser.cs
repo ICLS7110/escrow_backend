@@ -60,10 +60,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.BusinessManagerName = request.BusinessManagerName;
             entity.BusinessEmail = request.BusinessEmail;
             entity.VatId = request.VatId;
-            //entity.ProofOfBusiness = request.ProofOfBusiness;
-            entity.AccountHolderName = request.AccountHolderName;
-            entity.IBANNumber = request.IBANNumber;
-            entity.BICCode = request.BICCode;
+            //entity.ProofOfBusiness = request.ProofOfBusiness;           
             entity.LoginMethod = request.LoginMethod;
 
             await _context.SaveChangesAsync(cancellationToken);

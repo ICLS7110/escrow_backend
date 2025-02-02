@@ -20,11 +20,5 @@ public class UserDetail : BaseAuditableEntity
     public string? BusinessEmail { get; set; }
     public string? VatId { get; set; }
     //public byte[]? ProofOfBusiness { get; set; } // File upload
-
-    // Bank Account Details Fields
-    public string? AccountHolderName { get; set; }
-    public string? IBANNumber { get; set; }
-    public string? BICCode { get; set; }
-
     public string? LoginMethod { get; set; }
 }

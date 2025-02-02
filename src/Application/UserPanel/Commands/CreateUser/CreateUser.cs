@@ -23,12 +23,6 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
         public string? BusinessEmail { get; set; }
         public string? VatId { get; set; }
         //public byte[]? ProofOfBusiness { get; set; } // File as binary
-
-        // Bank Account Details Fields
-        public string? AccountHolderName { get; set; }
-        public string? IBANNumber { get; set; }
-        public string? BICCode { get; set; }
-
         public string? LoginMethod { get; set; }
     }
 
@@ -54,10 +48,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 BusinessManagerName = request.BusinessManagerName,
                 BusinessEmail = request.BusinessEmail,
                 VatId = request.VatId,
-                //ProofOfBusiness = request.ProofOfBusiness,
-                AccountHolderName = request.AccountHolderName,
-                IBANNumber = request.IBANNumber,
-                BICCode = request.BICCode,
+                //ProofOfBusiness = request.ProofOfBusiness,               
                 LoginMethod = request.LoginMethod
             };
 

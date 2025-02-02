@@ -155,7 +155,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                     Message = "OTP verified successfully.",
                     AccessToken = token,
                     UserId = String.IsNullOrEmpty(newUser.PhoneNumber) ? user.Id : newUser.Id,
-                    IsProfileCompleted = user.AccountHolderName != null
+                    IsProfileCompleted = false//user.AccountHolderName != null
                 });
 
             }

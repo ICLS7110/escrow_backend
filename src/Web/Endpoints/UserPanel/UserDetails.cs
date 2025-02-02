@@ -26,16 +26,19 @@ public class UserDetails : EndpointGroupBase
         });
 
         userGroup.MapGet("/", GetUserDetails);        // Get all users  
-        userGroup.MapGet("/{id:int}", GetUserDetails); // Get user by ID  
+        userGroup.MapGet("/{id:int}", GetUserDetails); // Get user by ID
         userGroup.MapPost("/", CreateUser);
         userGroup.MapPut("/{id:int}", UpdateUserDetail);
         userGroup.MapDelete("/{id:int}", DeleteUser);
     }
 
     [Authorize]
-    public async Task<Ok<List<UserDetail>>> GetUserDetails(ISender sender, int? id, [AsParameters] GetUserDetailsQuery query)
+    public async Task<Ok<PaginatedList<UserDetailDto>>> GetUserDetails(
+        ISender sender,
+        int? id,        
+        [AsParameters] GetUserDetailsQuery query)
     {
-        query = new GetUserDetailsQuery { Id = id };
+        query = new GetUserDetailsQuery { Id = id, PageNumber = query.PageNumber, PageSize = query.PageSize};
         var result = await sender.Send(query);
         return TypedResults.Ok(result);
     }
@@ -80,6 +83,6 @@ public class UserDetails : EndpointGroupBase
         {
             // Handle unexpected errors
             return TypedResults.Problem($"An error occurred: {ex.Message}");
-        }       
+        }
     }
 }
