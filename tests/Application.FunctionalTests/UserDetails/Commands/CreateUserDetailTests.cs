@@ -17,7 +17,7 @@ public class CreateUserDetailTests : BaseTestFixture
     }
 
     [Test]
-    public async Task ShouldRequireUniqueTitle()
+    public async Task ShouldRequireUniqueTitle()//Test comment to run git action
     {
         await SendAsync(new CreateUserCommand
         {
