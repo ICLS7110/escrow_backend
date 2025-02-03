@@ -34,7 +34,7 @@ public class CreateUserDetailTests : BaseTestFixture
     }
 
     [Test]
-    public async Task ShouldCreateTodoList()
+    public async Task ShouldCreateUserDetail()
     {
         var userId = await RunAsDefaultUserAsync();
 

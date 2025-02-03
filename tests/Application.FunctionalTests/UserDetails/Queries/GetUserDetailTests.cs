@@ -38,14 +38,4 @@ public class GetUserDetailTests : BaseTestFixture
 
         result.Should().GetHashCode().Equals(1);
     }
-
-   /* [Test]
-    public async Task ShouldDenyAnonymousUser()
-    {
-        var query = new GetTodosQuery();
-
-        var action = () => SendAsync(query);
-        
-        await action.Should().ThrowAsync<UnauthorizedAccessException>();
-    }*/
 }

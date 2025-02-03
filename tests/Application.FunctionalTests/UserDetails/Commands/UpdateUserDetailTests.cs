@@ -11,7 +11,7 @@ using static Testing;
 public class UpdateUserDetailTests : BaseTestFixture
 {
     [Test]
-    public async Task ShouldRequireValidTodoListId()
+    public async Task ShouldRequireValidUserId()
     {
         var command = new UpdateUserCommand { UserId = "0099", FullName = "New Title" };
         await FluentActions.Invoking(() => SendAsync(command)).Should().ThrowAsync<NotFoundException>();
@@ -43,7 +43,7 @@ public class UpdateUserDetailTests : BaseTestFixture
     }
 
     [Test]
-    public async Task ShouldUpdateTodoList()
+    public async Task ShouldUpdateUserDetail()
     {
         var userId = await RunAsDefaultUserAsync();
 

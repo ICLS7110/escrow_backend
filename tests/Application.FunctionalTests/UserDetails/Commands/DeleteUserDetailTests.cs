@@ -10,14 +10,14 @@ using static Testing;
 public class DeleteUserDetailTests : BaseTestFixture
 {
     [Test]
-    public async Task ShouldRequireValidTodoListId()
+    public async Task ShouldRequireValidUserIdId()
     {
         var command = new DeleteUserCommand(99);
         await FluentActions.Invoking(() => SendAsync(command)).Should().ThrowAsync<NotFoundException>();
     }
 
     [Test]
-    public async Task ShouldDeleteTodoList()
+    public async Task ShouldDeleteUserDetail()
     {
         var userId = await SendAsync(new CreateUserCommand
         {
