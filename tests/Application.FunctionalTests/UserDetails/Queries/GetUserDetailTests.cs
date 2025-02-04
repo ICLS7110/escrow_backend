@@ -12,7 +12,7 @@ public class GetUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldReturnPriorityLevels()
     {
-        await RunAsDefaultUserAsync();
+        //await RunAsDefaultUserAsync();
 
         var query = new GetUserDetailsQuery();
 
@@ -24,7 +24,7 @@ public class GetUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldReturnAllListsAndItems()
     {
-        await RunAsDefaultUserAsync();
+        //await RunAsDefaultUserAsync();
 
         await AddAsync(new UserDetail
         {
