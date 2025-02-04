@@ -3,7 +3,7 @@ name: Deploy to SCloud via FTP
 on:
   push:
     branches:
-      - ci-cd-files  # Change this if your main deployment branch is different
+      - develop  # Change this if your main deployment branch is different
 
 jobs:
   deploy:
@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         
       - name: Set up .NET
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0'  # Adjust this based on your project's .NET version
+          dotnet-version: 9.0.101  # Adjust this based on your project's .NET version
 
       - name: Publish the app
         run: |
