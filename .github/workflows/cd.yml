@@ -1,9 +1,9 @@
-name: Deploy to Azure Web App
+name: Deploy to SCloud via FTP
 
 on:
   push:
     branches:
-      - main
+      - ci-cd-files  # Change this if your main deployment branch is different
 
 jobs:
   deploy:
@@ -16,20 +16,18 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '9.0'  # Use the version of .NET your project is targeting
+          dotnet-version: '9.0'  # Adjust this based on your project's .NET version
 
       - name: Publish the app
         run: |
           dotnet publish src/Web/Web.csproj --configuration Release --output ./output
 
-      - name: Set up Azure credentials
-        uses: azure/login@v1
+      - name: Deploy via FTP to SCloud
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'your-app-name'
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: './output'
+          server: ${{ secrets.SCLOUD_FTP_SERVER }}  # Your FTP server (e.g., ftp.your-scloud.com)
+          username: ${{ secrets.SCLOUD_FTP_USER }}  # FTP username stored in GitHub Secrets
+          password: ${{ secrets.SCLOUD_FTP_PASSWORD }}  # FTP password stored in GitHub Secrets
+          local-dir: './output/'  # The folder where the build is stored
+          server-dir: '/var/www/html/'  # Adjust this based on your SCloud server's deployment path
+          protocol: 'ftp'  # Ensures FTP is used (can be changed to sftp if needed)
