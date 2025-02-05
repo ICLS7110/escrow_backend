@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Infrastructure.Security;
+
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record CreateBankDetailCommand : IRequest<int>
@@ -18,10 +20,12 @@ public record CreateBankDetailCommand : IRequest<int>
 public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IRsaHelper _rsaHelper;
 
-    public CreateBankDetailCommandHandler(IApplicationDbContext context)
+    public CreateBankDetailCommandHandler(IApplicationDbContext context, IRsaHelper rsaHelper)
     {
         _context = context;
+        _rsaHelper = rsaHelper;
     }
 
     public async Task<int> Handle(CreateBankDetailCommand request, CancellationToken cancellationToken)
@@ -30,8 +34,8 @@ public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCo
         {
             UserDetailId = request.UserDetailId,
             AccountHolderName = request.AccountHolderName,
-            IBANNumber = request.IBANNumber,
-            BICCode = request.BICCode
+            IBANNumber =_rsaHelper.EncryptWithPrivateKey( request.IBANNumber),
+            BICCode = _rsaHelper.EncryptWithPrivateKey(request.BICCode)
         };
 
         _context.BankDetails.Add(entity);

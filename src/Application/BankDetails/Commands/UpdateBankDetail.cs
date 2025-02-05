@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Infrastructure.Security;
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record UpdateBankDetailCommand: IRequest<int>
@@ -19,10 +20,12 @@ public record UpdateBankDetailCommand: IRequest<int>
 public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IRsaHelper _rsaHelper;
 
-    public UpdateBankDetailCommandHandler(IApplicationDbContext context)
+    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IRsaHelper rsaHelper)
     {
         _context = context;
+        _rsaHelper = rsaHelper;
     }
 
     public async Task<int> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
@@ -36,9 +39,9 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
 
         entity.UserDetailId = request.UserDetailId;
         entity.AccountHolderName = request.AccountHolderName;
-        entity.IBANNumber = request.IBANNumber;
-        entity.BICCode = request.BICCode;
-
+        entity.IBANNumber =_rsaHelper.EncryptWithPrivateKey( request.IBANNumber);
+        entity.BICCode = _rsaHelper.EncryptWithPrivateKey(request.BICCode);
+        
         await _context.SaveChangesAsync(cancellationToken);
 
         return entity.Id;

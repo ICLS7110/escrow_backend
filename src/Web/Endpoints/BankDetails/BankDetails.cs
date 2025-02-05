@@ -5,6 +5,8 @@ using Escrow.Api.Application.BankDetails.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Mvc;
+using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Infrastructure.Configuration;
 
 namespace Escrow.Api.Web.Endpoints.BankDetails;
 
@@ -40,18 +42,20 @@ public class BankDetails : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<Created<int>> CreateBankDetail(ISender sender, CreateBankDetailCommand command)
+    public async Task<Created<int>> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
     {
+        
+        command.UserDetailId= Convert.ToInt32(jwtService.GetUserId());
         var id = await sender.Send(command);
 
         return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
     }
 
     [Authorize]
-    public async Task<Results<IResult, BadRequest>> UpdateBankDetail(ISender sender, int id, UpdateBankDetailCommand command)
+    public async Task<Results<IResult, BadRequest>> UpdateBankDetail(ISender sender, IJwtService jwtService, int id, UpdateBankDetailCommand command)
     {
         if (id != command.Id) return TypedResults.BadRequest();
-
+        command.UserDetailId = Convert.ToInt32(jwtService.GetUserId());
         var result = await sender.Send(command);
         return TypedResults.Ok(result);
     }
