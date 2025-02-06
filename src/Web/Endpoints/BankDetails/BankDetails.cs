@@ -45,7 +45,7 @@ public class BankDetails : EndpointGroupBase
     public async Task<Created<int>> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
     {
         
-        command.UserDetailId= Convert.ToInt32(jwtService.GetUserId());
+        //command.UserDetailId= Convert.ToInt32(jwtService.GetUserId());
         var id = await sender.Send(command);
 
         return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
@@ -55,7 +55,7 @@ public class BankDetails : EndpointGroupBase
     public async Task<Results<IResult, BadRequest>> UpdateBankDetail(ISender sender, IJwtService jwtService, int id, UpdateBankDetailCommand command)
     {
         if (id != command.Id) return TypedResults.BadRequest();
-        command.UserDetailId = Convert.ToInt32(jwtService.GetUserId());
+        //command.UserDetailId = Convert.ToInt32(jwtService.GetUserId());
         var result = await sender.Send(command);
         return TypedResults.Ok(result);
     }
