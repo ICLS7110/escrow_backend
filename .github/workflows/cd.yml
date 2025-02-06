@@ -1,9 +1,9 @@
-name: Deploy to SCloud via FTP
+name: CD for .NET App
 
 on:
   push:
     branches:
-      - develop  # Change this if your main deployment branch is different
+      - master # Trigger the workflow on pushes to the master branch
 
 jobs:
   deploy:
@@ -11,23 +11,33 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        
+        uses: actions/checkout@v2
+
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 9.0.101  # Adjust this based on your project's .NET version
+          dotnet-version: "9.0.101" # Replace with your required .NET version
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --configuration Release
 
       - name: Publish the app
         run: |
           dotnet publish src/Web/Web.csproj --configuration Release --output ./output
 
-      - name: Deploy via FTP to SCloud
-        uses: SamKirkland/FTP-Deploy-Action@v4
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.8
         with:
-          server: ${{ secrets.SCLOUD_FTP_SERVER }}  # Your FTP server (e.g., ftp.your-scloud.com)
-          username: ${{ secrets.SCLOUD_FTP_USER }}  # FTP username stored in GitHub Secrets
-          password: ${{ secrets.SCLOUD_FTP_PASSWORD }}  # FTP password stored in GitHub Secrets
-          local-dir: './output/'  # The folder where the build is stored
-          server-dir: '/var/www/html/'  # Adjust this based on your SCloud server's deployment path
-          protocol: 'ftp'  # Ensures FTP is used (can be changed to sftp if needed)
+          host: 103.119.170.253 # Your server's IP
+          username: ubuntu # Your server's IP
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # SSH private key stored in GitHub secrets
+          port: 22
+          script: |
+            cd /var/www/html/dotnet-testing/  # Navigate to project directory
+             sudo git stash
+            sudo git pull origin master        # Pull latest changes from the master branch
+            sudo dotnet publish src/Web/Web.csproj --configuration Release --output /var/www/html/dotnet-testing/output  # Publish app
+            sudo systemctl restart escrow_backend  # Restart the service using systemd, update with your service name
