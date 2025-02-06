@@ -20,7 +20,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         if (!optionsBuilder.IsConfigured)
         {
             //optionsBuilder.UseNpgsql("Escrow.ApiDb"); // Or another provider, e.g., SQL Server
-            optionsBuilder.UseNpgsql("Host=103.189.173.7;Database=escrow;Username=root;Password=root@123;Persist Security Info=True");
+            optionsBuilder.UseNpgsql("Host=103.119.170.253;Database=escrow;Username=root;Password=root@123;Persist Security Info=True");
             //
         }
         optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
