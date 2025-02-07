@@ -48,8 +48,7 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
                 IBANNumber=_rsaHelper.DecryptWithPrivateKey(s.IBANNumber),
                 BICCode=_rsaHelper.DecryptWithPrivateKey(s.BICCode),
             })
-            .OrderBy(x => x.AccountHolderName)
-                //.ProjectTo<BankDetail>(_mapper.ConfigurationProvider)
+            .OrderBy(x => x.AccountHolderName)                
                 .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);
         }
         else
@@ -64,7 +63,6 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
                 BICCode = _rsaHelper.DecryptWithPrivateKey(s.BICCode),
             })
                 .OrderBy(x => x.AccountHolderName)
-                //.ProjectTo<BankDetail>(_mapper.ConfigurationProvider)
                 .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);
         }
     }

@@ -33,13 +33,13 @@ namespace Escrow.Api.Web.Endpoints.Authentication
 
         public AuthController(OtpManagerService otpManagerService, 
             UserManager<ApplicationUser> userManager,
-            //IOpenIddictTokenManager tokenManager,
+            
             IUserService userService,
             ILogger<AuthController> logger)
         {
             _otpManagerService = otpManagerService;
             _userManager = userManager;
-            //_tokenManager = tokenManager;
+            
             _userService = userService;
             _logger = logger;
         }
@@ -51,13 +51,13 @@ namespace Escrow.Api.Web.Endpoints.Authentication
             {
                 await _otpManagerService.RequestOtpAsync(request.CountryCode,request.MobileNumber);
                 return TypedResults.Ok(new { Message = "OTP sent successfully.", status = 200 });
-                //return Ok(new { status=200,Message = "OTP sent successfully." });
+                
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while verifying OTP.===>" + ex.Message);
                 return TypedResults.Problem($"An error occurred: {ex.Message}");
-                //return BadRequest(new { Error = ex.Message });
+                
             }
         }
 
@@ -155,7 +155,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                     Message = "OTP verified successfully.",
                     AccessToken = token,
                     UserId = String.IsNullOrEmpty(newUser.PhoneNumber) ? user.Id : newUser.Id,
-                    IsProfileCompleted = false//user.AccountHolderName != null
+                    IsProfileCompleted = false
                 });
 
             }

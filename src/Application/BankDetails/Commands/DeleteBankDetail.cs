@@ -27,7 +27,7 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
 
         _context.BankDetails.Remove(entity);
 
-        //entity.AddDomainEvent(new BankDetailDeletedEvent(entity));
+        
 
         await _context.SaveChangesAsync(cancellationToken);
     }

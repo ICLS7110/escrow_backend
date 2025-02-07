@@ -26,7 +26,6 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public string? BusinessManagerName { get; set; }
         public string? BusinessEmail { get; set; }
         public string? VatId { get; set; }
-        //public byte[]? ProofOfBusiness { get; set; } // File as binary
 
         // Bank Account Details Fields
         public string? AccountHolderName { get; set; }
@@ -59,8 +58,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.DateOfBirth = request.DateOfBirth;
             entity.BusinessManagerName = request.BusinessManagerName;
             entity.BusinessEmail = request.BusinessEmail;
-            entity.VatId = request.VatId;
-            //entity.ProofOfBusiness = request.ProofOfBusiness;           
+            entity.VatId = request.VatId;           
             entity.LoginMethod = request.LoginMethod;
 
             await _context.SaveChangesAsync(cancellationToken);

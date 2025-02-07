@@ -26,7 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
-    //public DbSet<UserDetail> UserDetails => Set<UserDetail>();
+   
     public DbSet<UserDetail> UserDetails { get; set; }
 
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
@@ -36,8 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        // Register the OpenIddict models
-        //builder.UseOpenIddict();
+        
     }
 
     public Task<int> SaveChangesAsync()

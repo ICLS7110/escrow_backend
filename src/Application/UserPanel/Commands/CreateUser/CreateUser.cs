@@ -47,12 +47,11 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 DateOfBirth = request.DateOfBirth,
                 BusinessManagerName = request.BusinessManagerName,
                 BusinessEmail = request.BusinessEmail,
-                VatId = request.VatId,
-                //ProofOfBusiness = request.ProofOfBusiness,               
+                VatId = request.VatId,               
                 LoginMethod = request.LoginMethod
             };
 
-            //entity.AddDomainEvent(new UserCreatedEvent(entity));
+            
             _context.UserDetails.Add(entity);
             await _context.SaveChangesAsync(cancellationToken);
             return entity.Id;
