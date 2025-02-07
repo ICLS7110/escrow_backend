@@ -28,7 +28,7 @@ public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery
         if (request.Id.HasValue)
         {
             return await _context.UserDetails
-            .Where(x => x.Id == Convert.ToInt32(request.Id))
+            .Where(x => x.Id == request.Id.Value)
             .OrderBy(x => x.FullName)
                 .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
                 .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);

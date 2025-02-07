@@ -39,7 +39,7 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
         if (request.Id.HasValue)
         {
             return await _context.BankDetails
-            .Where(x => x.Id == Convert.ToInt32(request.Id)).Select(s => new BankDetail()
+            .Where(x => x.Id == request.Id.Value).Select(s => new BankDetail()
             {
                 Id = s.Id,
                 UserDetail = s.UserDetail,
