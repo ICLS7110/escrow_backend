@@ -26,10 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
-    public DbSet<TodoList> TodoLists => Set<TodoList>();
-
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
-
+    //public DbSet<UserDetail> UserDetails => Set<UserDetail>();
     public DbSet<UserDetail> UserDetails { get; set; }
 
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
