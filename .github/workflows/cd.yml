@@ -1,0 +1,43 @@
+name: CD for .NET App
+
+on:
+  push:
+    branches:
+      - master # Trigger the workflow on pushes to the master branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "9.0.101" # Replace with your required .NET version
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --configuration Release
+
+      - name: Publish the app
+        run: |
+          dotnet publish src/Web/Web.csproj --configuration Release --output ./output
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: 103.119.170.253 # Your server's IP
+          username: ubuntu # Your server's IP
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # SSH private key stored in GitHub secrets
+          port: 22
+          script: |
+            cd /var/www/html/dotnet-testing/  # Navigate to project directory
+             sudo git stash
+            sudo git pull origin master        # Pull latest changes from the master branch
+            sudo dotnet publish src/Web/Web.csproj --configuration Release --output /var/www/html/dotnet-testing/output  # Publish app
+            sudo systemctl restart escrow_backend  # Restart the service using systemd, update with your service name

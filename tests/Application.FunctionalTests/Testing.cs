@@ -4,7 +4,9 @@ using Escrow.Api.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Escrow.Api.Application.FunctionalTests;
 
@@ -19,10 +21,18 @@ public partial class Testing
     [OneTimeSetUp]
     public async Task RunBeforeAnyTests()
     {
+        var configuration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory()) // Ensure correct path
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .Build();
+
+        // Read connection string
+        var connectionstring = configuration.GetConnectionString("Escrow");
         _database = await TestDatabaseFactory.CreateAsync();
-
-        _factory = new CustomWebApplicationFactory(_database.GetConnection(), _database.GetConnectionString());
-
+       
+        var db= new NpgsqlConnection(connectionstring);
+        //_factory = new CustomWebApplicationFactory(_database.GetConnection(), _database.GetConnectionString());
+        _factory = new CustomWebApplicationFactory(db, connectionstring??"");
         _scopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
     }
 

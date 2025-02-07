@@ -21,9 +21,9 @@ public class UserDetailDto
     //public byte[]? ProofOfBusiness { get; set; } // File upload
 
     // Bank Account Details Fields
-    public string? AccountHolderName { get; set; }
-    public string? IBANNumber { get; set; }
-    public string? BICCode { get; set; }
+    //public string? AccountHolderName { get; set; }
+    //public string? IBANNumber { get; set; }
+    //public string? BICCode { get; set; }
 
     public string? LoginMethod { get; set; }
 

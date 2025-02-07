@@ -1267,18 +1267,6 @@
             "type": "string",
             "nullable": true
           },
-          "accountHolderName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ibanNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "bicCode": {
-            "type": "string",
-            "nullable": true
-          },
           "loginMethod": {
             "type": "string",
             "nullable": true
