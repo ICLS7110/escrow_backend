@@ -12,7 +12,7 @@ public class GetUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldReturnPriorityLevels()
     {
-        await RunAsDefaultUserAsync();
+        //await RunAsDefaultUserAsync();
 
         var query = new GetUserDetailsQuery();
 
@@ -24,7 +24,7 @@ public class GetUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldReturnAllListsAndItems()
     {
-        await RunAsDefaultUserAsync();
+        //await RunAsDefaultUserAsync();
 
         await AddAsync(new UserDetail
         {
@@ -38,14 +38,4 @@ public class GetUserDetailTests : BaseTestFixture
 
         result.Should().GetHashCode().Equals(1);
     }
-
-   /* [Test]
-    public async Task ShouldDenyAnonymousUser()
-    {
-        var query = new GetTodosQuery();
-
-        var action = () => SendAsync(query);
-        
-        await action.Should().ThrowAsync<UnauthorizedAccessException>();
-    }*/
 }
