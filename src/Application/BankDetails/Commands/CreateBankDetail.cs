@@ -35,7 +35,8 @@ public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCo
             UserDetailId = request.UserDetailId,
             AccountHolderName = request.AccountHolderName,
             IBANNumber = _AESService.Encrypt( request.IBANNumber),
-            BICCode = request.BICCode
+            BICCode = request.BICCode,
+            RecordState="Active"
         };
 
         _context.BankDetails.Add(entity);

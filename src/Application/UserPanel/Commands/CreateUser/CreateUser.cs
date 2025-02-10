@@ -48,7 +48,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 BusinessManagerName = request.BusinessManagerName,
                 BusinessEmail = request.BusinessEmail,
                 VatId = request.VatId,               
-                LoginMethod = request.LoginMethod
+                LoginMethod = request.LoginMethod,
+                RecordState = "Active"
             };
 
             

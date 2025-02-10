@@ -31,7 +31,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
                 throw new CustomValidationException("User Details Not Found.");
             }
 
-            _context.UserDetails.Remove(entity);
+            entity.RecordState = "Deleted";
+            _context.UserDetails.Update(entity);
 
             
 

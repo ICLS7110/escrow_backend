@@ -39,7 +39,7 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
 
-        var query = _context.BankDetails.AsQueryable();
+        var query = _context.BankDetails.Where(x => x.RecordState == "Active").AsQueryable();
 
         if (request.Id.HasValue)
         {

@@ -487,34 +487,6 @@
             "JWT": []
           }
         ]
-      },
-      "put": {
-        "tags": [
-          "UserDetails"
-        ],
-        "operationId": "PutApiUserDetails",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
       }
     },
     "/api/UserDetails/{id}": {
@@ -567,6 +539,46 @@
             "x-position": 4
           }
         ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PutApiUserDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
         "responses": {
           "200": {
             "description": ""
@@ -694,34 +706,6 @@
             "JWT": []
           }
         ]
-      },
-      "put": {
-        "tags": [
-          "BankDetails"
-        ],
-        "operationId": "PutApiBankDetails",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBankDetailCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
       }
     },
     "/api/BankDetails/{id}": {
@@ -774,6 +758,46 @@
             "x-position": 4
           }
         ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "BankDetails"
+        ],
+        "operationId": "PutApiBankDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBankDetailCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
         "responses": {
           "200": {
             "description": ""

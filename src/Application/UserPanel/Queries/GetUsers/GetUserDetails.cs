@@ -28,7 +28,7 @@ public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
 
-        var query = _context.UserDetails.AsQueryable();
+        var query = _context.UserDetails.Where(x => x.RecordState == "Active").AsQueryable();
 
         if (request.Id.HasValue)
         {

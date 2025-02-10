@@ -9,4 +9,6 @@ public abstract class BaseAuditableEntity : BaseEntity
     public DateTimeOffset LastModified { get; set; }
 
     public string? LastModifiedBy { get; set; }
+
+    public string RecordState { get; set; } = string.Empty;
 }

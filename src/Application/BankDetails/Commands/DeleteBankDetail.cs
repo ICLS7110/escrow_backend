@@ -27,7 +27,8 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
         {
             throw new CustomValidationException("Bank Details Not Found.");
         }
-        _context.BankDetails.Remove(entity);
+        entity.RecordState = "Deleted";
+        _context.BankDetails.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
     }
 }
