@@ -25,20 +25,19 @@ public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery
 
     public async Task<PaginatedList<UserDetailDto>> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
     {
+        int pageNumber = request.PageNumber ?? 1;
+        int pageSize = request.PageSize ?? 10;
+
+        var query = _context.UserDetails.AsQueryable();
+
         if (request.Id.HasValue)
         {
-            return await _context.UserDetails
-            .Where(x => x.Id == request.Id.Value)
+            query = query.Where(x => x.Id == request.Id.Value);
+        }
+
+        return await query
             .OrderBy(x => x.FullName)
-                .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
-                .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);
-        }
-        else
-        {
-            return await _context.UserDetails
-                .OrderBy(x => x.FullName)
-                .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
-                .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);
-        }
+            .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
+            .PaginatedListAsync(pageNumber, pageSize);
     }
 }

@@ -23,12 +23,11 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
         var entity = await _context.BankDetails
             .FindAsync(new object[] { request.Id }, cancellationToken);
 
-        Guard.Against.NotFound(request.Id, entity);
-
+        if (entity == null)
+        {
+            throw new CustomValidationException("Bank Details Not Found.");
+        }
         _context.BankDetails.Remove(entity);
-
-        
-
         await _context.SaveChangesAsync(cancellationToken);
     }
 }

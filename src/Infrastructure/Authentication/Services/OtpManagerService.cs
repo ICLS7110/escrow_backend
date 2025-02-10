@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Escrow.Api.Application;
 using Escrow.Api.Application.Authentication.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,12 +28,12 @@ public class OtpManagerService : IOtpManagerService
 
     // Implementing RequestOtpAsync from IOtpManagerService
     public async Task RequestOtpAsync(string countryCode, string mobileNumber)
-    {
+    {        
         var phoneNumber = $"{countryCode}{mobileNumber}";
         var isPhoneNumberValid = await _validationService.ValidatePhoneNumberAsync(phoneNumber);
         if (!isPhoneNumberValid)
-            throw new ArgumentException("Invalid phone number.");
-
+            throw new CustomValidationException("Invalid phone number.");
+       
         var otp = await _otpService.GenerateOtpAsync();
 
         // Store OTP in cache with a 5-minute expiration

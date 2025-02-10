@@ -36,34 +36,27 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
 
     public async Task<PaginatedList<BankDetail>> Handle(GetBankDetailsQuery request, CancellationToken cancellationToken)
     {
+        int pageNumber = request.PageNumber ?? 1;
+        int pageSize = request.PageSize ?? 10;
+
+        var query = _context.BankDetails.AsQueryable();
+
         if (request.Id.HasValue)
         {
-            return await _context.BankDetails
-            .Where(x => x.Id == request.Id.Value).Select(s => new BankDetail()
-            {
-                Id = s.Id,
-                UserDetail = s.UserDetail,
-                UserDetailId=s.UserDetailId,
-                AccountHolderName= s.AccountHolderName,
-                IBANNumber=_rsaHelper.DecryptWithPrivateKey(s.IBANNumber),
-                BICCode=_rsaHelper.DecryptWithPrivateKey(s.BICCode),
-            })
-            .OrderBy(x => x.AccountHolderName)                
-                .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);
+            query = query.Where(x => x.Id == request.Id.Value);
         }
-        else
-        {
-            return await _context.BankDetails.Select(s => new BankDetail()
+
+        return await query
+            .Select(s => new BankDetail
             {
                 Id = s.Id,
                 UserDetail = s.UserDetail,
                 UserDetailId = s.UserDetailId,
                 AccountHolderName = s.AccountHolderName,
                 IBANNumber = _rsaHelper.DecryptWithPrivateKey(s.IBANNumber),
-                BICCode = _rsaHelper.DecryptWithPrivateKey(s.BICCode),
+                BICCode = _rsaHelper.DecryptWithPrivateKey(s.BICCode)
             })
-                .OrderBy(x => x.AccountHolderName)
-                .PaginatedListAsync(request.PageNumber ?? 1, request.PageSize ?? 10);
-        }
+            .OrderBy(x => x.AccountHolderName)
+            .PaginatedListAsync(pageNumber, pageSize);
     }
 }

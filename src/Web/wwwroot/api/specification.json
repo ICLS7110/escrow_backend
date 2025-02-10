@@ -451,14 +451,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfUserDetailDto"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -486,21 +479,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {}
-            }
-          },
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -562,14 +541,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfUserDetailDto"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -609,12 +581,6 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {}
-            }
-          },
-          "400": {
             "description": ""
           }
         },
@@ -704,14 +670,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfBankDetail"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -739,21 +698,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {}
-            }
-          },
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -815,14 +760,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedListOfBankDetail"
-                }
-              }
-            }
+            "description": ""
           }
         },
         "security": [
@@ -862,12 +800,6 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {}
-            }
-          },
-          "400": {
             "description": ""
           }
         },
@@ -1200,79 +1132,6 @@
           }
         }
       },
-      "PaginatedListOfUserDetailDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserDetailDto"
-            }
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "hasPreviousPage": {
-            "type": "boolean"
-          },
-          "hasNextPage": {
-            "type": "boolean"
-          }
-        }
-      },
-      "UserDetailDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "emailAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "phoneNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "gender": {
-            "type": "string",
-            "nullable": true
-          },
-          "dateOfBirth": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "businessManagerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "businessEmail": {
-            "type": "string",
-            "nullable": true
-          },
-          "vatId": {
-            "type": "string",
-            "nullable": true
-          },
-          "loginMethod": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "CreateUserCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -1376,170 +1235,6 @@
             "nullable": true
           }
         }
-      },
-      "PaginatedListOfBankDetail": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BankDetail"
-            }
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "hasPreviousPage": {
-            "type": "boolean"
-          },
-          "hasNextPage": {
-            "type": "boolean"
-          }
-        }
-      },
-      "BankDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseAuditableEntity"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "userDetailId": {
-                "type": "integer",
-                "format": "int32"
-              },
-              "userDetail": {
-                "$ref": "#/components/schemas/UserDetail"
-              },
-              "accountHolderName": {
-                "type": "string"
-              },
-              "ibanNumber": {
-                "type": "string"
-              },
-              "bicCode": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "UserDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseAuditableEntity"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "userId": {
-                "type": "string"
-              },
-              "fullName": {
-                "type": "string",
-                "nullable": true
-              },
-              "emailAddress": {
-                "type": "string",
-                "nullable": true
-              },
-              "phoneNumber": {
-                "type": "string",
-                "nullable": true
-              },
-              "gender": {
-                "type": "string",
-                "nullable": true
-              },
-              "dateOfBirth": {
-                "type": "string",
-                "format": "date-time",
-                "nullable": true
-              },
-              "businessManagerName": {
-                "type": "string",
-                "nullable": true
-              },
-              "businessEmail": {
-                "type": "string",
-                "nullable": true
-              },
-              "vatId": {
-                "type": "string",
-                "nullable": true
-              },
-              "loginMethod": {
-                "type": "string",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "BaseAuditableEntity": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseEntity"
-          },
-          {
-            "type": "object",
-            "x-abstract": true,
-            "additionalProperties": false,
-            "properties": {
-              "created": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "createdBy": {
-                "type": "string",
-                "nullable": true
-              },
-              "lastModified": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "lastModifiedBy": {
-                "type": "string",
-                "nullable": true
-              }
-            }
-          }
-        ]
-      },
-      "BaseEntity": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "domainEvents": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BaseEvent"
-            }
-          }
-        }
-      },
-      "BaseEvent": {
-        "type": "object",
-        "x-abstract": true,
-        "additionalProperties": false
       },
       "CreateBankDetailCommand": {
         "type": "object",

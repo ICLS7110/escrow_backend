@@ -21,7 +21,8 @@ public static class DependencyInjection
         builder.Services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>();
 
-        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+        builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+       // builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 
         // Customise default API behaviour

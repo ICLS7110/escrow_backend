@@ -9,6 +9,8 @@ using OpenIddict.Validation.AspNetCore;
 using Escrow.Api.Domain.Entities.UserPanel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Microsoft.AspNetCore.Mvc;
+using Escrow.Api.Application.ResultHandler;
+using Escrow.Api.Application;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 
@@ -33,56 +35,42 @@ public class UserDetails : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<Ok<PaginatedList<UserDetailDto>>> GetUserDetails(
+    public async Task<IResult> GetUserDetails(
         ISender sender,
         int? id,        
         [AsParameters] GetUserDetailsQuery query)
     {
         query = new GetUserDetailsQuery { Id = id, PageNumber = query.PageNumber, PageSize = query.PageSize};
         var result = await sender.Send(query);
-        return TypedResults.Ok(result);
+        return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(result));
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
-    public async Task<Created<int>> CreateUser(ISender sender, CreateUserCommand command)
+    public async Task<IResult> CreateUser(ISender sender, CreateUserCommand command)
     {
         var id = await sender.Send(command);
 
-        return TypedResults.Created($"/{nameof(UserDetails)}/{id}", id);
+        return TypedResults.Ok(Result<int>.Success(id));
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
-    public async Task<Results<IResult, BadRequest>> UpdateUserDetail(ISender sender, int id, UpdateUserCommand command)
+    public async Task<IResult> UpdateUserDetail(ISender sender, int id, UpdateUserCommand command)
     {
-        if (id != command.Id) return TypedResults.BadRequest();
-
-        try
+        if (id != command.Id)
         {
-            await sender.Send(command);
-            return TypedResults.Ok(new { Message = "User details updated successfully.", UserId = command.Id });
+            throw new CustomValidationException("Invalid Request.");
         }
-        catch (Exception ex)
-        {
-            // Handle unexpected errors
-            return TypedResults.Problem($"An error occurred: {ex.Message}");
-        }
+         await sender.Send(command);
+         return TypedResults.Ok(Result<object>.Success(new { Message = "User details updated successfully.", UserId = command.Id }));        
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
     public async Task<IResult> DeleteUser(ISender sender, int id)
     {
-        try
-        {
-            await sender.Send(new DeleteUserCommand(id));
-            return TypedResults.NoContent();
-        }
-        catch (Exception ex)
-        {
-            // Handle unexpected errors
-            return TypedResults.Problem($"An error occurred: {ex.Message}");
-        }
+        await sender.Send(new DeleteUserCommand(id));
+        return TypedResults.Ok(Result<object>.Success(new { Message = "User details Deleted successfully." }));   
     }
 }

@@ -145,7 +145,8 @@ else
 }
 
 //app.MapStaticAssets();
-app.UseExceptionHandler(options => { });
+//app.UseExceptionHandler(options => { });
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Map("/", () => Results.Redirect("/api"));
 
