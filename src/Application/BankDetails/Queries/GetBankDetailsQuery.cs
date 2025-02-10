@@ -54,7 +54,7 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
                 UserDetailId = s.UserDetailId,
                 AccountHolderName = s.AccountHolderName,
                 IBANNumber = _AESService.Decrypt(s.IBANNumber),
-                BICCode = _AESService.Decrypt(s.BICCode)
+                BICCode = s.BICCode
             })
             .OrderBy(x => x.AccountHolderName)
             .PaginatedListAsync(pageNumber, pageSize);

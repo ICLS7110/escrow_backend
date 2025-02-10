@@ -49,7 +49,10 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             var entity = await _context.UserDetails
                 .FindAsync(new object[] { request.Id }, cancellationToken);
 
-            Guard.Against.NotFound(request.Id, entity);
+            if (entity == null) 
+            {
+                throw new CustomValidationException("User Details Not Found.");
+            }
 
             entity.UserId = request.UserId;
             entity.FullName = request.FullName;

@@ -34,13 +34,13 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
 
         if (entity == null)
         {
-            throw new NotFoundException(nameof(BankDetail), request.Id.ToString());
+            throw new CustomValidationException("Bank Details Not Found.");
         }
 
         entity.UserDetailId = request.UserDetailId;
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
-        entity.BICCode = _aESService.Encrypt(request.BICCode);
+        entity.BICCode = request.BICCode;
         
         await _context.SaveChangesAsync(cancellationToken);
 

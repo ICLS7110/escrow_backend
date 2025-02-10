@@ -26,7 +26,10 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
             var entity = await _context.UserDetails
                 .FindAsync(new object[] { request.Id }, cancellationToken);
 
-            Guard.Against.NotFound(request.Id, entity);
+            if (entity == null)
+            {
+                throw new CustomValidationException("User Details Not Found.");
+            }
 
             _context.UserDetails.Remove(entity);
 
