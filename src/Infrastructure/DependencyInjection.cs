@@ -15,6 +15,7 @@ using Escrow.Api.Infrastructure.Authentication.Services;
 using Escrow.Api.Infrastructure.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Escrow.Api.Infrastructure.OptionConfiguration;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -53,6 +54,7 @@ public static class DependencyInjection
         });
 
         builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
+        builder.Services.Configure<AESSettings>(builder.Configuration.GetSection("AESSettings"));
 
         // Register IApplicationDbContext and initializer
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -84,6 +86,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IRsaHelper,RsaHelper>();
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<IJwtService, JwtService>();
+        builder.Services.AddSingleton<IAESService,AESService>();
 
         
     }

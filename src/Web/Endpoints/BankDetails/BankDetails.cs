@@ -9,6 +9,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Application.ResultHandler;
 using Escrow.Api.Application;
+using Escrow.Api.Infrastructure.Security;
 
 namespace Escrow.Api.Web.Endpoints.BankDetails;
 
@@ -38,6 +39,7 @@ public class BankDetails : EndpointGroupBase
         int? id,
         [AsParameters] GetBankDetailsQuery query)
     {
+        
         query = new GetBankDetailsQuery { Id = id, PageNumber = query.PageNumber, PageSize = query.PageSize };
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<BankDetail>>.Success(result));

@@ -20,12 +20,12 @@ public record UpdateBankDetailCommand: IRequest<int>
 public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IRsaHelper _rsaHelper;
+    private readonly IAESService _aESService;
 
-    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IRsaHelper rsaHelper)
+    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService)
     {
         _context = context;
-        _rsaHelper = rsaHelper;
+       _aESService = aESService;
     }
 
     public async Task<int> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
@@ -39,8 +39,8 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
 
         entity.UserDetailId = request.UserDetailId;
         entity.AccountHolderName = request.AccountHolderName;
-        entity.IBANNumber =_rsaHelper.EncryptWithPrivateKey( request.IBANNumber);
-        entity.BICCode = _rsaHelper.EncryptWithPrivateKey(request.BICCode);
+        entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
+        entity.BICCode = _aESService.Encrypt(request.BICCode);
         
         await _context.SaveChangesAsync(cancellationToken);
 

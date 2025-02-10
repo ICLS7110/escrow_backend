@@ -20,12 +20,12 @@ public record CreateBankDetailCommand : IRequest<int>
 public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IRsaHelper _rsaHelper;
+    private readonly IAESService _AESService;
 
-    public CreateBankDetailCommandHandler(IApplicationDbContext context, IRsaHelper rsaHelper)
+    public CreateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService)
     {
         _context = context;
-        _rsaHelper = rsaHelper;
+        _AESService = aESService;
     }
 
     public async Task<int> Handle(CreateBankDetailCommand request, CancellationToken cancellationToken)
@@ -34,8 +34,8 @@ public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCo
         {
             UserDetailId = request.UserDetailId,
             AccountHolderName = request.AccountHolderName,
-            IBANNumber =_rsaHelper.EncryptWithPrivateKey( request.IBANNumber),
-            BICCode = _rsaHelper.EncryptWithPrivateKey(request.BICCode)
+            IBANNumber = _AESService.Encrypt( request.IBANNumber),
+            BICCode = _AESService.Encrypt(request.BICCode)
         };
 
         _context.BankDetails.Add(entity);

@@ -24,14 +24,14 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IJwtService _jwtService;
-    private readonly IRsaHelper _rsaHelper;
+    private readonly IAESService _AESService;
 
-    public GetBankDetailsQueryHandler(IApplicationDbContext context, IMapper mapper,IJwtService jwtService, IRsaHelper rsaHelper)
+    public GetBankDetailsQueryHandler(IApplicationDbContext context, IMapper mapper,IJwtService jwtService, IAESService aESService)
     {
         _context = context;
         _mapper = mapper;
         _jwtService = jwtService;
-        _rsaHelper = rsaHelper;
+        _AESService = aESService;
     }
 
     public async Task<PaginatedList<BankDetail>> Handle(GetBankDetailsQuery request, CancellationToken cancellationToken)
@@ -53,8 +53,8 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
                 UserDetail = s.UserDetail,
                 UserDetailId = s.UserDetailId,
                 AccountHolderName = s.AccountHolderName,
-                IBANNumber = _rsaHelper.DecryptWithPrivateKey(s.IBANNumber),
-                BICCode = _rsaHelper.DecryptWithPrivateKey(s.BICCode)
+                IBANNumber = _AESService.Decrypt(s.IBANNumber),
+                BICCode = _AESService.Decrypt(s.BICCode)
             })
             .OrderBy(x => x.AccountHolderName)
             .PaginatedListAsync(pageNumber, pageSize);
