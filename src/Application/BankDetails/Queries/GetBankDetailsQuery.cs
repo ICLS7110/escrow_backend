@@ -39,11 +39,11 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
 
-        var query = _context.BankDetails.Where(x => x.RecordState == "Active").AsQueryable();
+        var query = _context.BankDetails.AsQueryable();
 
         if (request.Id.HasValue)
         {
-            query = query.Where(x => x.Id == request.Id.Value);
+            query = query.Where(x => x.UserDetailId == request.Id.Value);
         }
 
         return await query
@@ -54,6 +54,7 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
                 UserDetailId = s.UserDetailId,
                 AccountHolderName = s.AccountHolderName,
                 IBANNumber = _AESService.Decrypt(s.IBANNumber),
+                BankName = _AESService.Decrypt(s.BankName),
                 BICCode = s.BICCode
             })
             .OrderBy(x => x.AccountHolderName)

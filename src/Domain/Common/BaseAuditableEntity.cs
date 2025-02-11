@@ -10,5 +10,8 @@ public abstract class BaseAuditableEntity : BaseEntity
 
     public string? LastModifiedBy { get; set; }
 
-    public string RecordState { get; set; } = string.Empty;
+    public RecordState RecordState { get; set; } = RecordState.Active; // Default to Active
+    public DateTimeOffset? DeletedAt { get; set; }
+    public int? DeletedBy { get; set; }
+
 }

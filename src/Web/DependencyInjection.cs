@@ -1,7 +1,9 @@
 ﻿using Azure.Identity;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Infrastructure.Data;
+using Escrow.Api.Infrastructure.Identity;
 using Escrow.Api.Web.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using NSwag;
@@ -58,4 +60,11 @@ public static class DependencyInjection
                 new DefaultAzureCredential());
         }
     }
+
+
+
+
+    
+
+
 }

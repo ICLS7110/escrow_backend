@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Escrow.Api.Application.Common.Interfaces;
-public interface IJwtService
+namespace Escrow.Api.Domain.Enums;
+public  enum RecordState
 {
-    string GetUserId();
+    Active = 0,  
+    Deleted = 1
 }

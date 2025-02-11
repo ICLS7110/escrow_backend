@@ -3,6 +3,7 @@ using System;
 using Escrow.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211065950_AddFullNameAndRoleToAspNetUsers")]
+    partial class AddFullNameAndRoleToAspNetUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,21 +41,11 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("BankName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("integer");
 
                     b.Property<string>("IBANNumber")
                         .IsRequired()
@@ -64,8 +57,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
-                    b.Property<int>("RecordState")
-                        .HasColumnType("integer");
+                    b.Property<string>("RecordState")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("UserDetailId")
                         .HasColumnType("integer");
@@ -100,12 +94,6 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("integer");
-
                     b.Property<string>("EmailAddress")
                         .HasColumnType("text");
 
@@ -128,8 +116,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
-                    b.Property<int>("RecordState")
-                        .HasColumnType("integer");
+                    b.Property<string>("RecordState")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()

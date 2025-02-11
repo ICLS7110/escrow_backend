@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Escrow.Api.Application;
-public class CustomValidationException : Exception
+public class EscrowApiException : Exception
 {
-    public CustomValidationException(string errorMessage)
+    public EscrowApiException(string errorMessage)
             : base(errorMessage)
     {
     }

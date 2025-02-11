@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 
@@ -12,10 +13,11 @@ public record DeleteBankDetailCommand(int Id): IRequest;
 public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCommand>
 {
     private readonly IApplicationDbContext _context;
-
-    public DeleteBankDetailCommandHandler(IApplicationDbContext context)
+    private readonly IJwtService _jwtService;
+    public DeleteBankDetailCommandHandler(IApplicationDbContext context, IJwtService jwtService)
     {
         _context = context;
+        _jwtService = jwtService;
     }
 
     public async Task Handle(DeleteBankDetailCommand request, CancellationToken cancellationToken)
@@ -25,9 +27,11 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
 
         if (entity == null)
         {
-            throw new CustomValidationException("Bank Details Not Found.");
+            throw new EscrowApiException("Bank Details Not Found.");
         }
-        entity.RecordState = "Deleted";
+        entity.RecordState = RecordState.Deleted;
+        entity.DeletedAt= DateTimeOffset.UtcNow;
+        entity.DeletedBy = Convert.ToInt32(_jwtService.GetUserId());
         _context.BankDetails.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
     }

@@ -4,6 +4,7 @@ using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -37,6 +38,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     {
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.Entity<BankDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
+        builder.Entity<UserDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
 
         
     }

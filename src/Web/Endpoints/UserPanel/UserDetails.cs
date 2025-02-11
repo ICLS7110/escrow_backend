@@ -26,12 +26,13 @@ public class UserDetails : EndpointGroupBase
             // Optional: Add custom authorization logic if needed
             return await next(context);
         });
-
-        userGroup.MapGet("/", GetUserDetails);        // Get all users  
-        userGroup.MapGet("/{id:int}", GetUserDetails); // Get user by ID
-        userGroup.MapPost("/", CreateUser);
-        userGroup.MapPut("/{id:int}", UpdateUserDetail);
-        userGroup.MapDelete("/{id:int}", DeleteUser);
+        
+        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("Admin"));        // Get all users  
+        userGroup.MapGet("/{id:int}", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("User")); // Get user by ID
+        userGroup.MapPost("/create", CreateUser).RequireAuthorization(policy => policy.RequireRole("Admin"));
+        userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapDelete("/{id:int}", DeleteUser).RequireAuthorization(policy => policy.RequireRole("Admin"));
+        
     }
 
     [Authorize]
@@ -56,14 +57,10 @@ public class UserDetails : EndpointGroupBase
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
-    public async Task<IResult> UpdateUserDetail(ISender sender, int id, UpdateUserCommand command)
-    {
-        if (id != command.Id)
-        {
-            throw new CustomValidationException("Invalid Request.");
-        }
+    public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
+    {        
          await sender.Send(command);
-         return TypedResults.Ok(Result<object>.Success(new { Message = "User details updated successfully.", UserId = command.Id }));        
+         return TypedResults.Ok(Result<object>.Success(new { Message = "User details updated successfully." }));        
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]

@@ -10,37 +10,38 @@ using Escrow.Api.Infrastructure.Security;
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record UpdateBankDetailCommand: IRequest<int>
 {
-    public int Id { get; set; }
-    public int UserDetailId { get; set; }
+    public int Id { get; set; }    
     public string AccountHolderName { get; set; } = string.Empty;
     public string IBANNumber { get; set; } = string.Empty;
     public string BICCode { get; set; } = string.Empty;
+    public string BankName { get; set; } = String.Empty;
 }
 
 public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly IAESService _aESService;
+    private readonly IJwtService _jwtService;
 
-    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService)
+    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService,IJwtService jwtService)
     {
         _context = context;
        _aESService = aESService;
+        _jwtService = jwtService;
     }
 
     public async Task<int> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.BankDetails.FindAsync(request.Id);
+        var entity = await _context.BankDetails.Where(x => x.UserDetailId==Convert.ToInt32(_jwtService.GetUserId())).FirstOrDefaultAsync();
 
         if (entity == null)
         {
-            throw new CustomValidationException("Bank Details Not Found.");
-        }
-
-        entity.UserDetailId = request.UserDetailId;
+            throw new EscrowApiException("Bank Details Not Found.");
+        }        
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
         entity.BICCode = request.BICCode;
+        entity.BankName = _aESService.Encrypt(request.BankName);
         
         await _context.SaveChangesAsync(cancellationToken);
 

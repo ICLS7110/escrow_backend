@@ -14,11 +14,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Escrow.Api.Web.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Escrow.Api.Application.ResultHandler;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationHelper.InitializeConfig(builder.Configuration);
+
 
 // Add services to the container
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -76,6 +78,16 @@ builder.Services.AddAuthentication(options =>{
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options=> 
 {
+    options.Events = new JwtBearerEvents
+    {
+        OnForbidden = async context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+            var response = "Access Denied. You do not have permission to access this resource.";
+            await context.Response.WriteAsJsonAsync(Result<string>.Failure(response));
+        }
+    };
     var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
         ?? throw new InvalidOperationException("Jwt:IssuerSigningKey is missing in the configuration.");
 
@@ -113,6 +125,13 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug);
 var app = builder.Build();
 app.UseCors("AllowAll");
 app.MapControllers();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+    await AdminSeedService.EnsureAdminUserExists(services);
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

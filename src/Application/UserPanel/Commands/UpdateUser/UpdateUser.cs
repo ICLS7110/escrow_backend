@@ -15,9 +15,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
     public record UpdateUserCommand : IRequest
-    {
-        public int Id { get; init; }
-        public string UserId { get; init; } = string.Empty;
+    {        
+        
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? Gender { get; set; }
@@ -38,23 +37,23 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand>
     {
         private readonly IApplicationDbContext _context;
-
-        public UpdateUserCommandHandler(IApplicationDbContext context)
+        private readonly IJwtService _jwtService;
+        public UpdateUserCommandHandler(IApplicationDbContext context, IJwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             var entity = await _context.UserDetails
-                .FindAsync(new object[] { request.Id }, cancellationToken);
+                .FindAsync(new object[] { Convert.ToInt32(_jwtService.GetUserId())}, cancellationToken);
 
             if (entity == null) 
             {
-                throw new CustomValidationException("User Details Not Found.");
+                throw new EscrowApiException("User Details Not Found.");
             }
-
-            entity.UserId = request.UserId;
+            
             entity.FullName = request.FullName;
             entity.EmailAddress = request.EmailAddress;
             entity.Gender = request.Gender;

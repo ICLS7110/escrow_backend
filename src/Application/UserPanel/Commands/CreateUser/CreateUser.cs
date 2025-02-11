@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 {
@@ -49,7 +50,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 BusinessEmail = request.BusinessEmail,
                 VatId = request.VatId,               
                 LoginMethod = request.LoginMethod,
-                RecordState = "Active"
+                
             };
 
             

@@ -13,5 +13,6 @@ public class BankDetail: BaseAuditableEntity
     public string AccountHolderName { get; set; } = String.Empty;
     public string IBANNumber { get; set; } = String.Empty;
     public string BICCode { get; set; } = String.Empty;
+    public string BankName {  get; set; } = String.Empty;
 
 }

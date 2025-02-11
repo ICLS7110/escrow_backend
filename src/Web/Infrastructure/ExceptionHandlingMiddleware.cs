@@ -30,7 +30,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/json";
 
-            if (ex is CustomValidationException customValidationException)
+            if (ex is EscrowApiException customValidationException)
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 response = new

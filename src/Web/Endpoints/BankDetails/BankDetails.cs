@@ -25,22 +25,20 @@ public class BankDetails : EndpointGroupBase
             // Optional: Add custom authorization logic if needed
             return await next(context);
         });
-
-        userGroup.MapGet("/", GetBankDetails);        // Get all users  
-        userGroup.MapGet("/{id:int}", GetBankDetails); // Get user by ID
-        userGroup.MapPost("/", CreateBankDetail);
-        userGroup.MapPut("/{id:int}", UpdateBankDetail);
-        userGroup.MapDelete("/{id:int}", DeleteBankDetail);
+        
+        userGroup.MapGet("/", GetBankDetails).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapPost("/create", CreateBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapPost("/update", UpdateBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+        
+       
     }
 
     [Authorize]
     public async Task<IResult> GetBankDetails(
-        ISender sender,
-        int? id,
-        [AsParameters] GetBankDetailsQuery query)
+        ISender sender,IJwtService jwtService)
     {
         
-        query = new GetBankDetailsQuery { Id = id, PageNumber = query.PageNumber, PageSize = query.PageSize };
+       var query = new GetBankDetailsQuery { Id = Convert.ToInt32(jwtService.GetUserId()), PageNumber = 1, PageSize = 1 };
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<BankDetail>>.Success(result));
     }
@@ -54,13 +52,8 @@ public class BankDetails : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService, int id, UpdateBankDetailCommand command)
-    {
-        if (id != command.Id)
-        {
-            throw new CustomValidationException("Invalid Request.");
-        }       
-        
+    public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService,  UpdateBankDetailCommand command)
+    {      
         var result = await sender.Send(command);
         return TypedResults.Ok(Result<object>.Success(new { Message = "User details updated successfully." }));
     }

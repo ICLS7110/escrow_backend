@@ -1,4 +1,7 @@
-﻿namespace Escrow.Api.Web.Helpers
+﻿using Escrow.Api.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+
+namespace Escrow.Api.Web.Helpers
 {
     public static class ConfigurationHelper
     {
@@ -39,6 +42,7 @@
                 return expiry;
             }
         }
+
     }
 }
 

@@ -17,10 +17,10 @@ public class JwtService : IJwtService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string? GetUserId()
+    public string GetUserId()
     {
         var userid= _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return userid;
+        return userid ?? string.Empty;
     }
     
 }

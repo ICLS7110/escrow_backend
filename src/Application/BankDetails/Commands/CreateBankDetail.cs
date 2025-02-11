@@ -5,38 +5,41 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Security;
 
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record CreateBankDetailCommand : IRequest<int>
 {
-    public int UserDetailId { get; set; }
     public string AccountHolderName { get; set; } = string.Empty;
     public string IBANNumber { get; set; } = string.Empty;
     public string BICCode { get; set; } = string.Empty;
+    public string BankName { get; set; } = String.Empty;
 }
 
 public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly IAESService _AESService;
+    private readonly IJwtService _jwtService;
 
-    public CreateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService)
+    public CreateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService,IJwtService jwtService)
     {
         _context = context;
         _AESService = aESService;
+        _jwtService = jwtService;
     }
 
     public async Task<int> Handle(CreateBankDetailCommand request, CancellationToken cancellationToken)
     {
         var entity = new BankDetail
         {
-            UserDetailId = request.UserDetailId,
+            UserDetailId = Convert.ToInt32(_jwtService.GetUserId()),
             AccountHolderName = request.AccountHolderName,
             IBANNumber = _AESService.Encrypt( request.IBANNumber),
-            BICCode = request.BICCode,
-            RecordState="Active"
+            BankName = _AESService.Encrypt(request.BankName),
+            BICCode = request.BICCode,            
         };
 
         _context.BankDetails.Add(entity);

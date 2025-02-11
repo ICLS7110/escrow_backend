@@ -459,34 +459,6 @@
             "JWT": []
           }
         ]
-      },
-      "post": {
-        "tags": [
-          "UserDetails"
-        ],
-        "operationId": "PostApiUserDetails",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
       }
     },
     "/api/UserDetails/{id}": {
@@ -550,46 +522,6 @@
           }
         ]
       },
-      "put": {
-        "tags": [
-          "UserDetails"
-        ],
-        "operationId": "PutApiUserDetails",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      },
       "delete": {
         "tags": [
           "UserDetails"
@@ -619,55 +551,24 @@
         ]
       }
     },
-    "/api/BankDetails": {
-      "get": {
+    "/api/UserDetails/create": {
+      "post": {
         "tags": [
-          "BankDetails"
+          "UserDetails"
         ],
-        "operationId": "GetApiBankDetails",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 1
+        "operationId": "PostApiUserDetailsCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserCommand"
+              }
+            }
           },
-          {
-            "name": "Id",
-            "x-originalName": "id",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 4
-          }
-        ],
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": ""
@@ -678,12 +579,62 @@
             "JWT": []
           }
         ]
-      },
+      }
+    },
+    "/api/UserDetails/update": {
+      "post": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PostApiUserDetailsUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/BankDetails": {
+      "get": {
+        "tags": [
+          "BankDetails"
+        ],
+        "operationId": "GetApiBankDetails",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/BankDetails/create": {
       "post": {
         "tags": [
           "BankDetails"
         ],
-        "operationId": "PostApiBankDetails",
+        "operationId": "PostApiBankDetailsCreate",
         "requestBody": {
           "x-name": "command",
           "content": {
@@ -708,84 +659,12 @@
         ]
       }
     },
-    "/api/BankDetails/{id}": {
-      "get": {
+    "/api/BankDetails/update": {
+      "post": {
         "tags": [
           "BankDetails"
         ],
-        "operationId": "GetApiBankDetails2",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 4
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "BankDetails"
-        ],
-        "operationId": "PutApiBankDetails",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
+        "operationId": "PostApiBankDetailsUpdate",
         "requestBody": {
           "x-name": "command",
           "content": {
@@ -796,36 +675,8 @@
             }
           },
           "required": true,
-          "x-position": 2
+          "x-position": 1
         },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "BankDetails"
-        ],
-        "operationId": "DeleteApiBankDetails",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
         "responses": {
           "200": {
             "description": ""
@@ -1182,13 +1033,6 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userId": {
-            "type": "string"
-          },
           "fullName": {
             "type": "string",
             "nullable": true
@@ -1240,10 +1084,6 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "userDetailId": {
-            "type": "integer",
-            "format": "int32"
-          },
           "accountHolderName": {
             "type": "string"
           },
@@ -1251,6 +1091,9 @@
             "type": "string"
           },
           "bicCode": {
+            "type": "string"
+          },
+          "bankName": {
             "type": "string"
           }
         }
@@ -1263,10 +1106,6 @@
             "type": "integer",
             "format": "int32"
           },
-          "userDetailId": {
-            "type": "integer",
-            "format": "int32"
-          },
           "accountHolderName": {
             "type": "string"
           },
@@ -1274,6 +1113,9 @@
             "type": "string"
           },
           "bicCode": {
+            "type": "string"
+          },
+          "bankName": {
             "type": "string"
           }
         }
