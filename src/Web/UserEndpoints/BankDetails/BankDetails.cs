@@ -18,7 +18,7 @@ public class BankDetails : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         var userGroup = app.MapGroup(this)
-        .RequireAuthorization() // Enable OpenIddict authorization
+        .RequireAuthorization(policy => policy.RequireRole("User")) // Enable OpenIddict authorization
         .WithOpenApi()
         .AddEndpointFilter(async (context, next) =>
         {
@@ -26,10 +26,10 @@ public class BankDetails : EndpointGroupBase
             return await next(context);
         });
         
-        userGroup.MapGet("/", GetBankDetails).RequireAuthorization(policy => policy.RequireRole("User"));
-        userGroup.MapPost("/create", CreateBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
-        userGroup.MapPost("/update", UpdateBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
-        userGroup.MapDelete("/{id:int}", DeleteBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapGet("/", GetBankDetails);
+        userGroup.MapPost("/create", CreateBankDetail);
+        userGroup.MapPost("/update", UpdateBankDetail);
+        userGroup.MapDelete("/{id:int}", DeleteBankDetail);
 
     }
 

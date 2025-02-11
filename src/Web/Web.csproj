@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Endpoints\UserDetails.cs" />
+    <Compile Remove="UserEndpoints\UserDetails.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +41,10 @@
     <PackageReference Include="OpenIddict.Validation.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Twilio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AdminEndPoints\UserPanel\" />
   </ItemGroup>
 
 
