@@ -29,8 +29,8 @@ public class BankDetails : EndpointGroupBase
         userGroup.MapGet("/", GetBankDetails).RequireAuthorization(policy => policy.RequireRole("User"));
         userGroup.MapPost("/create", CreateBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
         userGroup.MapPost("/update", UpdateBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
-        
-       
+        userGroup.MapDelete("/{id:int}", DeleteBankDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+
     }
 
     [Authorize]

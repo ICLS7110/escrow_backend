@@ -32,7 +32,7 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
 
     public async Task<int> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.BankDetails.Where(x => x.UserDetailId==Convert.ToInt32(_jwtService.GetUserId())).FirstOrDefaultAsync();
+        var entity = await _context.BankDetails.FindAsync(request.Id);
 
         if (entity == null)
         {

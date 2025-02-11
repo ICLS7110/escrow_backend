@@ -27,11 +27,9 @@ public class UserDetails : EndpointGroupBase
             return await next(context);
         });
         
-        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("Admin"));        // Get all users  
+                // Get all users  
         userGroup.MapGet("/{id:int}", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("User")); // Get user by ID
-        userGroup.MapPost("/create", CreateUser).RequireAuthorization(policy => policy.RequireRole("Admin"));
         userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole("User"));
-        userGroup.MapDelete("/{id:int}", DeleteUser).RequireAuthorization(policy => policy.RequireRole("Admin"));
         
     }
 
