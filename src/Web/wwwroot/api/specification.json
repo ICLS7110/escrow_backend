@@ -448,6 +448,36 @@
         ]
       }
     },
+    "/api/Contract": {
+      "post": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "PostApiContract",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractDetailCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/BankDetails": {
       "get": {
         "tags": [
@@ -1093,6 +1123,55 @@
           "vatId": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "CreateContractDetailCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": "string"
+          },
+          "serviceType": {
+            "type": "string"
+          },
+          "serviceDescription": {
+            "type": "string"
+          },
+          "additionalNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "feesPaidBy": {
+            "type": "string"
+          },
+          "feeAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "buyerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "buyerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
           }
         }
       },

@@ -3,6 +3,7 @@ using System;
 using Escrow.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250212092434_Add_Contract_Table")]
+    partial class Add_Contract_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,16 +105,11 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("StatusReason")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserDetailId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerDetailsId");
 
                     b.HasIndex("SellerDetailsId");
-
-                    b.HasIndex("UserDetailId");
 
                     b.ToTable("ContractDetails");
                 });
@@ -450,17 +448,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("SellerDetailsId");
 
-                    b.HasOne("Escrow.Api.Domain.Entities.UserPanel.UserDetail", "UserDetail")
-                        .WithMany()
-                        .HasForeignKey("UserDetailId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("BuyerDetails");
 
                     b.Navigation("SellerDetails");
-
-                    b.Navigation("UserDetail");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.UserPanel.BankDetail", b =>
