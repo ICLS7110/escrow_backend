@@ -24,7 +24,7 @@ public class Result<T>
         };
     }
 
-    public static Result<T> Failure(string error)
+    public static Result<T> Failure(string? error)
     {
         return new Result<T>
         {            

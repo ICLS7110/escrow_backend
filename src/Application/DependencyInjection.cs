@@ -1,5 +1,9 @@
 ﻿using System.Reflection;
 using Escrow.Api.Application.Common.Behaviours;
+using Escrow.Api.Application.ContactUsCommands.Commands;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 //using Escrow.Api.Application.Common.Services;
 using Microsoft.Extensions.Hosting;
 
@@ -20,7 +24,6 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         });
-
-
+        
     }
 }

@@ -448,6 +448,31 @@
         ]
       }
     },
+    "/api/ContactUs": {
+      "post": {
+        "tags": [
+          "ContactUs"
+        ],
+        "operationId": "PostApiContactUs",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContactUsCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/BankDetails": {
       "get": {
         "tags": [
@@ -1093,6 +1118,21 @@
           "vatId": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "CreateContactUsCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
           }
         }
       },
