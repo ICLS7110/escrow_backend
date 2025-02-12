@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <Folder Include="AdminEndPoints\UserPanel\" />
+    <Folder Include="wwwroot\UserUploads\" />
   </ItemGroup>
 
 

@@ -112,7 +112,7 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-
+builder.Services.AddAntiforgery();
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
 builder.AddInfrastructureServices();
@@ -166,7 +166,7 @@ else
 //app.MapStaticAssets();
 //app.UseExceptionHandler(options => { });
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+app.UseAntiforgery();
 app.Map("/", () => Results.Redirect("/api"));
 
 app.MapEndpoints();

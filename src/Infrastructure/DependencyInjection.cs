@@ -16,6 +16,7 @@ using Escrow.Api.Infrastructure.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Escrow.Api.Infrastructure.OptionConfiguration;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -87,8 +88,11 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddSingleton<IAESService,AESService>();
-
-        
+        builder.Services.AddScoped<IFileService, FileService>();
+        builder.Services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+        });
 
     }
 
