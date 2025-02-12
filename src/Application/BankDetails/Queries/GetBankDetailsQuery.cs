@@ -6,20 +6,21 @@ using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Mappings;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.Common.Models.BankDtos;
 using Escrow.Api.Application.UserPanel.Queries.GetUsers;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Security;
 
 namespace Escrow.Api.Application.BankDetails.Queries;
 
-public record GetBankDetailsQuery : IRequest<PaginatedList<BankDetail>>
+public record GetBankDetailsQuery : IRequest<PaginatedList<BankDetailDTO>>
 {
     public int? Id { get; init; }
     public int? PageNumber { get; init; } = 1;
     public int? PageSize { get; init; } = 10;
 }
 
-public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, PaginatedList<BankDetail>>
+public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, PaginatedList<BankDetailDTO>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -34,7 +35,7 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
         _AESService = aESService;
     }
 
-    public async Task<PaginatedList<BankDetail>> Handle(GetBankDetailsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<BankDetailDTO>> Handle(GetBankDetailsQuery request, CancellationToken cancellationToken)
     {
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
@@ -47,11 +48,9 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
         }
 
         return await query
-            .Select(s => new BankDetail
+            .Select(s => new BankDetailDTO
             {
-                Id = s.Id,
-                UserDetail = s.UserDetail,
-                UserDetailId = s.UserDetailId,
+                Id = s.Id,                
                 AccountHolderName = s.AccountHolderName,
                 IBANNumber = _AESService.Decrypt(s.IBANNumber),
                 BankName = _AESService.Decrypt(s.BankName),

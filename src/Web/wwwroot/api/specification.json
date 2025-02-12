@@ -400,56 +400,12 @@
         ]
       }
     },
-    "/api/UserDetails/{id}": {
+    "/api/UserDetails": {
       "get": {
         "tags": [
           "UserDetails"
         ],
         "operationId": "GetApiUserDetails",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 3
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 4
-          }
-        ],
         "responses": {
           "200": {
             "description": ""
@@ -1135,22 +1091,6 @@
             "nullable": true
           },
           "vatId": {
-            "type": "string",
-            "nullable": true
-          },
-          "accountHolderName": {
-            "type": "string",
-            "nullable": true
-          },
-          "ibanNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "bicCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "loginMethod": {
             "type": "string",
             "nullable": true
           }

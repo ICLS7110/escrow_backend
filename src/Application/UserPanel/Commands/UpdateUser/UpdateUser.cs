@@ -25,13 +25,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public string? BusinessManagerName { get; set; }
         public string? BusinessEmail { get; set; }
         public string? VatId { get; set; }
-
-        // Bank Account Details Fields
-        public string? AccountHolderName { get; set; }
-        public string? IBANNumber { get; set; }
-        public string? BICCode { get; set; }
-
-        public string? LoginMethod { get; set; }
+        
     }
 
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand>
@@ -60,9 +54,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.DateOfBirth = request.DateOfBirth;
             entity.BusinessManagerName = request.BusinessManagerName;
             entity.BusinessEmail = request.BusinessEmail;
-            entity.VatId = request.VatId;           
-            entity.LoginMethod = request.LoginMethod;
-
+            entity.VatId = request.VatId;
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

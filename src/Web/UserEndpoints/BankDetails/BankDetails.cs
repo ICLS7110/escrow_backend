@@ -10,6 +10,7 @@ using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Application.ResultHandler;
 using Escrow.Api.Application;
 using Escrow.Api.Infrastructure.Security;
+using Escrow.Api.Application.Common.Models.BankDtos;
 
 namespace Escrow.Api.Web.Endpoints.BankDetails;
 
@@ -38,9 +39,9 @@ public class BankDetails : EndpointGroupBase
         ISender sender,IJwtService jwtService)
     {
         
-       var query = new GetBankDetailsQuery { Id = Convert.ToInt32(jwtService.GetUserId()), PageNumber = 1, PageSize = 1 };
+       var query = new GetBankDetailsQuery { Id = Convert.ToInt32(jwtService.GetUserId()), PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<BankDetail>>.Success(result));
+        return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(result));
     }
 
     [Authorize]

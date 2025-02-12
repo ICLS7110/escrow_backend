@@ -22,8 +22,9 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
 
     public async Task Handle(DeleteBankDetailCommand request, CancellationToken cancellationToken)
     {
+        var userid= Convert.ToInt32(_jwtService.GetUserId());
         var entity = await _context.BankDetails
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id==request.Id && x.UserDetailId==userid);
 
         if (entity == null)
         {
@@ -31,7 +32,7 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
         }
         entity.RecordState = RecordState.Deleted;
         entity.DeletedAt= DateTimeOffset.UtcNow;
-        entity.DeletedBy = Convert.ToInt32(_jwtService.GetUserId());
+        entity.DeletedBy = userid;
         _context.BankDetails.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
     }

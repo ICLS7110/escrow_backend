@@ -11,6 +11,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Microsoft.AspNetCore.Mvc;
 using Escrow.Api.Application.ResultHandler;
 using Escrow.Api.Application;
+using Escrow.Api.Application.Common.Interfaces;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 
@@ -28,18 +29,15 @@ public class UserDetails : EndpointGroupBase
         });
         
                 // Get all users  
-        userGroup.MapGet("/{id:int}", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("User")); // Get user by ID
+        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("User")); // Get user by ID
         userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole("User"));
         
     }
 
     [Authorize]
-    public async Task<IResult> GetUserDetails(
-        ISender sender,
-        int? id,        
-        [AsParameters] GetUserDetailsQuery query)
+    public async Task<IResult> GetUserDetails(ISender sender,IJwtService jwtService )
     {
-        query = new GetUserDetailsQuery { Id = id, PageNumber = query.PageNumber, PageSize = query.PageSize};
+        var query = new GetUserDetailsQuery { Id = Convert.ToInt32(jwtService.GetUserId()), PageNumber = 1, PageSize = 1};
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(result));
     }
