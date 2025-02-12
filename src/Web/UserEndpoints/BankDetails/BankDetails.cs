@@ -39,7 +39,7 @@ public class BankDetails : EndpointGroupBase
         ISender sender,IJwtService jwtService)
     {
         
-       var query = new GetBankDetailsQuery { Id = Convert.ToInt32(jwtService.GetUserId()), PageNumber = 1, PageSize = 10 };
+       var query = new GetBankDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(result));
     }

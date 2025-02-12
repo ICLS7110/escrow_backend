@@ -37,7 +37,7 @@ public class UserDetails : EndpointGroupBase
     [Authorize]
     public async Task<IResult> GetUserDetails(ISender sender,IJwtService jwtService )
     {
-        var query = new GetUserDetailsQuery { Id = Convert.ToInt32(jwtService.GetUserId()), PageNumber = 1, PageSize = 1};
+        var query = new GetUserDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 1};
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(result));
     }
