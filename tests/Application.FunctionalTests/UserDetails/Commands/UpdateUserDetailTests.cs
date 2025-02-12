@@ -61,7 +61,8 @@ public class UpdateUserDetailTests : BaseTestFixture
         });
 
         var command = new UpdateUserCommand
-        {            
+        {
+            
             FullName = "Updated List Title 5",
             EmailAddress = "john@example.com",
             Gender = "Male",

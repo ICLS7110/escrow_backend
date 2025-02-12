@@ -35,7 +35,7 @@ public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCo
     {
         var entity = new BankDetail
         {
-            UserDetailId = Convert.ToInt32(_jwtService.GetUserId()),
+            UserDetailId = _jwtService.GetUserId().ToInt(),
             AccountHolderName = request.AccountHolderName,
             IBANNumber = _AESService.Encrypt( request.IBANNumber),
             BankName = _AESService.Encrypt(request.BankName),

@@ -35,10 +35,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
 
             entity.RecordState = RecordState.Deleted;
             entity.DeletedAt = DateTimeOffset.UtcNow;
-            entity.DeletedBy = Convert.ToInt32(_jwtService.GetUserId());
-            _context.UserDetails.Update(entity);
-
-            
+            entity.DeletedBy = _jwtService.GetUserId().ToInt();
+            _context.UserDetails.Update(entity);           
 
             await _context.SaveChangesAsync(cancellationToken);
         }
