@@ -88,11 +88,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddSingleton<IAESService,AESService>();
-        builder.Services.AddScoped<IFileService, FileService>();
-        builder.Services.Configure<FormOptions>(options =>
-        {
-            options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
-        });
+        
 
     }
 
