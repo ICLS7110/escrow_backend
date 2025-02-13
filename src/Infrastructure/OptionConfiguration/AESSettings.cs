@@ -16,3 +16,11 @@ public class ConnectionStrings
 {
     public string Escrow { get; set; } = string.Empty;
 }
+
+public class AWSS3
+{
+    public string AccessKey { get; set; } = string.Empty;
+    public string SecretKey { get; set; } = string.Empty;
+    public string BucketName { get; set; } = string.Empty;
+    public string Region { get; set; } = string.Empty;
+}
