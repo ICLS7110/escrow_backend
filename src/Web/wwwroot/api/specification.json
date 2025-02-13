@@ -1093,6 +1093,14 @@
           "vatId": {
             "type": "string",
             "nullable": true
+          },
+          "businessProof": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyEmail": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

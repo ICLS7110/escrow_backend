@@ -25,7 +25,9 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public string? BusinessManagerName { get; set; }
         public string? BusinessEmail { get; set; }
         public string? VatId { get; set; }
-        
+        public string? BusinessProof { get; set; }
+        public string? CompanyEmail { get; set; }
+
     }
 
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand>
@@ -55,6 +57,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.BusinessManagerName = request.BusinessManagerName;
             entity.BusinessEmail = request.BusinessEmail;
             entity.VatId = request.VatId;
+            entity.BusinessProof = request.BusinessProof;
+            entity.CompanyEmail = request.CompanyEmail;
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
