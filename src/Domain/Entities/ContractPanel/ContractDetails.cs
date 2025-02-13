@@ -29,4 +29,5 @@ public class ContractDetails : BaseAuditableEntity
     public int UserDetailId { get; set; }
     public UserDetail? UserDetail { get; set; }
     
+    public ICollection<MileStone>? MileStones { get; set; } 
 }
