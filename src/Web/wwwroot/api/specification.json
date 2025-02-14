@@ -1145,6 +1145,10 @@
           "companyEmail": {
             "type": "string",
             "nullable": true
+          },
+          "profilePicture": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

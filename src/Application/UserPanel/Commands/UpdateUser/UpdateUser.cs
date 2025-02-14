@@ -27,6 +27,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public string? VatId { get; set; }
         public string? BusinessProof { get; set; }
         public string? CompanyEmail { get; set; }
+        public string? ProfilePicture { get; set; }
 
     }
 
@@ -59,6 +60,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.VatId = request.VatId;
             entity.BusinessProof = request.BusinessProof;
             entity.CompanyEmail = request.CompanyEmail;
+            entity.ProfilePicture = request.ProfilePicture;
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
