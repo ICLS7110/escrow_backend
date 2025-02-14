@@ -85,7 +85,7 @@ builder.Services.AddAuthentication(options =>{
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             context.Response.ContentType = "application/json";
             var response = "Access Denied. You do not have permission to access this resource.";
-            await context.Response.WriteAsJsonAsync(Result<string>.Failure(response));
+            await context.Response.WriteAsJsonAsync(Result<string>.Failure(StatusCodes.Status403Forbidden, response));
         }
     };
     var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]

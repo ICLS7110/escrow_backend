@@ -24,14 +24,14 @@ public class FileUploadController : ControllerBase
 
         if (files == null || files.Count == 0)
         {
-            return TypedResults.BadRequest(Result<string>.Failure("No files Found."));
+            return TypedResults.BadRequest(Result<string>.Failure(StatusCodes.Status400BadRequest, "No files Found."));
 
         }
         var fileUrls = await _fileService.UploadFilesonAWS(files);
         if (fileUrls.Any())
         {
-            return TypedResults.Ok(Result<List<string>>.Success(fileUrls));
+            return TypedResults.Ok(Result<List<string>>.Success(StatusCodes.Status200OK,"Success", fileUrls));
         }
-        return TypedResults.BadRequest(Result<string>.Failure("Something went wrong in saving the files."));
+        return TypedResults.BadRequest(Result<string>.Failure(StatusCodes.Status400BadRequest, "Something went wrong in saving the files."));
     }
 }
