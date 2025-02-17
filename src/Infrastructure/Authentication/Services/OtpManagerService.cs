@@ -32,7 +32,7 @@ public class OtpManagerService : IOtpManagerService
         var phoneNumber = $"{countryCode}{mobileNumber}";
         var isPhoneNumberValid = await _validationService.ValidatePhoneNumberAsync(phoneNumber);
         if (!isPhoneNumberValid)
-            throw new EscrowApiException("Invalid phone number.");
+            throw new EscrowValidationException("Invalid phone number.");
        
         var otp = await _otpService.GenerateOtpAsync();
 
@@ -70,10 +70,10 @@ public class OtpManagerService : IOtpManagerService
         var phoneNumber = $"{countryCode}{mobileNumber}";
 
         if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
-            throw new EscrowApiException("OTP expired or invalid.");
+            throw new EscrowDataNotFoundException("OTP expired or invalid.");
 
         if (storedOtp != otp)
-            throw new EscrowApiException("Invalid OTP.");
+            throw new EscrowValidationException("Invalid OTP.");
 
         // Remove OTP after successful validation
         _cache.Remove(phoneNumber);

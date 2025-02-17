@@ -62,7 +62,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                 // Verify the OTP and retrieve the user ID
                 var user = await _otpManagerService.VerifyOtpAsync(request.countryCode,request.MobileNumber, request.Otp);
                 if (string.IsNullOrEmpty(user.UserId))
-                    throw new EscrowApiException("Invalid OTP or user ID could not be retrieved.");
+                    throw new EscrowValidationException("Invalid OTP or user ID could not be retrieved.");
 
                 #region Commented Old Code
                 //// Create claims and identity for the token

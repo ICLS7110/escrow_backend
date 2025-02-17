@@ -43,7 +43,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
             var isExists=_context.UserDetails.Any(x => x.BusinessEmail == request.BusinessEmail );
             if (isExists) 
             {
-                throw new EscrowApiException("The business email address already registed with weLink.com");
+                throw new ValidationException("The business email address already registed with weLink.com");
             }
             var entity = new UserDetail
             {      
