@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amazon.Runtime.Internal;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
 
 namespace Escrow.Api.Application.ContractPanel;
@@ -21,20 +23,26 @@ public record CreateContractDetailCommand : IRequest<int>
     public string? SellerName { get; set; }
     public string? SellerMobile { get; set; }
     public string Status { get; set; } = string.Empty;
+
+    public List<MileStoneDTO>? MileStones { get; set; }
 }
 
 public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetailCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtService _jwtService;
-    public CreateContractDetailsHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService)
+    private readonly IMapper _mapper;
+    public CreateContractDetailsHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService,IMapper mapper)
     {
         _context = applicationDbContext;
         _jwtService = jwtService;
+        _mapper = mapper;
     }
 
     public async Task<int> Handle(CreateContractDetailCommand request,CancellationToken cancellationToken)
     {
+        int ContractId;
+        int userid = _jwtService.GetUserId().ToInt();
         var entity = new ContractDetails
         {
             Role = request.Role,
@@ -49,12 +57,24 @@ public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetail
             SellerMobile = request.SellerMobile,
             SellerName = request.SellerName,
             Status = request.Status,
-            BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ?  Convert.ToInt32(_jwtService.GetUserId()) : null,
-            SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? Convert.ToInt32(_jwtService.GetUserId()) : null,
-            UserDetailId= Convert.ToInt32(_jwtService.GetUserId())
+            BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null,
+            SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null,
+            UserDetailId= userid
         };
         await _context.ContractDetails.AddAsync(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        return entity.Id;
+        ContractId= entity.Id;
+        if(request.MileStones!=null && request.MileStones.Any())
+        {
+            foreach(var milestone in request.MileStones)
+            {
+                var mappedentity = _mapper.Map<MileStone>(milestone);
+                mappedentity.CreatedBy = userid.ToString();
+                mappedentity.ContractId = ContractId;
+                await _context.MileStones.AddAsync(mappedentity);
+            }
+        }
+        await _context.SaveChangesAsync(cancellationToken);
+        return ContractId;
     }
 }

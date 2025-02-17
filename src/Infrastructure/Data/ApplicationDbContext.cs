@@ -36,6 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
 
     public DbSet<ContractDetails> ContractDetails => Set<ContractDetails>();
+    public DbSet<MileStone> MileStones => Set<MileStone>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -1228,6 +1228,106 @@
           },
           "status": {
             "type": "string"
+          },
+          "mileStones": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/MileStoneDTO"
+            }
+          }
+        }
+      },
+      "MileStoneDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "documents": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "contractDetails": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContractDetailsDTO"
+              }
+            ]
+          }
+        }
+      },
+      "ContractDetailsDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": "string"
+          },
+          "serviceType": {
+            "type": "string"
+          },
+          "serviceDescription": {
+            "type": "string"
+          },
+          "additionalNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "feesPaidBy": {
+            "type": "string"
+          },
+          "feeAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "buyerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "buyerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "mileStones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MileStoneDTO"
+            }
           }
         }
       },
