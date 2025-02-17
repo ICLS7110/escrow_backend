@@ -61,6 +61,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.BusinessProof = request.BusinessProof;
             entity.CompanyEmail = request.CompanyEmail;
             entity.ProfilePicture = request.ProfilePicture;
+            
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

@@ -146,7 +146,7 @@ namespace Escrow.Api.Web.Endpoints.Authentication
             {               
                 AccessToken = token,
                 UserId = String.IsNullOrEmpty(newUser.PhoneNumber) ? user.Id : newUser.Id,
-                IsProfileCompleted = false
+                IsProfileCompleted = user?.IsProfileCompleted
             };
             return Ok(Result<object>.Success(StatusCodes.Status200OK, "OTP verified successfully.", result));               
             
