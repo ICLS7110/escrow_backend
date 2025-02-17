@@ -13,6 +13,7 @@ public class UserDetail : BaseAuditableEntity
     public string? EmailAddress { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Gender { get; set; }
+    [Column(TypeName = "timestamp without time zone")]
     public DateTime? DateOfBirth { get; set; }
 
     // Business Fields
@@ -24,4 +25,6 @@ public class UserDetail : BaseAuditableEntity
     public string? LoginMethod { get; set; }
     public string? BusinessProof {  get; set; }
     public string? ProfilePicture {  get; set; }
+
+    public bool IsProfileCompleted { get; set; } = false;
 }

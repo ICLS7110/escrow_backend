@@ -27,7 +27,7 @@ public class FileUploadController : ControllerBase
             return TypedResults.BadRequest(Result<string>.Failure(StatusCodes.Status400BadRequest, "No files Found."));
 
         }
-        var fileUrls = await _fileService.UploadFilesonAWS(files);
+        var fileUrls = await _fileService.UploadFilesForUser(files);
         if (fileUrls.Any())
         {
             return TypedResults.Ok(Result<List<string>>.Success(StatusCodes.Status200OK,"Success", fileUrls));

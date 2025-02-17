@@ -48,7 +48,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 
             if (entity == null) 
             {
-                throw new EscrowApiException("User Details Not Found.");
+                throw new EscrowDataNotFoundException("User Details Not Found.");
             }
             
             entity.FullName = request.FullName;
@@ -61,6 +61,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.BusinessProof = request.BusinessProof;
             entity.CompanyEmail = request.CompanyEmail;
             entity.ProfilePicture = request.ProfilePicture;
+            
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

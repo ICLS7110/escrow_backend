@@ -37,7 +37,7 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
 
         if (entity == null)
         {
-            throw new EscrowApiException("Bank Details Not Found.");
+            throw new EscrowDataNotFoundException("Bank Details Not Found.");
         }        
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);

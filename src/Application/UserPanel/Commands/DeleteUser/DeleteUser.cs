@@ -30,7 +30,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
 
             if (entity == null)
             {
-                throw new EscrowApiException("User Details Not Found.");
+                throw new EscrowDataNotFoundException("User Details Not Found.");
             }
 
             entity.RecordState = RecordState.Deleted;

@@ -28,12 +28,12 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
 
         if (entity == null)
         {
-            throw new EscrowApiException("Bank Details Not Found.");
+            throw new EscrowDataNotFoundException("Bank Details Not Found.");
         }
         entity.RecordState = RecordState.Deleted;
         entity.DeletedAt= DateTimeOffset.UtcNow;
         entity.DeletedBy = userid;
         _context.BankDetails.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
-    }
+    }  
 }

@@ -73,7 +73,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
                 if (!createUserResult.Succeeded)
                 {
                     var errors = string.Join(", ", createUserResult.Errors.Select(e => e.Description));
-                    throw new EscrowApiException($"User creation failed: {errors}");
+                    throw new EscrowRecordCreationException($"User creation failed: {errors}");
                 }
 
                 // Assign "User" role
@@ -81,7 +81,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
                 if (!roleResult.Succeeded)
                 {
                     var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                    throw new EscrowApiException($"Role assignment failed: {roleErrors}");
+                    throw new EscrowRecordCreationException($"Role assignment failed: {roleErrors}");
                 }
                 newApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
             }
@@ -100,7 +100,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
             if (newApplicationUser == null)
             {
-                throw new InvalidOperationException("User creation failed.");
+                throw new EscrowRecordCreationException("User creation failed.");
             }
 
             return newUser;
