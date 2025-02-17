@@ -12,8 +12,8 @@ using Escrow.Api.Domain.Enums;
 namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 {
     public record CreateUserCommand : IRequest<int>
-    {
-        public string UserId { get; init; } = string.Empty;
+    {        
+        public string UserId { get; set; }= string.Empty;
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? PhoneNumber { get; set; }
@@ -25,6 +25,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
         public string? VatId { get; set; }
         //public byte[]? ProofOfBusiness { get; set; } // File as binary
         public string? LoginMethod { get; set; }
+        public string? BusinessProof { get; set; }
+        public string? CompanyEmail { get; set; }
     }
 
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, int>
@@ -38,8 +40,13 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 
         public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var entity = new UserDetail
+            var isExists=_context.UserDetails.Any(x => x.BusinessEmail == request.BusinessEmail );
+            if (isExists) 
             {
+                throw new EscrowApiException("The business email address already registed with weLink.com");
+            }
+            var entity = new UserDetail
+            {      
                 UserId = request.UserId,
                 FullName = request.FullName,
                 EmailAddress = request.EmailAddress,
@@ -50,7 +57,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 BusinessEmail = request.BusinessEmail,
                 VatId = request.VatId,               
                 LoginMethod = request.LoginMethod,
-                
+                BusinessProof= request.BusinessProof,
+                CompanyEmail = request.CompanyEmail,
             };
 
             

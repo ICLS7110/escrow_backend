@@ -51,11 +51,8 @@ namespace Escrow.Api.Web.Endpoints.Authentication
         public async Task<IResult> RequestOtp([FromBody] RequestOtpDto request)
         {
                 await _otpManagerService.RequestOtpAsync(request.CountryCode,request.MobileNumber);
-                object returnResult = new
-                {
-                    Message = "OTP sent successfully."
-                };
-                return TypedResults.Ok(Result<object>.Success(returnResult));          
+                
+                return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "OTP sent successfully.", new()));          
         }
 
         [HttpPost("verify-otp")]
@@ -146,13 +143,12 @@ namespace Escrow.Api.Web.Endpoints.Authentication
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
             object result = new
-            {                
-                Message = "OTP verified successfully.",
+            {               
                 AccessToken = token,
                 UserId = String.IsNullOrEmpty(newUser.PhoneNumber) ? user.Id : newUser.Id,
                 IsProfileCompleted = false
             };
-            return Ok(Result<object>.Success(result));               
+            return Ok(Result<object>.Success(StatusCodes.Status200OK, "OTP verified successfully.", result));               
             
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Eventing.Reader;
 using Escrow.Api.Application;
 using Newtonsoft.Json;
+using YamlDotNet.Core.Tokens;
 
 namespace Escrow.Api.Web.Infrastructure;
 
@@ -24,8 +25,9 @@ public class ExceptionHandlingMiddleware : IMiddleware
             _logger.LogError(ex, ex.Message);
             var response = new
             {
-                IsSuccess = false,
-                ErrorMessage = "An unhandled exception has occurred."
+                Status = StatusCodes.Status500InternalServerError,
+                Message = "An unhandled exception has occurred.",
+                Value= new object() { }
             };
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "application/json";
@@ -35,8 +37,9 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 response = new
                 {
-                    IsSuccess = false,
-                    ErrorMessage = customValidationException.Message
+                    Status = StatusCodes.Status400BadRequest,
+                    Message = customValidationException.Message,
+                    Value = new object() { }
                 };
             }
 

@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Escrow.Api.Infrastructure.OptionConfiguration;
 using Microsoft.AspNetCore.Http.Features;
+using Amazon.S3;
+using Amazon;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -56,6 +58,7 @@ public static class DependencyInjection
 
         builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
         builder.Services.Configure<AESSettings>(builder.Configuration.GetSection("AESSettings"));
+        builder.Services.Configure<AWSS3>(builder.Configuration.GetSection("AWSS3"));
 
         // Register IApplicationDbContext and initializer
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -88,7 +91,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddSingleton<IAESService,AESService>();
-        
+        builder.Services.AddScoped<IFileService, FileService>();
 
     }
 

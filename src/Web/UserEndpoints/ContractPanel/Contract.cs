@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.ContractPanel;
+﻿using System.Net;
+using Escrow.Api.Application.ContractPanel;
 using Escrow.Api.Application.ResultHandler;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Twilio.TwiML.Messaging;
@@ -23,10 +24,7 @@ public class Contract : EndpointGroupBase
     public async Task<IResult> CreateContractDetails(ISender sender, CreateContractDetailCommand command)
     {
         var id = await sender.Send(command);
-        var respose = new 
-        { 
-            Message="Contract Created Successfully."
-        };
-        return TypedResults.Ok(Result<object>.Success(respose));
+        
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract Created Successfully.",new()));
     }
 }

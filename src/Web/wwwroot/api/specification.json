@@ -797,6 +797,50 @@
         ]
       }
     },
+    "/api/files/Upload-Files": {
+      "post": {
+        "tags": [
+          "FileUpload"
+        ],
+        "operationId": "FileUpload_UploadFiles",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/auth/request-otp": {
       "post": {
         "tags": [
@@ -1121,6 +1165,18 @@
             "nullable": true
           },
           "vatId": {
+            "type": "string",
+            "nullable": true
+          },
+          "businessProof": {
+            "type": "string",
+            "nullable": true
+          },
+          "companyEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "profilePicture": {
             "type": "string",
             "nullable": true
           }

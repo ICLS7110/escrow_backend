@@ -7,29 +7,29 @@ using System.Threading.Tasks;
 namespace Escrow.Api.Application.ResultHandler;
 public class Result<T>
 {
-    public bool IsSuccess { get; private set; } = false;
+    public int Status { get; private set; } 
     public T? Value { get; private set; }    
-    public string? ErrorMessage { get; private set; }= string.Empty;
+    public string? Message { get; private set; }= string.Empty;
 
     // Private constructor to enforce the use of factory methods
     private Result() { }
 
-    public static Result<T> Success(T value)
+    public static Result<T> Success(int statuscode,string message,T value)
     {
         return new Result<T>
         {
-            IsSuccess = true,
-            Value = value,            
-            ErrorMessage = null
+            Status = statuscode,
+            Value = value,
+            Message = message
         };
     }
 
-    public static Result<T> Failure(string error)
+    public static Result<T> Failure(int statuscode,string error)
     {
         return new Result<T>
-        {            
-            IsSuccess = false,
-            ErrorMessage = error
+        {
+            Status = statuscode,
+            Message = error
         };
     }
 }

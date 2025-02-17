@@ -41,14 +41,14 @@ public class BankDetails : EndpointGroupBase
         
        var query = new GetBankDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(result));
+        return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(StatusCodes.Status200OK,"Success", result));
     }
 
     [Authorize]
     public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
     {       
         var id = await sender.Send(command);
-        return TypedResults.Ok(Result<int>.Success(id));
+        return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
         //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
     }
 
@@ -56,13 +56,13 @@ public class BankDetails : EndpointGroupBase
     public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService,  UpdateBankDetailCommand command)
     {      
         var result = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(new { Message = "User details updated successfully." }));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"Bank details updated successfully.",new()));
     }
 
     [Authorize]
     public async Task<IResult> DeleteBankDetail(ISender sender, int id)
     {
         await sender.Send(new DeleteBankDetailCommand(id));
-        return TypedResults.Ok( Result<object>.Success( new { Message = "Bank details Deleted successfully." } )); 
+        return TypedResults.Ok( Result<object>.Success(StatusCodes.Status204NoContent, "Bank details Deleted successfully.", new())); 
     }
 }

@@ -39,7 +39,7 @@ public class UserDetails : EndpointGroupBase
     {
         var query = new GetUserDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 1};
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(result));
+        return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(StatusCodes.Status200OK, "Success", result));
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
@@ -48,7 +48,7 @@ public class UserDetails : EndpointGroupBase
     {
         var id = await sender.Send(command);
 
-        return TypedResults.Ok(Result<int>.Success(id));
+        return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
@@ -56,7 +56,7 @@ public class UserDetails : EndpointGroupBase
     public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
     {        
          await sender.Send(command);
-         return TypedResults.Ok(Result<object>.Success(new { Message = "User details updated successfully." }));        
+         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"User details updated successfully.", new()));        
     }
 
     //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
@@ -64,6 +64,6 @@ public class UserDetails : EndpointGroupBase
     public async Task<IResult> DeleteUser(ISender sender, int id)
     {
         await sender.Send(new DeleteUserCommand(id));
-        return TypedResults.Ok(Result<object>.Success(new { Message = "User details Deleted successfully." }));   
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details Deleted successfully.", new()));   
     }
 }

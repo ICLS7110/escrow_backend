@@ -18,9 +18,11 @@ public class UserDetailDto
     public string? BusinessManagerName { get; set; }
     public string? BusinessEmail { get; set; }
     public string? VatId { get; set; }
-    
 
+    public string? BusinessProof { get; set; }
+    public string? CompanyEmail { get; set; }
     public string? LoginMethod { get; set; }
+    public string? ProfilePicture { get; set; }
 
     private class Mapping : Profile
     {
