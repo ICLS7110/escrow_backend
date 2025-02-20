@@ -44,7 +44,8 @@ public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCo
 
         _context.BankDetails.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        var userentity = await _context.UserDetails.FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
+        int userId = _jwtService.GetUserId().ToInt();
+        var userentity = await _context.UserDetails.FindAsync(new object[] { userId }, cancellationToken);
         if (userentity != null) 
         { 
             userentity.IsProfileCompleted = true;
