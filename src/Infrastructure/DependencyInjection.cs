@@ -12,6 +12,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Escrow.Api.Infrastructure.Authentication.Services;
+using Escrow.Api.Infrastructure.Security;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Escrow.Api.Infrastructure.OptionConfiguration;
+using Amazon.S3;
+using Amazon;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -46,8 +52,12 @@ public static class DependencyInjection
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString);            
         });
+
+        builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
+        builder.Services.Configure<AESSettings>(builder.Configuration.GetSection("AESSettings"));
+        builder.Services.Configure<AWSS3>(builder.Configuration.GetSection("AWSS3"));
 
         // Register IApplicationDbContext and initializer
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -76,6 +86,13 @@ public static class DependencyInjection
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, Escrow.Api.Infrastructure.Authentication.Services.IdentityEmailSender>();
+        builder.Services.AddSingleton<IRsaHelper,RsaHelper>();
+        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        builder.Services.AddScoped<IJwtService, JwtService>();
+        builder.Services.AddSingleton<IAESService,AESService>();
+        builder.Services.AddScoped<IFileService, FileService>();
 
     }
+
+    
 }

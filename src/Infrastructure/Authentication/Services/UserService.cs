@@ -9,16 +9,18 @@ using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
+using Escrow.Api.Application;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
 {
     public class UserService : IUserService
     {
         private readonly IApplicationDbContext _context;
-
-        public UserService(IApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public UserService(IApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<UserDetail> FindOrCreateUserAsync(string phoneNumber)
@@ -55,18 +57,50 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
         public async Task<UserDetail> CreateUserAsync(string phoneNumber)
         {
+            var existingApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
+            ApplicationUser? newApplicationUser;
+            if (existingApplicationUser == null)
+            {
+                // Create a new user
+                newApplicationUser = new ApplicationUser
+                {
+                    UserName = phoneNumber,
+                    PhoneNumber = phoneNumber,
+                    PhoneNumberConfirmed = true
+                };
+
+                var createUserResult = await _userManager.CreateAsync(newApplicationUser);
+                if (!createUserResult.Succeeded)
+                {
+                    var errors = string.Join(", ", createUserResult.Errors.Select(e => e.Description));
+                    throw new EscrowRecordCreationException($"User creation failed: {errors}");
+                }
+
+                // Assign "User" role
+                var roleResult = await _userManager.AddToRoleAsync(newApplicationUser, "User");
+                if (!roleResult.Succeeded)
+                {
+                    var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    throw new EscrowRecordCreationException($"Role assignment failed: {roleErrors}");
+                }
+                newApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
+            }
+            else
+            {
+                newApplicationUser = existingApplicationUser;
+            }
             var newUser = new UserDetail
             {
                 PhoneNumber = phoneNumber,
-                UserId = Guid.NewGuid().ToString()  // Generate a new unique UserId (GUID)
+                UserId = newApplicationUser?.Id ?? Guid.Empty.ToString(),
             };
 
             _context.UserDetails.Add(newUser);
             await _context.SaveChangesAsync();
 
-            if (newUser == null)
+            if (newApplicationUser == null)
             {
-                throw new InvalidOperationException("User creation failed.");
+                throw new EscrowRecordCreationException("User creation failed.");
             }
 
             return newUser;

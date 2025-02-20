@@ -16,7 +16,7 @@ public class MappingTests
 
     public MappingTests()
     {
-        _configuration = new MapperConfiguration(config => 
+        _configuration = new MapperConfiguration(config =>
             config.AddMaps(Assembly.GetAssembly(typeof(IApplicationDbContext))));
 
         _mapper = _configuration.CreateMapper();
@@ -29,7 +29,7 @@ public class MappingTests
     }
 
     [Test]
-    [TestCase(typeof(UserDetail), typeof(UserDetailDto))]    
+    [TestCase(typeof(UserDetail), typeof(UserDetailDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);

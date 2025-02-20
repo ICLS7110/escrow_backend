@@ -5,14 +5,14 @@ using Escrow.Api.Domain.Entities.UserPanel;
 
 namespace Escrow.Api.Application.UserPanel.Queries.GetUsers;
 
-public record GetUserDetailsQuery : IRequest<List<UserDetail>>
+public record GetUserDetailsQuery : IRequest<PaginatedList<UserDetailDto>>
 {
-    public string? UserId { get; init; } = string.Empty;
-    /* public int PageNumber { get; init; } = 1;
-     public int PageSize { get; init; } = 10;*/
+    public int? Id { get; init; }
+    public int? PageNumber { get; init; } = 1;
+    public int? PageSize { get; init; } = 10;
 }
 
-public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, List<UserDetail>>
+public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, PaginatedList<UserDetailDto>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -23,20 +23,21 @@ public class GetGetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery
         _mapper = mapper;
     }
 
-    public async Task<List<UserDetail>> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<UserDetailDto>> Handle(GetUserDetailsQuery request, CancellationToken cancellationToken)
     {
-        if (String.IsNullOrEmpty(request.UserId))
+        int pageNumber = request.PageNumber ?? 1;
+        int pageSize = request.PageSize ?? 10;
+
+        var query = _context.UserDetails.AsQueryable();
+
+        if (request.Id.HasValue)
         {
-            return await _context.UserDetails.ToListAsync(cancellationToken);
+            query = query.Where(x => x.Id == request.Id.Value);
         }
-        else
-        {
-            return await _context.UserDetails
-            .Where(x => x.UserId == request.UserId).ToListAsync(cancellationToken);
-        }
-        
-        //.OrderBy(x => x.FullName)
-        //.ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider);
-        //.PaginatedListAsync(request.PageNumber, request.PageSize);
+
+        return await query
+            .OrderBy(x => x.FullName)
+            .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
+            .PaginatedListAsync(pageNumber, pageSize);
     }
 }

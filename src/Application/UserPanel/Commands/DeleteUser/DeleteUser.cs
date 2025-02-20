@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
 {
@@ -15,10 +16,11 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
     public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
     {
         private readonly IApplicationDbContext _context;
-
-        public DeleteUserCommandHandler(IApplicationDbContext context)
+        private readonly IJwtService _jwtService;
+        public DeleteUserCommandHandler(IApplicationDbContext context, IJwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
@@ -26,11 +28,15 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
             var entity = await _context.UserDetails
                 .FindAsync(new object[] { request.Id }, cancellationToken);
 
-            Guard.Against.NotFound(request.Id, entity);
+            if (entity == null)
+            {
+                throw new EscrowDataNotFoundException("User Details Not Found.");
+            }
 
-            _context.UserDetails.Remove(entity);
-
-            //entity.AddDomainEvent(new UserDeletedEvent(entity));
+            entity.RecordState = RecordState.Deleted;
+            entity.DeletedAt = DateTimeOffset.UtcNow;
+            entity.DeletedBy = _jwtService.GetUserId().ToInt();
+            _context.UserDetails.Update(entity);           
 
             await _context.SaveChangesAsync(cancellationToken);
         }

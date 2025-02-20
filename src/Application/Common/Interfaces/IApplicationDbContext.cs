@@ -6,6 +6,7 @@ namespace Escrow.Api.Application.Common.Interfaces;
 public interface IApplicationDbContext
 {   
     DbSet<UserDetail> UserDetails { get; }
+    DbSet<BankDetail> BankDetails { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

@@ -7,12 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 {
     public record CreateUserCommand : IRequest<int>
-    {
-        public string UserId { get; init; } = string.Empty;
+    {        
+        public string UserId { get; set; }= string.Empty;
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? PhoneNumber { get; set; }
@@ -23,13 +24,9 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
         public string? BusinessEmail { get; set; }
         public string? VatId { get; set; }
         //public byte[]? ProofOfBusiness { get; set; } // File as binary
-
-        // Bank Account Details Fields
-        public string? AccountHolderName { get; set; }
-        public string? IBANNumber { get; set; }
-        public string? BICCode { get; set; }
-
         public string? LoginMethod { get; set; }
+        public string? BusinessProof { get; set; }
+        public string? CompanyEmail { get; set; }
     }
 
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, int>
@@ -43,8 +40,13 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
 
         public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var entity = new UserDetail
+            var isExists=_context.UserDetails.Any(x => x.BusinessEmail == request.BusinessEmail );
+            if (isExists) 
             {
+                throw new ValidationException("The business email address already registed with weLink.com");
+            }
+            var entity = new UserDetail
+            {      
                 UserId = request.UserId,
                 FullName = request.FullName,
                 EmailAddress = request.EmailAddress,
@@ -53,15 +55,13 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 DateOfBirth = request.DateOfBirth,
                 BusinessManagerName = request.BusinessManagerName,
                 BusinessEmail = request.BusinessEmail,
-                VatId = request.VatId,
-                //ProofOfBusiness = request.ProofOfBusiness,
-                AccountHolderName = request.AccountHolderName,
-                IBANNumber = request.IBANNumber,
-                BICCode = request.BICCode,
-                LoginMethod = request.LoginMethod
+                VatId = request.VatId,               
+                LoginMethod = request.LoginMethod,
+                BusinessProof= request.BusinessProof,
+                CompanyEmail = request.CompanyEmail,
             };
 
-            //entity.AddDomainEvent(new UserCreatedEvent(entity));
+            
             _context.UserDetails.Add(entity);
             await _context.SaveChangesAsync(cancellationToken);
             return entity.Id;

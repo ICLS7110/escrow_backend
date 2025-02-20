@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Endpoints\UserDetails.cs" />
+    <Compile Remove="UserEndpoints\UserDetails.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" />
     <PackageReference Include="Azure.Identity" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
@@ -41,6 +42,11 @@
     <PackageReference Include="OpenIddict.Validation.AspNetCore" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Twilio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AdminEndPoints\UserPanel\" />
+    <Folder Include="wwwroot\UserUploads\" />
   </ItemGroup>
 
 

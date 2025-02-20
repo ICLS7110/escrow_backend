@@ -13,7 +13,7 @@ public class UpdateUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldRequireValidUserId()
     {
-        var command = new UpdateUserCommand { UserId = "0099", FullName = "New Title" };
+        var command = new UpdateUserCommand {  FullName = "New Title" };
         await FluentActions.Invoking(() => SendAsync(command)).Should().ThrowAsync<NotFoundException>();
     }
 
@@ -45,7 +45,7 @@ public class UpdateUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldUpdateUserDetail()
     {
-        var userId = "8";//await RunAsDefaultUserAsync();
+       
 
         var listId = await SendAsync(new CreateUserCommand
         {
@@ -57,28 +57,19 @@ public class UpdateUserDetailTests : BaseTestFixture
             DateOfBirth = DateTime.UtcNow,
             BusinessManagerName = "Jane",
             BusinessEmail = "jane@business.com",
-            VatId = "VAT123458",
-            AccountHolderName = "John",
-            IBANNumber = "DE89370400440532014000",
-            BICCode = "DEUTDEFFYYY",
-            LoginMethod = "Email"
+            VatId = "VAT123458"
         });
 
         var command = new UpdateUserCommand
         {
-            Id = listId,
-            UserId = userId,
+            
             FullName = "Updated List Title 5",
             EmailAddress = "john@example.com",
             Gender = "Male",
             DateOfBirth = DateTime.UtcNow,
             BusinessManagerName = "Jane",
             BusinessEmail = "jane@business.com",
-            VatId = "VAT123458",
-            AccountHolderName = "John",
-            IBANNumber = "DE89370400440532014000",
-            BICCode = "DEUTDEFFYYY",
-            LoginMethod = "Email"
+            VatId = "VAT123458"
         };
 
         await SendAsync(command);
