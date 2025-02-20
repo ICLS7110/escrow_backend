@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Eventing.Reader;
 using System.Net;
-using Escrow.Api.Application;
+using Escrow.Api.Application.Abstraction;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.ResultHandler;
 using Newtonsoft.Json;

@@ -7,6 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
+    //TODO: move this class to Extentions Folder and you can call ApplicationServiceCollection
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());

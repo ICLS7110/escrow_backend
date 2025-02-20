@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentValidation.Results;
 
-namespace Escrow.Api.Application;
+namespace Escrow.Api.Application.Abstraction;
 public abstract class EscrowApiExceptionBase : Exception
 {
 
@@ -15,14 +15,16 @@ public abstract class EscrowApiExceptionBase : Exception
     {
     }
 }
+
+//TODO: move those classes to Exceptions folder 
 public class EscrowDataNotFoundException : EscrowApiExceptionBase
 {
     public EscrowDataNotFoundException(string errorMessage) : base(errorMessage)
     {
-            
+
     }
 
-    public override HttpStatusCode StatusCode =>  HttpStatusCode.NotFound;
+    public override HttpStatusCode StatusCode => HttpStatusCode.NotFound;
 }
 public class EscrowUnauthorizedAccessException : EscrowApiExceptionBase
 {
@@ -54,11 +56,11 @@ public class EscrowConflictException : EscrowApiExceptionBase
 }
 
 public class EscrowValidationException : EscrowApiExceptionBase
-{    
+{
 
     public EscrowValidationException(string errorMessage) : base(errorMessage)
     {
-            
+
     }
 
     public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
