@@ -1,8 +1,8 @@
-﻿using Escrow.Api.Application.Common.Exceptions;
-using Escrow.Api.Application.UserPanel.Commands.CreateUser;
-using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
+﻿
+using Escrow.Api.Application.Features.Commands;
+using Escrow.Api.Application.Handler;
 using Escrow.Api.Domain.Entities;
-using Escrow.Api.Domain.Entities.UserPanel;
+
 
 namespace Escrow.Api.Application.FunctionalTests.UserDetails.Commands;
 
@@ -13,7 +13,7 @@ public class UpdateUserDetailTests : BaseTestFixture
     [Test]
     public async Task ShouldRequireValidUserId()
     {
-        var command = new UpdateUserCommand {  FullName = "New Title" };
+        var command = new CreateUserCommand {  FullName = "New Title" };
         await FluentActions.Invoking(() => SendAsync(command)).Should().ThrowAsync<NotFoundException>();
     }
 
@@ -74,7 +74,7 @@ public class UpdateUserDetailTests : BaseTestFixture
 
         await SendAsync(command);
 
-        var list = await FindAsync<UserDetail>(listId);
+        var list = await FindAsync<User>(listId);
 
         list.Should().NotBeNull();
         list!.FullName.Should().Be(command.FullName);

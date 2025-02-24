@@ -1,6 +1,5 @@
 ﻿using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Constants;
-using Escrow.Api.Application.Authentication.Interfaces;
 using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Data.Interceptors;
@@ -18,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Escrow.Api.Infrastructure.OptionConfiguration;
 using Amazon.S3;
 using Amazon;
+using Escrow.Api.Application.Interfaces;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -45,8 +45,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IOtpService, SimpleOtpService>(); // Replace TwilioOtpService with SimpleOtpService
         builder.Services.AddScoped<IOtpValidationService, PhoneNumberValidationService>();
-        builder.Services.AddScoped<IOtpManagerService, OtpManagerService>();
-        builder.Services.AddScoped<OtpManagerService>();
+  
 
         // Register DbContext with Npgsql and interceptors
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>

@@ -1,4 +1,4 @@
-﻿using Escrow.Api.Application.Authentication.Interfaces;
+﻿using Escrow.Api.Application.Interfaces;
 using System;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services

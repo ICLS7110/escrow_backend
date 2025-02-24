@@ -1,12 +1,13 @@
-﻿using Escrow.Api.Domain.Entities.UserPanel;
+﻿
+using Escrow.Api.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Escrow.Api.Infrastructure.Data.Configurations;
-internal class UserDetailConfiguration : IEntityTypeConfiguration<UserDetail>
+internal class UserDetailConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<UserDetail> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(e => e.Id);
 

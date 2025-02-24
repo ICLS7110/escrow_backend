@@ -2,9 +2,8 @@
 using System.Runtime.CompilerServices;
 using AutoMapper;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.Common.Models;
-using Escrow.Api.Application.UserPanel.Queries.GetUsers;
-using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Entities;
 using NUnit.Framework;
 
 namespace Escrow.Api.Application.UnitTests.Common.Mappings;
@@ -29,7 +28,7 @@ public class MappingTests
     }
 
     [Test]
-    [TestCase(typeof(UserDetail), typeof(UserDetailDto))]
+    [TestCase(typeof(User), typeof(UserDto))]
     public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
     {
         var instance = GetInstanceOf(source);

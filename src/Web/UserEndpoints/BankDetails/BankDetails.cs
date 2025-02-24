@@ -1,18 +1,12 @@
-﻿using Escrow.Api.Application.Common.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Escrow.Api.Application.BankDetails.Queries;
-using Escrow.Api.Application.BankDetails.Commands;
-using Microsoft.AspNetCore.Authorization;
-using Escrow.Api.Domain.Entities.UserPanel;
-using Microsoft.AspNetCore.Mvc;
-using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Infrastructure.Configuration;
-using Escrow.Api.Application.ResultHandler;
-using Escrow.Api.Application;
-using Escrow.Api.Infrastructure.Security;
-using Escrow.Api.Application.Common.Models.BankDtos;
+﻿namespace Escrow.Api.Web.Endpoints;
 
-namespace Escrow.Api.Web.Endpoints.BankDetails;
+using Microsoft.AspNetCore.Authorization;
+using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Features.Queries;
+using Escrow.Api.Application.Features.Commands;
+
+
+
 
 public class BankDetails : EndpointGroupBase
 {
@@ -39,30 +33,29 @@ public class BankDetails : EndpointGroupBase
         ISender sender,IJwtService jwtService)
     {
         
-       var query = new GetBankDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 10 };
+        var query = new GetBanksQuery { PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(StatusCodes.Status200OK,"Success", result));
+        return TypedResults.Ok(result);
     }
 
     [Authorize]
-    public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
-    {       
-        var id = await sender.Send(command);
-        return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
-        //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
+    public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankCommand command)
+    {
+        var result = await sender.Send(command);
+        return TypedResults.Ok(result);
     }
 
     [Authorize]
-    public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService,  UpdateBankDetailCommand command)
+    public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService, UpdateBankCommand command)
     {      
         var result = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"Bank details updated successfully.",new()));
+        return TypedResults.Ok(result);
     }
 
     [Authorize]
-    public async Task<IResult> DeleteBankDetail(ISender sender, int id)
+    public async Task<IResult> DeleteBankDetail(ISender sender, DeleteBankCommand command)
     {
-        await sender.Send(new DeleteBankDetailCommand(id));
-        return TypedResults.Ok( Result<object>.Success(StatusCodes.Status204NoContent, "Bank details Deleted successfully.", new())); 
+        var result = await sender.Send(command);
+        return TypedResults.Ok(result);
     }
 }

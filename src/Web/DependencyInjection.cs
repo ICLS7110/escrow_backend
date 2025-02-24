@@ -23,11 +23,10 @@ public static class DependencyInjection
         builder.Services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>();
 
-        builder.Services.AddTransient<ExceptionHandlingMiddleware>();
-       // builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+ 
 
 
-        // Customise default API behaviour
+   
         builder.Services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);
 

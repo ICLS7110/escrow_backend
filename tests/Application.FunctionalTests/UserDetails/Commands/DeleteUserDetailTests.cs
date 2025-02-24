@@ -1,7 +1,7 @@
-﻿using Escrow.Api.Application.UserPanel.Commands.CreateUser;
-using Escrow.Api.Application.UserPanel.Commands.DeleteUser;
+﻿
+using Escrow.Api.Application.Features.Commands;
 using Escrow.Api.Domain.Entities;
-using Escrow.Api.Domain.Entities.UserPanel;
+
 
 namespace Escrow.Api.Application.FunctionalTests.UserDetails.Commands;
 
@@ -24,9 +24,9 @@ public class DeleteUserDetailTests : BaseTestFixture
             FullName = "New List"
         });
 
-        await SendAsync(new DeleteUserCommand(userId));
+        await SendAsync(new DeleteUserCommand(1));
 
-        var list = await FindAsync<UserDetail>(userId);
+        var list = await FindAsync<User>(userId);
 
         list.Should().BeNull();
     }

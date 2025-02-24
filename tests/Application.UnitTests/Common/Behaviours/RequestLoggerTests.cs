@@ -1,6 +1,6 @@
 ﻿using Escrow.Api.Application.Common.Behaviours;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.UserPanel.Commands.CreateUser;
+using Escrow.Api.Application.Features.Commands;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;

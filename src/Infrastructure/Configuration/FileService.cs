@@ -1,24 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Amazon;
+﻿namespace Escrow.Api.Infrastructure.Configuration;
+
 using Amazon.Runtime;
-using Amazon.Runtime.Internal.Util;
 using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.Common.Models;
-using Escrow.Api.Application.ResultHandler;
 using Escrow.Api.Infrastructure.OptionConfiguration;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Twilio.TwiML.Messaging;
 
-namespace Escrow.Api.Infrastructure.Configuration;
+
 public class FileService : IFileService
 {
     private readonly IOptions<AWSS3> _awss3;        

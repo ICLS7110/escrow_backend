@@ -1,19 +1,12 @@
-﻿using Escrow.Api.Application.Common.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Escrow.Api.Application.UserPanel.Queries.GetUsers;
-using Escrow.Api.Application.UserPanel.Commands.CreateUser;
-using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
-using Escrow.Api.Application.UserPanel.Commands.DeleteUser;
-using Microsoft.AspNetCore.Authorization;
-using OpenIddict.Validation.AspNetCore;
-using Escrow.Api.Domain.Entities.UserPanel;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Microsoft.AspNetCore.Mvc;
-using Escrow.Api.Application.ResultHandler;
-using Escrow.Api.Application;
-using Escrow.Api.Application.Common.Interfaces;
+﻿namespace Escrow.Api.Web.Endpoints.UserPanel; 
 
-namespace Escrow.Api.Web.Endpoints.UserPanel;
+using Escrow.Api.Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
+using Escrow.Api.Application.Handler;
+using Escrow.Api.Application.Features.Commands;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 public class UserDetails : EndpointGroupBase
 {
@@ -37,33 +30,30 @@ public class UserDetails : EndpointGroupBase
     [Authorize]
     public async Task<IResult> GetUserDetails(ISender sender,IJwtService jwtService )
     {
-        var query = new GetUserDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 1};
+        var query = new GetUserDetailsQuery { Id = int.Parse(jwtService.GetUserId()), PageNumber = 1, PageSize = 1};
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(StatusCodes.Status200OK, "Success", result));
+        return TypedResults.Ok(result);
     }
 
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
     public async Task<IResult> CreateUser(ISender sender, CreateUserCommand command)
     {
-        var id = await sender.Send(command);
+        var result = await sender.Send(command);
 
-        return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
+        return TypedResults.Ok(result);
     }
 
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
     public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
     {        
-         await sender.Send(command);
-         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"User details updated successfully.", new()));        
+         var result = await sender.Send(command);
+         return TypedResults.Ok(result);        
     }
 
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
-    public async Task<IResult> DeleteUser(ISender sender, int id)
+    public async Task<IResult> DeleteUser(ISender sender, DeleteUserCommand command)
     {
-        await sender.Send(new DeleteUserCommand(id));
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details Deleted successfully.", new()));   
+        var result = await sender.Send(command);
+        return TypedResults.Ok(result);
     }
 }

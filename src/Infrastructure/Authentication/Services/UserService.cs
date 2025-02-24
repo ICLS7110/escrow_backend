@@ -1,15 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using Escrow.Api.Domain.Entities.Authentication;
-using Escrow.Api.Application.Authentication.Interfaces;
+﻿
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Domain.Entities.UserPanel;
-using Escrow.Api.Domain.Events.UserPanel;
-using System.Threading;
 using Microsoft.EntityFrameworkCore;
-using Escrow.Api.Application;
+using Escrow.Api.Application.Interfaces;
+using Escrow.Api.Domain.Entities;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
 {
@@ -23,12 +18,12 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             _userManager = userManager;
         }
 
-        public async Task<UserDetail> FindOrCreateUserAsync(string phoneNumber)
+        public async Task<User> FindOrCreateUserAsync(string phoneNumber)
         {
             var user = await _context.UserDetails.FindAsync(phoneNumber);
             if (user == null)
             {
-                var entity = new UserDetail
+                var entity = new User
                 {
                     PhoneNumber = phoneNumber
                 };
@@ -46,7 +41,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             return user;
         }
 
-        public async Task<UserDetail?> FindUserAsync(string phoneNumber)
+        public async Task<User?> FindUserAsync(string phoneNumber)
         {
             var user = await _context.UserDetails.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
 
@@ -55,7 +50,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
         }
 
 
-        public async Task<UserDetail> CreateUserAsync(string phoneNumber)
+        public async Task<User> CreateUserAsync(string phoneNumber)
         {
             var existingApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
             ApplicationUser? newApplicationUser;
@@ -73,7 +68,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
                 if (!createUserResult.Succeeded)
                 {
                     var errors = string.Join(", ", createUserResult.Errors.Select(e => e.Description));
-                    throw new EscrowRecordCreationException($"User creation failed: {errors}");
+                    throw new Exception($"User creation failed: {errors}");
                 }
 
                 // Assign "User" role
@@ -81,7 +76,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
                 if (!roleResult.Succeeded)
                 {
                     var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                    throw new EscrowRecordCreationException($"Role assignment failed: {roleErrors}");
+                    throw new Exception($"Role assignment failed: {roleErrors}");
                 }
                 newApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
             }
@@ -89,7 +84,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             {
                 newApplicationUser = existingApplicationUser;
             }
-            var newUser = new UserDetail
+            var newUser = new User
             {
                 PhoneNumber = phoneNumber,
                 UserId = newApplicationUser?.Id ?? Guid.Empty.ToString(),
@@ -100,7 +95,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
             if (newApplicationUser == null)
             {
-                throw new EscrowRecordCreationException("User creation failed.");
+                throw new Exception("User creation failed.");
             }
 
             return newUser;

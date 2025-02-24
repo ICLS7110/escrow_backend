@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using PhoneNumbers;
-using Escrow.Api.Application.Authentication.Interfaces;
+using Escrow.Api.Application.Interfaces;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
 
@@ -11,7 +11,7 @@ public class PhoneNumberValidationService : IOtpValidationService
         var phoneNumberUtil = PhoneNumberUtil.GetInstance();
         try
         {
-            // Parse the phone number with the provided country code
+           
             PhoneNumbers.PhoneNumber number = phoneNumberUtil.Parse(phoneNumber, null);
 
             // Check if the phone number is valid

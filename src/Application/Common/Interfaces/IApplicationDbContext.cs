@@ -1,12 +1,12 @@
 ﻿using Escrow.Api.Domain.Entities;
-using Escrow.Api.Domain.Entities.UserPanel;
+
 
 namespace Escrow.Api.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {   
-    DbSet<UserDetail> UserDetails { get; }
-    DbSet<BankDetail> BankDetails { get; }
+    DbSet<User> UserDetails { get; }
+    DbSet<Bank> BankDetails { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();
