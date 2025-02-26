@@ -41,11 +41,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // Map ApplicationUser to UserDetails table
+        //builder.Entity<ApplicationUser>().ToTable("UserDetail");
+
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Entity<BankDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
         builder.Entity<UserDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
-
-        
     }
 
     public Task<int> SaveChangesAsync()

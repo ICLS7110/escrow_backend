@@ -130,7 +130,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.Migrate();
-    await AdminSeedService.EnsureAdminUserExists(services);
+    //await AdminSeedService.EnsureAdminUserExists(services);
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

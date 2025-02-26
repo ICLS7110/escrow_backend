@@ -28,9 +28,9 @@ public class AdminSeedService
         {
             var adminUser = new ApplicationUser
             {
-                FullName = "Super Admin",
+                //FullName = "Super Admin",
                 Email = adminEmail,
-                Role = "Admin",
+                //Role = "Admin",
                 UserName = adminEmail,
                 EmailConfirmed = true
             };
