@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics.Eventing.Reader;
 using System.Net;
-using Escrow.Api.Application;
+using Escrow.Api.Application.Abstraction;
+using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.ResultHandler;
 using Newtonsoft.Json;
 using Twilio.TwiML.Messaging;
 using YamlDotNet.Core.Tokens;
@@ -22,60 +24,32 @@ public class ExceptionHandlingMiddleware : IMiddleware
         {
             await _next(context);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ex.Message);
-            await ExceptionHandlerAsync(context, ex);
+        catch (Exception e) {
+
+            await ExceptionHandlerAsync(context, e);
         }
+       
     }
 
-
+  
     private async Task ExceptionHandlerAsync(HttpContext context, Exception exception)
     {
-        HttpStatusCode status;
-        string message;
-        switch (exception)
+        Result<object> result;
+        if (exception is EscrowApiExceptionBase escrowEx)
         {
-            case EscrowDataNotFoundException:
-                status = HttpStatusCode.NotFound;
-                message = exception.Message;
-                break;
-            case EscrowValidationException:
-                status = HttpStatusCode.BadRequest;
-                message = exception.Message;
-                break;
-            case EscrowUnauthorizedAccessException:
-                status = HttpStatusCode.Unauthorized;
-                message = "Unauthorized access.";
-                break;
-            case EscrowForbiddenException:
-                status = HttpStatusCode.Forbidden;
-                message = exception.Message;
-                break;
-            case EscrowConflictException:
-                status = HttpStatusCode.Conflict;
-                message = exception.Message;
-                break;
-            case TimeoutException:
-                status = HttpStatusCode.RequestTimeout;
-                message = exception.Message;
-                break;
-            case EscrowRecordCreationException:
-                status = HttpStatusCode.BadRequest;
-                message = exception.Message;
-                break;
-            default:
-                status = HttpStatusCode.InternalServerError;
-                message = "An unexpected error occurred.";
-                break;
+            result = Result<object>.Failure((int)escrowEx.StatusCode, escrowEx.Message);
         }
-        var response = new
+        else
         {
-            Status = status,
-            Message = message,
-            Value = new object() { }
-        };
-        await context.Response.WriteAsJsonAsync(response);
+            result = Result<object>.Failure(500, "Unexpected Server Error.");
+
+        }
+
+        _logger.LogError(exception, exception.Message);
+
+        context.Response.StatusCode = result.Status;
+        await context.Response.WriteAsJsonAsync(result);
+
     }
 }
 
