@@ -6,6 +6,7 @@ namespace Escrow.Api.Web.Infrastructure;
 
 public class CustomExceptionHandler : IExceptionHandler
 {
+    //TODO: not sure why do we have this class
     private readonly Dictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHandlers;
 
     public CustomExceptionHandler()

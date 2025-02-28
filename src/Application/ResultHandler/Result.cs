@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Escrow.Api.Application.ResultHandler;
+
+//TODO: we should have only one Result class not two 
+
 public class Result<T>
 {
     public int Status { get; private set; } 
