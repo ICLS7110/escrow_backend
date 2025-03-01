@@ -7,6 +7,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Security;
+using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record UpdateBankDetailCommand: IRequest<Result<int>>
@@ -38,7 +39,7 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
 
         if (entity == null)
         {
-            return Result<int>.Failure(404, "Not Fount");
+            return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
         }        
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
@@ -46,7 +47,7 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
         entity.BankName = _aESService.Encrypt(request.BankName);
         
         await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(200, "Success");
+        return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
     }
 }
 // Compare this snippet from src/Application/BankDetails/Commands/DeleteBankDetail.cs:

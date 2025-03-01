@@ -12,6 +12,7 @@ using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Escrow.Api.Application.DTOs;
+using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
@@ -49,7 +50,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 
             if (entity == null) 
             {
-                return Result<int>.Failure(404, "Not Fount");
+                return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
             }
             
             entity.FullName = request.FullName;
@@ -64,7 +65,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             //entity.ProfilePicture = request.ProfilePicture;
             
             await _context.SaveChangesAsync(cancellationToken);
-            return Result<int>.Success(200, "Success");
+            return Result<int>.Success(StatusCodes.Status200OK, "Success");
         }
     }
 }

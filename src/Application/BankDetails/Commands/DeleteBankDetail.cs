@@ -1,9 +1,10 @@
 ﻿namespace Escrow.Api.Application.BankDetails.Commands;
 
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Enums;
-
+using Microsoft.AspNetCore.Http;
 
 public record DeleteBankDetailCommand(int Id): IRequest<Result<int>>;
 
@@ -25,13 +26,14 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
 
         if (entity == null)
         {
-            return Result<int>.Failure(404,"Not Fount");
+            return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
         }
         entity.RecordState = RecordState.Deleted;
         entity.DeletedAt= DateTimeOffset.UtcNow;
         entity.DeletedBy = userid;
         _context.BankDetails.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(200, "Success");
+  
+        return Result<int>.Success(StatusCodes.Status200OK, "Success");
     }  
 }
