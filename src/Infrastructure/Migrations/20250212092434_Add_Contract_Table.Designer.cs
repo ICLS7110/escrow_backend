@@ -3,6 +3,7 @@ using System;
 using Escrow.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250212092434_Add_Contract_Table")]
+    partial class Add_Contract_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,73 +105,13 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("StatusReason")
                         .HasColumnType("text");
 
-                    b.Property<int?>("UserDetailId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerDetailsId");
 
                     b.HasIndex("SellerDetailsId");
 
-                    b.HasIndex("UserDetailId");
-
                     b.ToTable("ContractDetails");
-                });
-
-            modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.MileStone", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<int?>("ContractId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Documents")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("DueDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("RecordState")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContractId");
-
-                    b.ToTable("MileStones");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.UserPanel.BankDetail", b =>
@@ -240,12 +183,6 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("BusinessManagerName")
                         .HasColumnType("text");
 
-                    b.Property<string>("BusinessProof")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CompanyEmail")
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
@@ -253,7 +190,7 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -271,9 +208,6 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("Gender")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsProfileCompleted")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -284,9 +218,6 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProfilePicture")
                         .HasColumnType("text");
 
                     b.Property<int>("RecordState")
@@ -323,6 +254,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("FullName")
+                        .HasColumnType("text");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
@@ -345,6 +279,10 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -510,24 +448,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("SellerDetailsId");
 
-                    b.HasOne("Escrow.Api.Domain.Entities.UserPanel.UserDetail", "UserDetail")
-                        .WithMany()
-                        .HasForeignKey("UserDetailId");
-
                     b.Navigation("BuyerDetails");
 
                     b.Navigation("SellerDetails");
-
-                    b.Navigation("UserDetail");
-                });
-
-            modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.MileStone", b =>
-                {
-                    b.HasOne("Escrow.Api.Domain.Entities.ContractPanel.ContractDetails", "ContractDetails")
-                        .WithMany("MileStones")
-                        .HasForeignKey("ContractId");
-
-                    b.Navigation("ContractDetails");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.UserPanel.BankDetail", b =>
@@ -590,11 +513,6 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.ContractDetails", b =>
-                {
-                    b.Navigation("MileStones");
                 });
 #pragma warning restore 612, 618
         }

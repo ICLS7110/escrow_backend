@@ -57,7 +57,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
         public async Task<UserDetail> CreateUserAsync(string phoneNumber)
         {
-            var existingApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
+            var existingApplicationUser = await _userManager.Users.Where(u => u.PhoneNumber == phoneNumber).FirstOrDefaultAsync();   
             ApplicationUser? newApplicationUser;
             if (existingApplicationUser == null)
             {

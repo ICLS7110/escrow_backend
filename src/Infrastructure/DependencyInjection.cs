@@ -16,6 +16,7 @@ using Escrow.Api.Infrastructure.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Escrow.Api.Infrastructure.OptionConfiguration;
+using Microsoft.AspNetCore.Http.Features;
 using Amazon.S3;
 using Amazon;
 

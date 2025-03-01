@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
+using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Configuration;
@@ -34,14 +35,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
 
+    public DbSet<ContractDetails> ContractDetails => Set<ContractDetails>();
+    public DbSet<MileStone> MileStones => Set<MileStone>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // Map ApplicationUser to UserDetails table
+        //builder.Entity<ApplicationUser>().ToTable("UserDetail");
+
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Entity<BankDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
         builder.Entity<UserDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
-
-        
     }
 
     public Task<int> SaveChangesAsync()
