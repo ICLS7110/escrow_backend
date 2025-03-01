@@ -10,8 +10,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.Common.Models;
-using Escrow.Api.Application.ResultHandler;
+
 using Escrow.Api.Infrastructure.OptionConfiguration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

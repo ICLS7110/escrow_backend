@@ -2,7 +2,7 @@
 using Escrow.Api.Application.BankDetails.Queries;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
-using Escrow.Api.Application.ResultHandler;
+using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Authorization;
 

@@ -5,13 +5,10 @@ using Escrow.Api.Application.UserPanel.Commands.CreateUser;
 using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
 using Escrow.Api.Application.UserPanel.Commands.DeleteUser;
 using Microsoft.AspNetCore.Authorization;
-using OpenIddict.Validation.AspNetCore;
-using Escrow.Api.Domain.Entities.UserPanel;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Microsoft.AspNetCore.Mvc;
-using Escrow.Api.Application.ResultHandler;
+
 using Escrow.Api.Application;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 

@@ -1,8 +1,7 @@
-﻿using System.Net;
+﻿
 using Escrow.Api.Application.ContractPanel;
-using Escrow.Api.Application.ResultHandler;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Twilio.TwiML.Messaging;
+using Escrow.Api.Application.DTOs;
+
 
 namespace Escrow.Api.Web.Endpoints.ContractPanel;
 

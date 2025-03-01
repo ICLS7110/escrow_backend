@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Security;
 
 namespace Escrow.Api.Application.BankDetails.Commands;
-public record UpdateBankDetailCommand: IRequest<int>
+public record UpdateBankDetailCommand: IRequest<Result<int>>
 {
     public int Id { get; set; }    
     public string AccountHolderName { get; set; } = string.Empty;
@@ -17,7 +18,7 @@ public record UpdateBankDetailCommand: IRequest<int>
     public string BankName { get; set; } = String.Empty;
 }
 
-public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, int>
+public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, Result<int>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IAESService _aESService;
@@ -30,14 +31,14 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
         _jwtService = jwtService;
     }
 
-    public async Task<int> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
     {
         var userid = _jwtService.GetUserId().ToInt();
         var entity = await _context.BankDetails.FirstOrDefaultAsync(x => x.Id==request.Id && x.UserDetailId== userid);
 
         if (entity == null)
         {
-            throw new EscrowDataNotFoundException("Bank Details Not Found.");
+            return Result<int>.Failure(404, "Not Fount");
         }        
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
@@ -45,8 +46,7 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
         entity.BankName = _aESService.Encrypt(request.BankName);
         
         await _context.SaveChangesAsync(cancellationToken);
-
-        return entity.Id;
+        return Result<int>.Success(200, "Success");
     }
 }
 // Compare this snippet from src/Application/BankDetails/Commands/DeleteBankDetail.cs:

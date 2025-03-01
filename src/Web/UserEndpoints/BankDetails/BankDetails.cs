@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Mvc;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Infrastructure.Configuration;
-using Escrow.Api.Application.ResultHandler;
+
 using Escrow.Api.Application;
 using Escrow.Api.Infrastructure.Security;
 using Escrow.Api.Application.Common.Models.BankDtos;
+using Escrow.Api.Application.DTOs;
 
 namespace Escrow.Api.Web.Endpoints.BankDetails;
 

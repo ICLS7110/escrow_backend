@@ -11,10 +11,11 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Escrow.Api.Application.DTOs;
 
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
-    public record UpdateUserCommand : IRequest
+    public record UpdateUserCommand : IRequest<Result<int>>
     {        
         
         public string? FullName { get; set; }
@@ -31,7 +32,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 
     }
 
-    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand>
+    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<int>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
@@ -41,14 +42,14 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             _jwtService = jwtService;
         }
 
-        public async Task Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             var entity = await _context.UserDetails
                 .FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
 
             if (entity == null) 
             {
-                throw new EscrowDataNotFoundException("User Details Not Found.");
+                return Result<int>.Failure(404, "Not Fount");
             }
             
             entity.FullName = request.FullName;
@@ -58,11 +59,12 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
             entity.BusinessManagerName = request.BusinessManagerName;
             entity.BusinessEmail = request.BusinessEmail;
             entity.VatId = request.VatId;
-            entity.BusinessProof = request.BusinessProof;
-            entity.CompanyEmail = request.CompanyEmail;
-            entity.ProfilePicture = request.ProfilePicture;
+            //entity.BusinessProof = request.BusinessProof;
+            //entity.CompanyEmail = request.CompanyEmail;
+            //entity.ProfilePicture = request.ProfilePicture;
             
             await _context.SaveChangesAsync(cancellationToken);
+            return Result<int>.Success(200, "Success");
         }
     }
 }

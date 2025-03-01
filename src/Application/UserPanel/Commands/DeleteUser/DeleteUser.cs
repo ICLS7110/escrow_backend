@@ -9,11 +9,12 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Application.DTOs;
 
 namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
 {
-    public record DeleteUserCommand(int Id) : IRequest;
-    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
+    public record DeleteUserCommand(int Id) : IRequest<Result<int>>;
+    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Result<int>>
     {
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
@@ -23,14 +24,14 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
             _jwtService = jwtService;
         }
 
-        public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<int>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
             var entity = await _context.UserDetails
                 .FindAsync(new object[] { request.Id }, cancellationToken);
 
             if (entity == null)
             {
-                throw new EscrowDataNotFoundException("User Details Not Found.");
+                return Result<int>.Failure(404, "Not Fount");
             }
 
             entity.RecordState = RecordState.Deleted;
@@ -39,6 +40,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
             _context.UserDetails.Update(entity);           
 
             await _context.SaveChangesAsync(cancellationToken);
+            return Result<int>.Success(200, "Success");
         }
 
     }
