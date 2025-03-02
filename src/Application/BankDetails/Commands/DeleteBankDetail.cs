@@ -25,9 +25,8 @@ public class DeleteBankDetailCommandHandler : IRequestHandler<DeleteBankDetailCo
             .FirstOrDefaultAsync(x => x.Id==request.Id && x.UserDetailId==userid);
 
         if (entity == null)
-        {
-            return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
-        }
+            return Result<int>.Failure(StatusCodes.Status404NotFound, "Bank Details Not Found.");
+
         entity.RecordState = RecordState.Deleted;
         entity.DeletedAt= DateTimeOffset.UtcNow;
         entity.DeletedBy = userid;
