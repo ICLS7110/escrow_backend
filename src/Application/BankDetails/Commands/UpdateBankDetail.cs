@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Security;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record UpdateBankDetailCommand: IRequest<int>

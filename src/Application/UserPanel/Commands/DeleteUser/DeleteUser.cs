@@ -9,6 +9,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
 {

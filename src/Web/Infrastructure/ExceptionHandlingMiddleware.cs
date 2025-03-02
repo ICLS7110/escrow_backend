@@ -28,7 +28,6 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
             await ExceptionHandlerAsync(context, e);
         }
-       
     }
 
   

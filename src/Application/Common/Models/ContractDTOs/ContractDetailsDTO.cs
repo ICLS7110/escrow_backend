@@ -8,6 +8,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
 {
     public class ContractDetailsDTO
     {
+        public int Id { get; set; }
         public string Role { get; set; } = string.Empty;
         public string ContractTitle { get; set; } = string.Empty;
         public string ServiceType { get; set; } = string.Empty;

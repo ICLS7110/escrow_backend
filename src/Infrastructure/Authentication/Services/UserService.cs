@@ -10,6 +10,7 @@ using Escrow.Api.Domain.Events.UserPanel;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Escrow.Api.Application;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
 {

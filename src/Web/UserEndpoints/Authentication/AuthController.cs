@@ -20,6 +20,7 @@ using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Application.ResultHandler;
 using Escrow.Api.Application;
 using Twilio.TwiML.Messaging;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Web.Endpoints.Authentication
 {

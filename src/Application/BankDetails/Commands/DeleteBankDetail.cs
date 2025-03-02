@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Application.BankDetails.Commands;
 

@@ -11,6 +11,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
