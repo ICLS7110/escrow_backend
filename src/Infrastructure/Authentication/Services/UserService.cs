@@ -39,7 +39,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
                 // Check if creation was successful
                 if (user == null)
-                    return Result<UserDetail>.Failure(StatusCodes.Status404NotFound, $"Not Found");
+                    return Result<UserDetail>.Failure(StatusCodes.Status500InternalServerError, $"User creation failed.");
             }
 
             return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", user);
