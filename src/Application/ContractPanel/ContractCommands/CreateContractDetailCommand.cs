@@ -59,11 +59,7 @@ public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetail
             Status = request.Status,
             BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null,
             SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null,
-            UserDetailId = userid,
-            CreatedBy = userid.ToString(),
-            Created = DateTime.Now,
-            LastModifiedBy = userid.ToString(),
-            LastModified = DateTime.Now
+            UserDetailId = userid           
         };
         await _context.ContractDetails.AddAsync(entity);
         await _context.SaveChangesAsync(cancellationToken);

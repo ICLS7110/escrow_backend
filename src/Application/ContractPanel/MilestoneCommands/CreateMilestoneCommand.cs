@@ -43,11 +43,7 @@ public class CreateMilestoneCommandHandler : IRequestHandler<CreateMilestoneComm
             Description = request.Description,
             DueDate = request.DueDate,
             Documents = request.Documents,
-            ContractId = request.ContractId,
-            CreatedBy = userid.ToString(),
-            Created = DateTime.Now,
-            LastModifiedBy = userid.ToString(),
-            LastModified = DateTime.Now
+            ContractId = request.ContractId           
         };
         await _context.MileStones.AddAsync(entity);
         await _context.SaveChangesAsync(cancellationToken);
