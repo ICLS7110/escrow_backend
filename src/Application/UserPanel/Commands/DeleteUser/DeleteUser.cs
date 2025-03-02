@@ -31,9 +31,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.DeleteUser
                 .FindAsync(new object[] { request.Id }, cancellationToken);
 
             if (entity == null)
-            {
-                return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
-            }
+                return Result<int>.Failure(StatusCodes.Status404NotFound, "User Details Not Found.");
 
             entity.RecordState = RecordState.Deleted;
             entity.DeletedAt = DateTimeOffset.UtcNow;

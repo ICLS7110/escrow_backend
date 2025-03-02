@@ -49,9 +49,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
                 .FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
 
             if (entity == null) 
-            {
-                return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
-            }
+                return Result<int>.Failure(StatusCodes.Status404NotFound, "User Details Not Found.");
             
             entity.FullName = request.FullName;
             entity.EmailAddress = request.EmailAddress;

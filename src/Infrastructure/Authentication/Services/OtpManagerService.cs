@@ -86,20 +86,20 @@ public class OtpManagerService : IOtpManagerService
         _cache.Remove(phoneNumber);
 
         // Try to find the user by phone number
-        var res = await _userService.FindUserAsync(phoneNumber);
+        var userRes = await _userService.FindUserAsync(phoneNumber);
 
         // If the user doesn't exist, create a new one
-        if (res.Data == null)
-        {            
+        if (userRes.Data == null)
+        {
 
             // Save the new user to the database (assuming _userService has a CreateUserAsync method)
-            res = await _userService.CreateUserAsync(phoneNumber);
+            userRes = await _userService.CreateUserAsync(phoneNumber);
         }
 
-        if (res.Data is null)
+        if (userRes.Data is null)
               return Result<UserDetail>.Failure(StatusCodes.Status404NotFound, $"Not Found");
 
-        return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", res.Data); 
+        return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", userRes.Data); 
     }
 
 

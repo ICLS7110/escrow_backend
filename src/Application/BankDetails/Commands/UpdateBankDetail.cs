@@ -38,9 +38,8 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
         var entity = await _context.BankDetails.FirstOrDefaultAsync(x => x.Id==request.Id && x.UserDetailId== userid);
 
         if (entity == null)
-        {
-            return Result<int>.Failure(StatusCodes.Status404NotFound, "Not Fount");
-        }        
+            return Result<int>.Failure(StatusCodes.Status404NotFound, "Bank Details Not Found.");
+
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
         entity.BICCode = request.BICCode;
