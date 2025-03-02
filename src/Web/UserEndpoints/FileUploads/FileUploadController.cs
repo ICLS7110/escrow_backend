@@ -1,5 +1,5 @@
 ﻿using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.ResultHandler;
+using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

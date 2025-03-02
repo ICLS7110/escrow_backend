@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Escrow.Api.Domain.Entities.Authentication;
+﻿
 using Escrow.Api.Application.Authentication.Interfaces;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +7,10 @@ using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Events.UserPanel;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
-using Escrow.Api.Application;
+
+using Escrow.Api.Application.DTOs;
+using Microsoft.AspNetCore.Http;
+
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
 {
@@ -23,7 +24,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             _userManager = userManager;
         }
 
-        public async Task<UserDetail> FindOrCreateUserAsync(string phoneNumber)
+        public async Task<Result<UserDetail>> FindOrCreateUserAsync(string phoneNumber)
         {
             var user = await _context.UserDetails.FindAsync(phoneNumber);
             if (user == null)
@@ -38,24 +39,22 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
                 // Check if creation was successful
                 if (user == null)
-                {
-                    throw new InvalidOperationException("User creation failed.");
-                }
+                    return Result<UserDetail>.Failure(StatusCodes.Status404NotFound, $"Not Found");
             }
 
-            return user;
+            return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", user);
         }
 
-        public async Task<UserDetail?> FindUserAsync(string phoneNumber)
+        public async Task<Result<UserDetail>> FindUserAsync(string phoneNumber)
         {
             var user = await _context.UserDetails.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
-
-            // Return null if the user is not found
-            return user;
+            if (user == null)
+                return Result<UserDetail>.Failure(StatusCodes.Status404NotFound, $"Not Found");
+            return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", user); 
         }
 
 
-        public async Task<UserDetail> CreateUserAsync(string phoneNumber)
+        public async Task<Result<UserDetail>> CreateUserAsync(string phoneNumber)
         {
             var existingApplicationUser = await _userManager.Users.Where(u => u.PhoneNumber == phoneNumber).FirstOrDefaultAsync();   
             ApplicationUser? newApplicationUser;
@@ -73,7 +72,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
                 if (!createUserResult.Succeeded)
                 {
                     var errors = string.Join(", ", createUserResult.Errors.Select(e => e.Description));
-                    throw new EscrowRecordCreationException($"User creation failed: {errors}");
+                    return Result<UserDetail>.Failure(StatusCodes.Status500InternalServerError, $"User creation failed: {errors}");
                 }
 
                 // Assign "User" role
@@ -81,7 +80,8 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
                 if (!roleResult.Succeeded)
                 {
                     var roleErrors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                    throw new EscrowRecordCreationException($"Role assignment failed: {roleErrors}");
+                    return Result<UserDetail>.Failure(StatusCodes.Status500InternalServerError, $"Role assignment failed: {roleErrors}");
+
                 }
                 newApplicationUser = await _userManager.FindByNameAsync(phoneNumber);
             }
@@ -100,10 +100,10 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
 
             if (newApplicationUser == null)
             {
-                throw new EscrowRecordCreationException("User creation failed.");
-            }
+                return Result<UserDetail>.Failure(StatusCodes.Status500InternalServerError, $"User creation failed");
 
-            return newUser;
+            }
+            return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", newUser);
         }
     }
 }

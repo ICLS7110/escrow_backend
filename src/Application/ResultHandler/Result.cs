@@ -1,33 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Escrow.Api.Application.ResultHandler;
-
-//TODO: we should have only one Result class not two 
+﻿
+namespace Escrow.Api.Application.DTOs;
 
 public class Result<T>
 {
-    public int Status { get; private set; } 
-    public T? Value { get; private set; }    
-    public string? Message { get; private set; }= string.Empty;
+    public int Status { get; private set; }
+    public T? Data { get; private set; }
+    public string Message { get; private set; } = string.Empty;
 
-    // Private constructor to enforce the use of factory methods
+
     private Result() { }
 
-    public static Result<T> Success(int statuscode,string message,T value)
+    public static Result<T> Success(int statusCode, string message, T? value = default)
     {
         return new Result<T>
         {
-            Status = statuscode,
-            Value = value,
+            Status = statusCode,
+            Data = value,
             Message = message
         };
     }
 
-    public static Result<T> Failure(int statuscode,string error)
+    public static Result<T> Failure(int statuscode, string error)
     {
         return new Result<T>
         {

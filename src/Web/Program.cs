@@ -1,20 +1,14 @@
-using Escrow.Api.Infrastructure.Authentication.Services;
-using Escrow.Api.Application.Authentication.Interfaces;
-using Escrow.Api.Infrastructure.Configuration;
+
 using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Escrow.Api.Domain.Entities.Authentication;
 using Microsoft.EntityFrameworkCore;
-using OpenIddict.Validation.AspNetCore;
-using Escrow.Api.Application.Common.Interfaces;
-using System;
-using System.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Escrow.Api.Web.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Escrow.Api.Application.ResultHandler;
+using Escrow.Api.Application.DTOs;
+
 
 
 

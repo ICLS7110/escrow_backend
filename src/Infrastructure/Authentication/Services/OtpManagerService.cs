@@ -2,7 +2,10 @@
 using System.Threading.Tasks;
 using Escrow.Api.Application;
 using Escrow.Api.Application.Authentication.Interfaces;
+using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
@@ -27,12 +30,13 @@ public class OtpManagerService : IOtpManagerService
     }
 
     // Implementing RequestOtpAsync from IOtpManagerService
-    public async Task RequestOtpAsync(string countryCode, string mobileNumber)
+    public async Task<bool> RequestOtpAsync(string countryCode, string mobileNumber)
     {        
         var phoneNumber = $"{countryCode}{mobileNumber}";
         var isPhoneNumberValid = await _validationService.ValidatePhoneNumberAsync(phoneNumber);
         if (!isPhoneNumberValid)
-            throw new EscrowValidationException("Invalid phone number.");
+            return false;   
+        
        
         var otp = await _otpService.GenerateOtpAsync();
 
@@ -41,6 +45,8 @@ public class OtpManagerService : IOtpManagerService
 
         // Send the OTP
         await _otpService.SendOtpAsync(phoneNumber, otp);
+        return true ;
+
     }
 
     // Implementing VerifyOtpAsync from IOtpManagerService
@@ -65,34 +71,35 @@ public class OtpManagerService : IOtpManagerService
 
     //    return user;
     //}
-    public async Task<UserDetail> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
+    public async Task<Result<UserDetail>> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
     {
+       
         var phoneNumber = $"{countryCode}{mobileNumber}";
 
         if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
-            throw new EscrowDataNotFoundException("OTP expired or invalid.");
+            return Result<UserDetail>.Failure(StatusCodes.Status400BadRequest, "OTP expired or invalid.");
 
         if (storedOtp != otp)
-            throw new EscrowValidationException("Invalid OTP.");
+            return Result<UserDetail>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP.");
 
         // Remove OTP after successful validation
         _cache.Remove(phoneNumber);
 
         // Try to find the user by phone number
-        var user = await _userService.FindUserAsync(phoneNumber);
+        var userRes = await _userService.FindUserAsync(phoneNumber);
 
         // If the user doesn't exist, create a new one
-        if (user == null)
-        {            
+        if (userRes.Data == null)
+        {
 
             // Save the new user to the database (assuming _userService has a CreateUserAsync method)
-            user=await _userService.CreateUserAsync(phoneNumber);
+            userRes = await _userService.CreateUserAsync(phoneNumber);
         }
 
-        if (string.IsNullOrEmpty(user.UserId))
-            throw new ArgumentException("User ID could not be retrieved.");
+        if (userRes.Data is null)
+              return Result<UserDetail>.Failure(StatusCodes.Status404NotFound, $"Not Found");
 
-        return user;
+        return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", userRes.Data); 
     }
 
 
