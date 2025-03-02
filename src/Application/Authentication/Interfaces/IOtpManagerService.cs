@@ -10,5 +10,5 @@ namespace Escrow.Api.Application.Authentication.Interfaces;
 public  interface IOtpManagerService
 {
     Task<bool> RequestOtpAsync(string countryCode,string phoneNumber);
-    Task<Result<UserDetail>> VerifyOtpAsync(string countryCode,string phoneNumber, string otp);
+    bool VerifyOtpAsync(string phoneNumber, string otp);
 }

@@ -14,34 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20250117142906_InitialCreate.cs" />
-    <Compile Remove="Migrations\20250117142906_InitialCreate.Designer.cs" />
-    <Compile Remove="Migrations\20250121170441_OpenIdDict.cs" />
-    <Compile Remove="Migrations\20250121170441_OpenIdDict.Designer.cs" />
-    <Compile Remove="Migrations\20250202010023_AddBankDetailsTable.cs" />
-    <Compile Remove="Migrations\20250202010023_AddBankDetailsTable.Designer.cs" />
-    <Compile Remove="Migrations\20250210115830_Add_RecordState_Column_To_BankDetails_And_UserDetails_Table.cs" />
-    <Compile Remove="Migrations\20250210115830_Add_RecordState_Column_To_BankDetails_And_UserDetails_Table.Designer.cs" />
-    <Compile Remove="Migrations\20250211065950_AddFullNameAndRoleToAspNetUsers.cs" />
-    <Compile Remove="Migrations\20250211065950_AddFullNameAndRoleToAspNetUsers.Designer.cs" />
-    <Compile Remove="Migrations\20250211090317_Add_BankName_Property_To_BankDetails_Entity.cs" />
-    <Compile Remove="Migrations\20250211090317_Add_BankName_Property_To_BankDetails_Entity.Designer.cs" />
-    <Compile Remove="Migrations\20250211100037_Remove_RecordState_Column.cs" />
-    <Compile Remove="Migrations\20250211100037_Remove_RecordState_Column.Designer.cs" />
-    <Compile Remove="Migrations\20250211101329_Modify_RecordState_Column.cs" />
-    <Compile Remove="Migrations\20250211101329_Modify_RecordState_Column.Designer.cs" />
-    <Compile Remove="Migrations\20250212092434_Add_Contract_Table.cs" />
-    <Compile Remove="Migrations\20250212092434_Add_Contract_Table.Designer.cs" />
-    <Compile Remove="Migrations\20250212093046_Add_UserDetailsId_Into_Contract_Table.cs" />
-    <Compile Remove="Migrations\20250212093046_Add_UserDetailsId_Into_Contract_Table.Designer.cs" />
-    <Compile Remove="Migrations\20250213045203_Add_BusinessProof_Column_To_UserDetail_Table.cs" />
-    <Compile Remove="Migrations\20250213045203_Add_BusinessProof_Column_To_UserDetail_Table.Designer.cs" />
-    <Compile Remove="Migrations\20250214073421_Add_ProfilePicture_Column_To_UserDetails_Table.cs" />
-    <Compile Remove="Migrations\20250214073421_Add_ProfilePicture_Column_To_UserDetails_Table.Designer.cs" />
-    <Compile Remove="Migrations\20250217064351_Add_MileStone_Table.cs" />
-    <Compile Remove="Migrations\20250217064351_Add_MileStone_Table.Designer.cs" />
-    <Compile Remove="Migrations\20250217111702_upate_the_DataType_Of_DOB_Column_In_UserDetail_Table.cs" />
-    <Compile Remove="Migrations\20250217111702_upate_the_DataType_Of_DOB_Column_In_UserDetail_Table.Designer.cs" />
     <Compile Remove="Services\NoOpEmailSender.cs" />
   </ItemGroup>
 
