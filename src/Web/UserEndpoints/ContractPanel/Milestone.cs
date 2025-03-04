@@ -24,29 +24,38 @@ public class Milestone : EndpointGroupBase
         });
 
         userGroup.MapGet("/", GetMilestoneDetails).RequireAuthorization(policy => policy.RequireRole("User"));
+        //userGroup.MapGet("/summary", GetMilestonesSummary).RequireAuthorization(policy => policy.RequireRole("User"));
         userGroup.MapPost("/", CreateMiliestone).RequireAuthorization(p => p.RequireRole("User"));
         userGroup.MapPost("/update", UpdateMilestone).RequireAuthorization(policy => policy.RequireRole("User"));
     }
 
     [Authorize]
-    public async Task<IResult> GetMilestoneDetails(ISender sender, IJwtService jwtService)
+    public async Task<IResult> GetMilestoneDetails(ISender sender, IJwtService jwtService, int? contractId)
     {
-        var query = new GetMilestoneQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 1 };
+        var query = new GetMilestoneQuery { Id = jwtService.GetUserId().ToInt(), ContractId = contractId, PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<MileStoneDTO>>.Success(StatusCodes.Status200OK, "Success", result));
     }
+
+    /*[Authorize]
+    public async Task<IResult> GetMilestonesSummary(ISender sender, IJwtService jwtService, int? contractId)
+    {
+        var query = new GetMilestoneQuery { Id = jwtService.GetUserId().ToInt(), ContractId = contractId, PageNumber = 1, PageSize = 10 };
+        var result = await sender.Send(query);
+        return TypedResults.Ok(Result<PaginatedList<MileStoneDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+    }*/
 
     [Authorize]
     public async Task<IResult> CreateMiliestone(ISender sender, CreateMilestoneCommand command)
     {
         var id = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract Created Successfully.", new()));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Milestone Created Successfully.", new()));
     }
 
     [Authorize]
     public async Task<IResult> UpdateMilestone(ISender sender, EditMilestoneCommand command)
     {
         await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract details updated successfully.", new()));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Milestone details updated successfully.", new()));
     }
 }

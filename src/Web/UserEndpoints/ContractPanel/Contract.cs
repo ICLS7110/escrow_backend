@@ -34,7 +34,7 @@ public class Contract : EndpointGroupBase
     [Authorize]
     public async Task<IResult> GetContractDetails(ISender sender, IJwtService jwtService)
     {
-        var query = new GetContractForUserQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 1 };
+        var query = new GetContractForUserQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
     }

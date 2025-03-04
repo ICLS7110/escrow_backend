@@ -42,12 +42,13 @@ public class GetMilestoneQueryHandler : IRequestHandler<GetMilestoneQuery, Pagin
 
         if (request.ContractId.HasValue)
         {
-            query = query.Where(x => x.ContractId == request.ContractId.Value && x.CreatedBy == request.Id.ToString());
+            query = query.Where(x => x.ContractId == request.ContractId.Value);
         }
 
         return await query
             .Select(s => new MileStoneDTO
-            {                
+            {   
+                Id = s.Id,
                 Name = s.Name,
                 Amount = s.Amount,
                 Description = s.Description,
