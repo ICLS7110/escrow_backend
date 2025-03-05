@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Authorization;
-using Escrow.Api.Application.ResultHandler;
 using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Twilio.TwiML.Messaging;

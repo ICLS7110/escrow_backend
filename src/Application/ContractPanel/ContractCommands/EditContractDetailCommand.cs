@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
-using Escrow.Api.Application.Exceptions;
+using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands;
 
-public record EditContractDetailCommand : IRequest<int>
+public record EditContractDetailCommand : IRequest<Result<int>>
 {
     public int Id { get; set; }
     public string Role { get; set; } = string.Empty;
@@ -28,7 +30,7 @@ public record EditContractDetailCommand : IRequest<int>
     public string Status { get; set; } = string.Empty;
 }
 
-public class EditContractDetailCommandHandler : IRequestHandler<EditContractDetailCommand, int>
+public class EditContractDetailCommandHandler : IRequestHandler<EditContractDetailCommand, Result<int>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtService _jwtService;
@@ -39,13 +41,13 @@ public class EditContractDetailCommandHandler : IRequestHandler<EditContractDeta
         _jwtService = jwtService;
     }
 
-    public async Task<int> Handle(EditContractDetailCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> Handle(EditContractDetailCommand request, CancellationToken cancellationToken)
     {
         int userid = _jwtService.GetUserId().ToInt();
         var entity = await _context.ContractDetails.FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid);
         if (entity == null)
         {
-            throw new EscrowDataNotFoundException("Contract Not Found.");
+            return Result<int>.Failure(StatusCodes.Status404NotFound, "Contract Not Found.");
         }
 
         entity.Role = request.Role;
@@ -65,7 +67,6 @@ public class EditContractDetailCommandHandler : IRequestHandler<EditContractDeta
 
         _context.ContractDetails.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
-
-        return entity.Id;
+        return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
     }
 }
