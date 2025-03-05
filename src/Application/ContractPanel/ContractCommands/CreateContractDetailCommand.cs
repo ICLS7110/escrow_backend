@@ -8,7 +8,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
 
-namespace Escrow.Api.Application.ContractPanel;
+namespace Escrow.Api.Application.ContractPanel.ContractCommands;
 public record CreateContractDetailCommand : IRequest<int>
 {
     public string Role { get; set; } = string.Empty;
@@ -32,14 +32,14 @@ public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetail
     private readonly IApplicationDbContext _context;
     private readonly IJwtService _jwtService;
     private readonly IMapper _mapper;
-    public CreateContractDetailsHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService,IMapper mapper)
+    public CreateContractDetailsHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService, IMapper mapper)
     {
         _context = applicationDbContext;
         _jwtService = jwtService;
         _mapper = mapper;
     }
 
-    public async Task<int> Handle(CreateContractDetailCommand request,CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateContractDetailCommand request, CancellationToken cancellationToken)
     {
         int ContractId;
         int userid = _jwtService.GetUserId().ToInt();
@@ -59,14 +59,14 @@ public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetail
             Status = request.Status,
             BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null,
             SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null,
-            UserDetailId= userid
+            UserDetailId = userid           
         };
         await _context.ContractDetails.AddAsync(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        ContractId= entity.Id;
-        if(request.MileStones!=null && request.MileStones.Any())
+        ContractId = entity.Id;
+        if (request.MileStones != null && request.MileStones.Any())
         {
-            foreach(var milestone in request.MileStones)
+            foreach (var milestone in request.MileStones)
             {
                 var mappedentity = _mapper.Map<MileStone>(milestone);
                 mappedentity.CreatedBy = userid.ToString();

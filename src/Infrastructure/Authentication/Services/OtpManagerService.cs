@@ -7,6 +7,7 @@ using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Escrow.Api.Application.Exceptions;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
 
