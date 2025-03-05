@@ -5,7 +5,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
 
-namespace Escrow.Api.Application.ContractPanel;
+namespace Escrow.Api.Application.ContractPanel.MilestoneCommands;
 
 public record CreateMilestoneCommand : IRequest<int>
 {
@@ -17,7 +17,7 @@ public record CreateMilestoneCommand : IRequest<int>
 
     public int? ContractId { get; set; }
 
-    public ContractDetailsDTO? ContractDetails { get; set; }
+    //public ContractDetailsDTO? ContractDetails { get; set; }
 }
 
 public class CreateMilestoneCommandHandler : IRequestHandler<CreateMilestoneCommand, int>
@@ -43,12 +43,11 @@ public class CreateMilestoneCommandHandler : IRequestHandler<CreateMilestoneComm
             Description = request.Description,
             DueDate = request.DueDate,
             Documents = request.Documents,
-            ContractId = request.ContractId,
-            
+            ContractId = request.ContractId           
         };
         await _context.MileStones.AddAsync(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        MilestoneId = entity.Id;        
+        MilestoneId = entity.Id;
         return MilestoneId;
     }
 }

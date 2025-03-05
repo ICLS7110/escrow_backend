@@ -10,6 +10,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
 {
     public class MileStoneDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public string? Description { get; set; }
@@ -17,7 +18,9 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? Documents { get; set; }
 
         public int? ContractId { get; set; }
-      
-        public ContractDetailsDTO? ContractDetails { get; set; }
+
+        //public ContractDetailsDTO? ContractDetails { get; set; }
     }
+
+   
 }
