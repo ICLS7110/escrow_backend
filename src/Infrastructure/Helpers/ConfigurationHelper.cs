@@ -1,7 +1,7 @@
-﻿using Escrow.Api.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.Extensions.Configuration;
 
-namespace Escrow.Api.Web.Helpers
+namespace Escrow.Api.Infrastructure.Helpers
 {
     public static class ConfigurationHelper
     {

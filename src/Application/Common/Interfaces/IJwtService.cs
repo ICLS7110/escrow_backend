@@ -8,4 +8,5 @@ namespace Escrow.Api.Application.Common.Interfaces;
 public interface IJwtService
 {
     string GetUserId();
+    string GetJWT(string userId);
 }

@@ -4,10 +4,10 @@ using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Escrow.Api.Web.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Infrastructure.Helpers;
 
 
 
@@ -140,8 +140,8 @@ else
 //app.UseHealthChecks("/health");
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
