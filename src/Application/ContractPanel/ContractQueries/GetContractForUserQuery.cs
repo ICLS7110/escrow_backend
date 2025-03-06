@@ -15,6 +15,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries;
 public record GetContractForUserQuery : IRequest<PaginatedList<ContractDetailsDTO>>
 {
     public int? Id { get; init; }
+    public int? ContractId { get; init; }
     public int? PageNumber { get; init; } = 1;
     public int? PageSize { get; init; } = 10;
 }
@@ -44,6 +45,11 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             query = query.Where(x => x.UserDetailId == request.Id.Value);
         }
 
+        if (request.ContractId.HasValue)
+        {
+            query = query.Where(x => x.Id == request.ContractId.Value);
+        }
+
         return await query
             .Select(s => new ContractDetailsDTO
             {
@@ -59,7 +65,19 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
                 BuyerMobile = s.BuyerMobile,
                 SellerName = s.SellerName,
                 SellerMobile = s.SellerMobile,
-                Status = s.Status
+                Status = s.Status,
+                MileStones = _context.MileStones
+                .Where(m => m.ContractId == s.Id)
+                .Select(m => new MileStoneDTO
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    DueDate = m.DueDate,
+                    Amount = m.Amount,
+                    Description = m.Description,
+                    Documents=m.Documents,
+                    ContractId=m.ContractId
+                }).ToList()
             })
             .OrderBy(x => x.ContractTitle)
             .PaginatedListAsync(pageNumber, pageSize);
