@@ -65,4 +65,11 @@ public class Contract : EndpointGroupBase
         await sender.Send(command);
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract details updated successfully.", new()));
     }
+
+    // [Authorize]
+    // public async Task<IResult> UpdateContractDetail(ISender sender, EditContractDetailCommand command)
+    // {
+    //     await sender.Send(command);
+    //     return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract details updated successfully.", new()));
+    // }
 }
