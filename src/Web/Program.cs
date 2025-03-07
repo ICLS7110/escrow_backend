@@ -143,19 +143,41 @@ app.UseStaticFiles();
 //app.UseAuthentication();
 //app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+//    // Enable Swagger in Development environment
+//    app.UseSwaggerUi(settings =>
+//    {
+//        settings.Path = "/api";
+//        settings.DocumentPath = "/api/specification.json";
+//    });
+//}
+//else
+//{
+//    app.UseHsts();
+//}
+
+
+
+
+
+
+
+// Enable Swagger in both Development and Production environments
+app.UseSwaggerUi(settings =>
 {
-    // Enable Swagger in Development environment
-    app.UseSwaggerUi(settings =>
-    {
-        settings.Path = "/api";
-        settings.DocumentPath = "/api/specification.json";
-    });
-}
-else
+    settings.Path = "/api";
+    settings.DocumentPath = "/api/specification.json";
+});
+
+// Enable HSTS only in Production
+if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
 }
+
+
+
 
 //app.MapStaticAssets();
 //app.UseExceptionHandler(options => { });

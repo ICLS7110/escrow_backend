@@ -18,18 +18,18 @@ public class JwtService : IJwtService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _config;
 
-    public JwtService(IHttpContextAccessor httpContextAccessor,IConfiguration configuration)
+    public JwtService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
     {
         _httpContextAccessor = httpContextAccessor;
         _config = configuration;
     }
 
-    public string GetJWT(string userId)
+    public string GetJWT(string userId, string role)
     {
         var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Role,"User")
+                new Claim(ClaimTypes.Role,role)
             };
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationHelper.JwtIssuerSigningKey));
@@ -47,8 +47,8 @@ public class JwtService : IJwtService
 
     public string GetUserId()
     {
-        var userid= _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userid = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return userid ?? string.Empty;
     }
-    
+
 }

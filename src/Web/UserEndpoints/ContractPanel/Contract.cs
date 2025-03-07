@@ -12,6 +12,7 @@ using Escrow.Api.Application.Common.Models.ContractDTOs;
 
 using Escrow.Api.Application.ContractPanel;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Application.ContractPanel.MilestoneQueries;
 
 
 namespace Escrow.Api.Web.Endpoints.ContractPanel;
@@ -30,12 +31,21 @@ public class Contract : EndpointGroupBase
         });
 
         userGroup.MapGet("/", GetContractDetails).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapGet("/allcontracts", GetAllContractDetails).RequireAuthorization(policy => policy.RequireRole("User"));
         userGroup.MapPost("/", CreateContractDetails).RequireAuthorization(p => p.RequireRole("User"));
         userGroup.MapPost("/update", UpdateContractDetail).RequireAuthorization(policy => policy.RequireRole("User"));
     }
 
     [Authorize]
-    public async Task<IResult> GetContractDetails(ISender sender, IJwtService jwtService)
+    public async Task<IResult> GetContractDetails(ISender sender, IJwtService jwtService, int? contractId)
+    {
+        var query = new GetContractForUserQuery { Id = jwtService.GetUserId().ToInt(), ContractId = contractId, PageNumber = 1, PageSize = 10 };
+        var result = await sender.Send(query);
+        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+    }
+
+    [Authorize]
+    public async Task<IResult> GetAllContractDetails(ISender sender, IJwtService jwtService)
     {
         var query = new GetContractForUserQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 10 };
         var result = await sender.Send(query);
@@ -45,8 +55,8 @@ public class Contract : EndpointGroupBase
     [Authorize]
     public async Task<IResult> CreateContractDetails(ISender sender, CreateContractDetailCommand command)
     {
-        var id = await sender.Send(command);        
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract Created Successfully.",new()));
+        var id = await sender.Send(command);
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract Created Successfully.", new { contractId = id }));
     }
 
     [Authorize]

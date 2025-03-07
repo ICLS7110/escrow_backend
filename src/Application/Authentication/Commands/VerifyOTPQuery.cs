@@ -47,7 +47,7 @@ public class VerifyOTPHandler : IRequestHandler<VerifyOTPQuery, Result<VerifyOtp
         if (res.Data is null)
             return Result<VerifyOtpDto>.Failure(StatusCodes.Status404NotFound, $"Not Found");
 
-        var token = _jwtService.GetJWT(res.Data.Id.ToString());
+        var token = _jwtService.GetJWT(res.Data.Id.ToString(),"User");
         var result = new VerifyOtpDto
         {
             AccessToken = token,

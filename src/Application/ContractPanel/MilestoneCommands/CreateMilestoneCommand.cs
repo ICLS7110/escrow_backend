@@ -3,21 +3,19 @@ using System.Threading.Tasks;
 using Amazon.Runtime.Internal;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
+using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
+using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.ContractPanel.MilestoneCommands;
 
 public record CreateMilestoneCommand : IRequest<int>
 {
-    public string Name { get; set; } = string.Empty;
-    public decimal Amount { get; set; }
-    public string? Description { get; set; }
-    public DateTimeOffset DueDate { get; set; }
-    public string? Documents { get; set; }
-
+    public List<MileStoneDTO>? MileStoneDetails { get; set; }
     public int? ContractId { get; set; }
-
-    //public ContractDetailsDTO? ContractDetails { get; set; }
+    public decimal? TaxAmount { get; set; }
+    public int? EscrowTax { get; set; }
+    public int? EscrowFeeAmount { get; set; }
 }
 
 public class CreateMilestoneCommandHandler : IRequestHandler<CreateMilestoneCommand, int>
@@ -34,20 +32,44 @@ public class CreateMilestoneCommandHandler : IRequestHandler<CreateMilestoneComm
 
     public async Task<int> Handle(CreateMilestoneCommand request, CancellationToken cancellationToken)
     {
-        int MilestoneId;
         int userid = _jwtService.GetUserId().ToInt();
-        var entity = new MileStone
+        List<MileStoneDTO>? list = request?.MileStoneDetails;
+        for (int i = 0; i < list?.Count; i++)
         {
-            Name = request.Name,
-            Amount = request.Amount,
-            Description = request.Description,
-            DueDate = request.DueDate,
-            Documents = request.Documents,
-            ContractId = request.ContractId           
-        };
-        await _context.MileStones.AddAsync(entity);
+            MileStoneDTO? item = list[i];
+            var entity = new MileStone
+            {
+                Name = item.Name,
+                Amount = item.Amount,
+                Description = item.Description,
+                DueDate = item.DueDate,
+                Documents = item.Documents,
+                ContractId = item.ContractId
+            };
+            await _context.MileStones.AddAsync(entity);
+        }
+
+        
         await _context.SaveChangesAsync(cancellationToken);
-        MilestoneId = entity.Id;
-        return MilestoneId;
+        //MilestoneId = entity.Id;
+
+
+        if (request?.ContractId != null)
+        {
+            var Contract = await _context.ContractDetails.FirstOrDefaultAsync(x => x.CreatedBy == userid.ToString() && x.Id == request.ContractId);
+            if (Contract == null)
+            {
+                return StatusCodes.Status404NotFound;
+            }
+
+            Contract.EscrowTax = request.EscrowTax;
+            Contract.FeeAmount = request.EscrowFeeAmount;
+            //Contract.EscrowTax = request.EscrowTax;
+
+            _context.ContractDetails.Update(Contract);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        await _context.SaveChangesAsync(cancellationToken);
+        return StatusCodes.Status201Created;
     }
 }

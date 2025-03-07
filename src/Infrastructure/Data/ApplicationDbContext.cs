@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
+using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
@@ -37,6 +38,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<ContractDetails> ContractDetails => Set<ContractDetails>();
     public DbSet<MileStone> MileStones => Set<MileStone>();
+    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

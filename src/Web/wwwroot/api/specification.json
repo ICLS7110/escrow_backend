@@ -41,14 +41,11 @@
         ],
         "operationId": "PostApiMilestone",
         "requestBody": {
-          "x-name": "commands",
+          "x-name": "command",
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/CreateMilestoneCommand"
-                }
+                "$ref": "#/components/schemas/CreateMilestoneCommand"
               }
             }
           },
@@ -74,14 +71,11 @@
         ],
         "operationId": "PostApiMilestoneUpdate",
         "requestBody": {
-          "x-name": "commands",
+          "x-name": "command",
           "content": {
             "application/json": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/EditMilestoneCommand"
-                }
+                "$ref": "#/components/schemas/EditMilestoneCommand"
               }
             }
           },
@@ -548,6 +542,18 @@
           "Contract"
         ],
         "operationId": "GetApiContract",
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -576,6 +582,24 @@
           "required": true,
           "x-position": 1
         },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contract/allcontracts": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "GetApiContractAllcontracts",
         "responses": {
           "200": {
             "description": ""
@@ -987,6 +1011,114 @@
         }
       }
     },
+    "/api/AdminAuth/Login": {
+      "post": {
+        "tags": [
+          "AdminAuth"
+        ],
+        "operationId": "PostApiAdminAuthLogin",
+        "parameters": [
+          {
+            "name": "Email",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "Password",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/AdminAuth/ForgotPassword": {
+      "post": {
+        "tags": [
+          "AdminAuth"
+        ],
+        "operationId": "PostApiAdminAuthForgotPassword",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminForgotPasswordCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/AdminAuth/VerifyOTP": {
+      "post": {
+        "tags": [
+          "AdminAuth"
+        ],
+        "operationId": "PostApiAdminAuthVerifyOTP",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminVerifyOTPCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/AdminAuth/ResetPassword": {
+      "post": {
+        "tags": [
+          "AdminAuth"
+        ],
+        "operationId": "PostApiAdminAuthResetPassword",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminResetPasswordCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/files/Upload-Files": {
       "post": {
         "tags": [
@@ -1038,6 +1170,43 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "mileStoneDetails": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/MileStoneDTO"
+            }
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "taxAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "escrowTax": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "escrowFeeAmount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "MileStoneDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
           "name": {
             "type": "string"
           },
@@ -1532,6 +1701,42 @@
             "type": "string"
           },
           "otp": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminForgotPasswordCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminVerifyOTPCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminResetPasswordCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "otp": {
+            "type": "string"
+          },
+          "newPassword": {
             "type": "string"
           }
         }

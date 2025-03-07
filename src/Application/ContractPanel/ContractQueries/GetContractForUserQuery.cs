@@ -15,6 +15,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries;
 public record GetContractForUserQuery : IRequest<PaginatedList<ContractDetailsDTO>>
 {
     public int? Id { get; init; }
+    public int? ContractId { get; init; }
     public int? PageNumber { get; init; } = 1;
     public int? PageSize { get; init; } = 10;
 }
@@ -42,6 +43,11 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
         if (request.Id.HasValue)
         {
             query = query.Where(x => x.UserDetailId == request.Id.Value);
+        }
+
+        if (request.ContractId.HasValue)
+        {
+            query = query.Where(x => x.Id == request.ContractId.Value);
         }
 
         return await query

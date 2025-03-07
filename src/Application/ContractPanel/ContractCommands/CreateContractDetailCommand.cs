@@ -75,6 +75,17 @@ public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetail
         //    }
         //}
         //await _context.SaveChangesAsync(cancellationToken);
+        // if (request.MileStones != null && request.MileStones.Any())
+        // {
+        //     foreach (var milestone in request.MileStones)
+        //     {
+        //         var mappedentity = _mapper.Map<MileStone>(milestone);
+        //         mappedentity.CreatedBy = userid.ToString();
+        //         mappedentity.ContractId = ContractId;
+        //         await _context.MileStones.AddAsync(mappedentity);
+        //     }
+        // }
+        await _context.SaveChangesAsync(cancellationToken);
         return ContractId;
     }
 }
