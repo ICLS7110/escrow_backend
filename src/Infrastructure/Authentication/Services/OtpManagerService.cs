@@ -71,35 +71,19 @@ public class OtpManagerService : IOtpManagerService
 
     //    return user;
     //}
-    public async Task<Result<UserDetail>> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)
+    public bool VerifyOtpAsync(string phoneNumber, string otp)
     {
-       
-        var phoneNumber = $"{countryCode}{mobileNumber}";
 
         if (!_cache.TryGetValue(phoneNumber, out object? cachedOtp) || cachedOtp is not string storedOtp)
-            return Result<UserDetail>.Failure(StatusCodes.Status400BadRequest, "OTP expired or invalid.");
+            return false;
 
         if (storedOtp != otp)
-            return Result<UserDetail>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP.");
+            return false;
 
-        // Remove OTP after successful validation
+    
         _cache.Remove(phoneNumber);
 
-        // Try to find the user by phone number
-        var userRes = await _userService.FindUserAsync(phoneNumber);
-
-        // If the user doesn't exist, create a new one
-        if (userRes.Data == null)
-        {
-
-            // Save the new user to the database (assuming _userService has a CreateUserAsync method)
-            userRes = await _userService.CreateUserAsync(phoneNumber);
-        }
-
-        if (userRes.Data is null)
-              return Result<UserDetail>.Failure(StatusCodes.Status404NotFound, $"Not Found");
-
-        return Result<UserDetail>.Success(StatusCodes.Status200OK, $"User creation Success", userRes.Data); 
+        return true;
     }
 
 

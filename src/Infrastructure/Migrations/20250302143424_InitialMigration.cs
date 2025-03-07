@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,45 +52,32 @@ namespace Escrow.Api.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TodoLists",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Colour_Code = table.Column<string>(type: "text", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TodoLists", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    UserId = table.Column<string>(type: "text", nullable: false),
                     FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     EmailAddress = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     Gender = table.Column<string>(type: "text", nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     BusinessManagerName = table.Column<string>(type: "text", nullable: true),
                     BusinessEmail = table.Column<string>(type: "text", nullable: true),
+                    CompanyEmail = table.Column<string>(type: "text", nullable: true),
                     VatId = table.Column<string>(type: "text", nullable: true),
-                    AccountHolderName = table.Column<string>(type: "text", nullable: true),
-                    IBANNumber = table.Column<string>(type: "text", nullable: true),
-                    BICCode = table.Column<string>(type: "text", nullable: true),
                     LoginMethod = table.Column<string>(type: "text", nullable: true),
+                    BusinessProof = table.Column<string>(type: "text", nullable: true),
+                    ProfilePicture = table.Column<string>(type: "text", nullable: true),
+                    IsProfileCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    RecordState = table.Column<int>(type: "integer", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,7 +190,115 @@ namespace Escrow.Api.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            
+            migrationBuilder.CreateTable(
+                name: "BankDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserDetailId = table.Column<int>(type: "integer", nullable: false),
+                    AccountHolderName = table.Column<string>(type: "text", nullable: false),
+                    IBANNumber = table.Column<string>(type: "text", nullable: false),
+                    BICCode = table.Column<string>(type: "text", nullable: false),
+                    BankName = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    RecordState = table.Column<int>(type: "integer", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BankDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BankDetails_UserDetails_UserDetailId",
+                        column: x => x.UserDetailId,
+                        principalTable: "UserDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ContractDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Role = table.Column<string>(type: "text", nullable: false),
+                    ContractTitle = table.Column<string>(type: "text", nullable: false),
+                    ServiceType = table.Column<string>(type: "text", nullable: false),
+                    ServiceDescription = table.Column<string>(type: "text", nullable: false),
+                    AdditionalNote = table.Column<string>(type: "text", nullable: true),
+                    FeesPaidBy = table.Column<string>(type: "text", nullable: false),
+                    FeeAmount = table.Column<decimal>(type: "numeric", nullable: true),
+                    BuyerName = table.Column<string>(type: "text", nullable: true),
+                    BuyerMobile = table.Column<string>(type: "text", nullable: true),
+                    SellerName = table.Column<string>(type: "text", nullable: true),
+                    SellerMobile = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    StatusReason = table.Column<string>(type: "text", nullable: true),
+                    BuyerDetailsId = table.Column<int>(type: "integer", nullable: true),
+                    SellerDetailsId = table.Column<int>(type: "integer", nullable: true),
+                    UserDetailId = table.Column<int>(type: "integer", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    RecordState = table.Column<int>(type: "integer", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContractDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ContractDetails_UserDetails_BuyerDetailsId",
+                        column: x => x.BuyerDetailsId,
+                        principalTable: "UserDetails",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ContractDetails_UserDetails_SellerDetailsId",
+                        column: x => x.SellerDetailsId,
+                        principalTable: "UserDetails",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ContractDetails_UserDetails_UserDetailId",
+                        column: x => x.UserDetailId,
+                        principalTable: "UserDetails",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MileStones",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    DueDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Documents = table.Column<string>(type: "text", nullable: true),
+                    ContractId = table.Column<int>(type: "integer", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
+                    RecordState = table.Column<int>(type: "integer", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MileStones", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MileStones_ContractDetails_ContractId",
+                        column: x => x.ContractId,
+                        principalTable: "ContractDetails",
+                        principalColumn: "Id");
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -242,7 +337,30 @@ namespace Escrow.Api.Infrastructure.Migrations
                 column: "NormalizedUserName",
                 unique: true);
 
-            
+            migrationBuilder.CreateIndex(
+                name: "IX_BankDetails_UserDetailId",
+                table: "BankDetails",
+                column: "UserDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContractDetails_BuyerDetailsId",
+                table: "ContractDetails",
+                column: "BuyerDetailsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContractDetails_SellerDetailsId",
+                table: "ContractDetails",
+                column: "SellerDetailsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ContractDetails_UserDetailId",
+                table: "ContractDetails",
+                column: "UserDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MileStones_ContractId",
+                table: "MileStones",
+                column: "ContractId");
         }
 
         /// <inheritdoc />
@@ -264,10 +382,10 @@ namespace Escrow.Api.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "TodoItems");
+                name: "BankDetails");
 
             migrationBuilder.DropTable(
-                name: "UserDetails");
+                name: "MileStones");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -276,7 +394,10 @@ namespace Escrow.Api.Infrastructure.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "TodoLists");
+                name: "ContractDetails");
+
+            migrationBuilder.DropTable(
+                name: "UserDetails");
         }
     }
 }
