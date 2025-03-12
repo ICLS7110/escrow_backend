@@ -12,6 +12,7 @@ public interface IApplicationDbContext
     DbSet<ContractDetails> ContractDetails { get; }
     DbSet<MileStone> MileStones { get; }
     DbSet<AdminUser> AdminUsers { get; }
+    DbSet<SellerBuyerInvitation> SellerBuyerInvitations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

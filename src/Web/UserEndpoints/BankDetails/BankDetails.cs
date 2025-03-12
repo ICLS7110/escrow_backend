@@ -44,12 +44,21 @@ public class BankDetails : EndpointGroupBase
         return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(StatusCodes.Status200OK,"Success", result));
     }
 
+    //[Authorize]
+    //public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
+    //{       
+    //    var id = await sender.Send(command);
+    //    return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
+    //    //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
+    //}
+
+
     [Authorize]
-    public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
-    {       
+    public async Task<IResult> CreateBankDetail(ISender sender, IJwtService jwtService, CreateBankDetailCommand command)
+    {
         var id = await sender.Send(command);
-        return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
-        //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Bank details created successfully.", new { BankId = id }));
+        //return TypedResults.Created($"/BankDetails/{id}", Result<int>.Success(StatusCodes.Status201Created, "Success.", id));
     }
 
     [Authorize]

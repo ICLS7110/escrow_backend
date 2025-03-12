@@ -40,7 +40,7 @@ public class Milestone : EndpointGroupBase
     public async Task<IResult> CreateMiliestone(ISender sender, CreateMilestoneCommand command)
     {
         await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Milestone Created Successfully.", new()));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Milestone Created Successfully.", new()));
     }
 
     [Authorize]

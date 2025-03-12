@@ -5,24 +5,25 @@
 namespace Escrow.Api.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_OTP_in_AdminUserTable : Migration
+    public partial class Add_Column_contractId_into_BuyerAndSellerTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "OTP",
-                table: "AdminUsers",
+                name: "ContractId",
+                table: "SellerBuyerInvitations",
                 type: "integer",
-                nullable: true);
+                nullable: false,
+                defaultValue: 0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "OTP",
-                table: "AdminUsers");
+                name: "ContractId",
+                table: "SellerBuyerInvitations");
         }
     }
 }

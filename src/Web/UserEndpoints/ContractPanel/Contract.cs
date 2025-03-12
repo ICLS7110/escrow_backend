@@ -9,10 +9,10 @@ using Escrow.Api.Application.ContractPanel.ContractCommands;
 using Escrow.Api.Application.ContractPanel.ContractQueries;
 using Escrow.Api.Application;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
-
 using Escrow.Api.Application.ContractPanel;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Application.ContractPanel.MilestoneQueries;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace Escrow.Api.Web.Endpoints.ContractPanel;
@@ -34,6 +34,9 @@ public class Contract : EndpointGroupBase
         userGroup.MapGet("/allcontracts", GetAllContractDetails).RequireAuthorization(policy => policy.RequireRole("User"));
         userGroup.MapPost("/", CreateContractDetails).RequireAuthorization(p => p.RequireRole("User"));
         userGroup.MapPost("/update", UpdateContractDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapPost("/update-status", UpdateContractStatus).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapGet("/buyersellercontracts", GetContractByBuyerSellerDetails).RequireAuthorization(policy => policy.RequireRole("User"));
+
     }
 
     [Authorize]
@@ -66,10 +69,21 @@ public class Contract : EndpointGroupBase
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract details updated successfully.", new()));
     }
 
-    // [Authorize]
-    // public async Task<IResult> UpdateContractDetail(ISender sender, EditContractDetailCommand command)
-    // {
-    //     await sender.Send(command);
-    //     return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract details updated successfully.", new()));
-    // }
+    [Authorize]
+    public async Task<IResult> GetContractByBuyerSellerDetails(ISender sender, IJwtService jwtService, int? buyerId, int? sellerId, int? ContractId)
+    {
+        var query = new GetContractForBuyerQuery { Id = jwtService.GetUserId().ToInt(), BuyerId = buyerId, SellerId = sellerId, ContractId = ContractId, PageNumber = 1, PageSize = 10 };
+        var result = await sender.Send(query);
+        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+    }
+
+    [Authorize]
+    public async Task<IResult> UpdateContractStatus(ISender sender, UpdateContractStatusCommand command)
+    {
+        var result = await sender.Send(command);
+        if (!result)
+            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Contract not found or update failed."));
+
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contract status updated successfully.", new()));
+    }
 }

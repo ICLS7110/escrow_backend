@@ -94,6 +94,36 @@
         ]
       }
     },
+    "/api/SellerBuyer": {
+      "post": {
+        "tags": [
+          "SellerBuyer"
+        ],
+        "operationId": "PostApiSellerBuyer",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBuyerSellerCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Users/register": {
       "post": {
         "tags": [
@@ -630,6 +660,86 @@
           "required": true,
           "x-position": 1
         },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contract/update-status": {
+      "post": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "PostApiContractUpdateStatus",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContractStatusCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contract/buyersellercontracts": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "GetApiContractBuyersellercontracts",
+        "parameters": [
+          {
+            "name": "buyerId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "sellerId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "ContractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -1264,6 +1374,24 @@
           }
         }
       },
+      "CreateBuyerSellerCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sellerMobileNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "buyerMobileNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "HttpValidationProblemDetails": {
         "allOf": [
           {
@@ -1635,6 +1763,29 @@
           },
           "status": {
             "type": "string"
+          }
+        }
+      },
+      "UpdateContractStatusCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "buyerPhoneNumber": {
+            "type": "string"
+          },
+          "sellerPhoneNumber": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "statusReason": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
