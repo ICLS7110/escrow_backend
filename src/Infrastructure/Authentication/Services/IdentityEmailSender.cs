@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services;
-public class IdentityEmailSender : IEmailSender<ApplicationUser>
+public class IdentityEmailSender : IEmailSender<ApplicationUser1>
 {
-    public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink)
+    public Task SendConfirmationLinkAsync(ApplicationUser1 user, string email, string confirmationLink)
     {
         throw new NotImplementedException();
     }
@@ -21,12 +21,12 @@ public class IdentityEmailSender : IEmailSender<ApplicationUser>
         return Task.CompletedTask;
     }
 
-    public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode)
+    public Task SendPasswordResetCodeAsync(ApplicationUser1 user, string email, string resetCode)
     {
         throw new NotImplementedException();
     }
 
-    public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink)
+    public Task SendPasswordResetLinkAsync(ApplicationUser1 user, string email, string resetLink)
     {
         throw new NotImplementedException();
     }

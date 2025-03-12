@@ -76,7 +76,7 @@ public static class DependencyInjection
 
         // Register Identity services
         builder.Services
-            .AddIdentityCore<ApplicationUser>()
+            .AddIdentityCore<ApplicationUser1>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -86,7 +86,7 @@ public static class DependencyInjection
         // Register other services
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
-        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, Escrow.Api.Infrastructure.Authentication.Services.IdentityEmailSender>();
+        builder.Services.AddSingleton<IEmailSender<ApplicationUser1>, Escrow.Api.Infrastructure.Authentication.Services.IdentityEmailSender>();
         builder.Services.AddSingleton<IRsaHelper,RsaHelper>();
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         builder.Services.AddScoped<IJwtService, JwtService>();

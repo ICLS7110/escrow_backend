@@ -15,88 +15,33 @@ using Escrow.Api.Infrastructure.Helpers;
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationHelper.InitializeConfig(builder.Configuration);
 
-
-// Add services to the container
+builder.Services.AddDbContext<IdentityDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("IdentityDbConnection"));
+    options.UseOpenIddict();
+});
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
-
-// Configure OpenIddict for token management
-/*
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
         options.UseEntityFrameworkCore()
-               .UseDbContext<ApplicationDbContext>();
+               .UseDbContext<IdentityDbContext>(); 
     })
     .AddServer(options =>
     {
-        // Register the OpenIddict server handlers and options
-        options.SetAuthorizationEndpointUris("connect/authorize")
-        .SetTokenEndpointUris("/connect/token");
+        options.AllowPasswordFlow()
+               .AllowRefreshTokenFlow();
 
-        options.AllowAuthorizationCodeFlow();
-        options.AllowPasswordFlow();
+        options.SetTokenEndpointUris("/connect/token");
 
         options.AddDevelopmentEncryptionCertificate()
                .AddDevelopmentSigningCertificate();
 
-        options.AddEphemeralEncryptionKey()
-               .AddEphemeralSigningKey();
-
-        // Register the ASP.NET Core host and configure token validation
         options.UseAspNetCore()
-               //.EnableAuthorizationEndpointPassthrough()
                .EnableTokenEndpointPassthrough();
-
-    })
-    .AddValidation(options =>
-    {
-        options.UseLocalServer();
-        options.UseAspNetCore();
-
-        // Configure your authority(issuer) URL.
-        //options.SetIssuer("https://your-authority-url.com/");
-
-        // Enable token validation against your application.
-        //options.AddAudiences("backend-api");
-    });*/
-
-/*builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-});*/
-builder.Services.AddAuthentication(options =>{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options=> 
-{
-    options.Events = new JwtBearerEvents
-    {
-        OnForbidden = async context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            context.Response.ContentType = "application/json";
-            var response = "Access Denied. You do not have permission to access this resource.";
-            await context.Response.WriteAsJsonAsync(Result<string>.Failure(StatusCodes.Status403Forbidden, response));
-        }
-    };
-    var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
-        ?? throw new InvalidOperationException("Jwt:IssuerSigningKey is missing in the configuration.");
-
-    options.TokenValidationParameters = new TokenValidationParameters {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = ConfigurationHelper.JwtValidIssuer,
-        ValidAudience = ConfigurationHelper.JwtValidAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(issuerSigningKey)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
+    });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

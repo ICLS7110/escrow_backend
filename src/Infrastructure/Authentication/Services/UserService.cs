@@ -17,8 +17,8 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
     public class UserService : IUserService
     {
         private readonly IApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public UserService(IApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly UserManager<ApplicationUser1> _userManager;
+        public UserService(IApplicationDbContext context, UserManager<ApplicationUser1> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -57,11 +57,11 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
         public async Task<Result<UserDetail>> CreateUserAsync(string phoneNumber)
         {
             var existingApplicationUser = await _userManager.Users.Where(u => u.PhoneNumber == phoneNumber).FirstOrDefaultAsync();   
-            ApplicationUser? newApplicationUser;
+            ApplicationUser1? newApplicationUser;
             if (existingApplicationUser == null)
             {
                 // Create a new user
-                newApplicationUser = new ApplicationUser
+                newApplicationUser = new ApplicationUser1
                 {
                     UserName = phoneNumber,
                     PhoneNumber = phoneNumber,

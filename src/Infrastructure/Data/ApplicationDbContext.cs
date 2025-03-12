@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser1>, IApplicationDbContext
 {    
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 

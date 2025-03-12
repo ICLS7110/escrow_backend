@@ -8,13 +8,13 @@ namespace Escrow.Api.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IUserClaimsPrincipalFactory<ApplicationUser> _userClaimsPrincipalFactory;
+    private readonly UserManager<ApplicationUser1> _userManager;
+    private readonly IUserClaimsPrincipalFactory<ApplicationUser1> _userClaimsPrincipalFactory;
     private readonly IAuthorizationService _authorizationService;
 
     public IdentityService(
-        UserManager<ApplicationUser> userManager,
-        IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
+        UserManager<ApplicationUser1> userManager,
+        IUserClaimsPrincipalFactory<ApplicationUser1> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService)
     {
         _userManager = userManager;
@@ -31,7 +31,7 @@ public class IdentityService : IIdentityService
 
     public async Task<(Result Result, string UserId)> CreateUserAsync(string userName, string password)
     {
-        var user = new ApplicationUser
+        var user = new ApplicationUser1
         {
             UserName = userName,
             Email = userName,
@@ -72,7 +72,7 @@ public class IdentityService : IIdentityService
         return user != null ? await DeleteUserAsync(user) : Result.Success();
     }
 
-    public async Task<Result> DeleteUserAsync(ApplicationUser user)
+    public async Task<Result> DeleteUserAsync(ApplicationUser1 user)
     {
         var result = await _userManager.DeleteAsync(user);
 

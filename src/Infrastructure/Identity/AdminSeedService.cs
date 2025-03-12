@@ -11,7 +11,7 @@ public class AdminSeedService
 {
     public static async Task EnsureAdminUserExists(IServiceProvider serviceProvider)
     {
-        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser1>>();
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
         // Create roles if they don't exist
@@ -26,7 +26,7 @@ public class AdminSeedService
 
         if (existingAdmin == null)
         {
-            var adminUser = new ApplicationUser
+            var adminUser = new ApplicationUser1
             {
                 //FullName = "Super Admin",
                 Email = adminEmail,

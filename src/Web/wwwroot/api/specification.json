@@ -931,6 +931,56 @@
         ]
       }
     },
+    "/api/Auth/request-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "PostApiAuthRequestOtp",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Auth/verify-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "PostApiAuthVerifyOtp",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOTPQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/files/Upload-Files": {
       "post": {
         "tags": [
@@ -973,72 +1023,6 @@
             "JWT": []
           }
         ]
-      }
-    },
-    "/api/auth/request-otp": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "Auth_RequestOtp",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RequestOtpDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/auth/verify-otp": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "Auth_VerifyOtp",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyOtpDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
       }
     }
   },
@@ -1635,7 +1619,7 @@
           }
         }
       },
-      "RequestOtpDto": {
+      "RequestOtpQuery": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1647,7 +1631,7 @@
           }
         }
       },
-      "VerifyOtpDto": {
+      "VerifyOTPQuery": {
         "type": "object",
         "additionalProperties": false,
         "properties": {

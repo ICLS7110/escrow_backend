@@ -33,7 +33,7 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="6.0.0" />
-    <PackageVersion Include="OpenIddict.AspNetCore" Version="6.0.0" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="6.1.1" />
     <PackageVersion Include="OpenIddict.Core" Version="6.0.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.0.0" />
     <PackageVersion Include="OpenIddict.Validation" Version="6.0.0" />
