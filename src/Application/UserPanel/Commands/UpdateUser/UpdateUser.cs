@@ -17,8 +17,8 @@ using Microsoft.AspNetCore.Http;
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
     public record UpdateUserCommand : IRequest<Result<int>>
-    {        
-        
+    {
+
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? Gender { get; set; }
@@ -30,6 +30,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
         public string? BusinessProof { get; set; }
         public string? CompanyEmail { get; set; }
         public string? ProfilePicture { get; set; }
+        public string? AccountType { get; set; }
+        public bool? IsProfileCompleted { get; set; }
 
     }
 
@@ -45,25 +47,36 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 
         public async Task<Result<int>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            var entity = await _context.UserDetails
-                .FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
+            try
+            {
+                var entity = await _context.UserDetails
+                    .FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
 
-            if (entity == null) 
-                return Result<int>.Failure(StatusCodes.Status404NotFound, "User Details Not Found.");
-            
-            entity.FullName = request.FullName;
-            entity.EmailAddress = request.EmailAddress;
-            entity.Gender = request.Gender;
-            entity.DateOfBirth = request.DateOfBirth;
-            entity.BusinessManagerName = request.BusinessManagerName;
-            entity.BusinessEmail = request.BusinessEmail;
-            entity.VatId = request.VatId;
-            //entity.BusinessProof = request.BusinessProof;
-            //entity.CompanyEmail = request.CompanyEmail;
-            //entity.ProfilePicture = request.ProfilePicture;
-            
-            await _context.SaveChangesAsync(cancellationToken);
+                if (entity == null)
+                    return Result<int>.Failure(StatusCodes.Status404NotFound, "User Details Not Found.");
+
+                entity.FullName = request.FullName;
+                entity.EmailAddress = request.EmailAddress;
+                entity.Gender = request.Gender;
+                entity.DateOfBirth = DateTime.SpecifyKind(request.DateOfBirth ?? DateTime.UtcNow, DateTimeKind.Unspecified);
+                entity.BusinessManagerName = request.BusinessManagerName;
+                entity.BusinessEmail = request.BusinessEmail;
+                entity.VatId = request.VatId;
+                entity.BusinessProof = request.BusinessProof;
+                entity.CompanyEmail = request.CompanyEmail;
+                entity.ProfilePicture = request.ProfilePicture;
+                entity.AccountType = request.AccountType;
+                entity.IsProfileCompleted = Convert.ToBoolean(request.IsProfileCompleted);
+
+                //await _context.UserDetails.AddAsync(entity);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                var error = ex;
+            }
             return Result<int>.Success(StatusCodes.Status200OK, "Success");
+
         }
     }
 }

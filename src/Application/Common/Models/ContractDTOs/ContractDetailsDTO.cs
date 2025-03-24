@@ -21,6 +21,8 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? SellerName { get; set; }
         public string? SellerMobile { get; set; }
         public string Status { get; set; } = string.Empty;
+        public bool? IsActive { get; set; }
+        public bool? IsDeleted { get; set; } 
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
     }

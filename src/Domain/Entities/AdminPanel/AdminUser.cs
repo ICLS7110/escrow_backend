@@ -18,5 +18,8 @@ namespace Escrow.Api.Domain.Entities.AdminPanel
         public string Role { get; set; } = "Admin"; // Default role
         public string? OTP { get; set; }
 
+        public bool? IsDeleted { get; set; } = false;
+        public bool? IsActive { get; set; } = false;
+
     }
 }

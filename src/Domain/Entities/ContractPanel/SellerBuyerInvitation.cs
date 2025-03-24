@@ -11,6 +11,8 @@ namespace Escrow.Api.Domain.Entities.ContractPanel
     {
         public int SellerId { get; set; }
         public int BuyerId { get; set; }
+        public string? BuyerPhoneNumber { get; set; }
+        public string? SellerPhoneNumber { get; set; }
         public string? InvitationLink { get; set; }
         public string Status { get; set; } = "Pending";
         public int ContractId { get; set; }

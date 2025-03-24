@@ -20,6 +20,10 @@ public class AdminAuth : EndpointGroupBase
         userGroup.MapPost("/ForgotPassword", AdminForgotPassword);
         userGroup.MapPost("/VerifyOTP", VerifyOTP);
         userGroup.MapPost("/ResetPassword", ResetPassword);
+        userGroup.MapPost("/ChangePassword", AdminChangePassword);
+        userGroup.MapPost("/GetAdminAllDetail", GetAdminAllDetail);
+        userGroup.MapPut("/UpdateDetails", UpdateDetails);
+        userGroup.MapGet("/GetAdminListings", GetAdminListings); 
     }
 
     public async Task<IResult> AdminLogin(ISender sender, [AsParameters] GetAdminDetailQuery request)
@@ -68,5 +72,32 @@ public class AdminAuth : EndpointGroupBase
         }
 
         return TypedResults.Ok(result);
+    }
+
+    public async Task<IResult> AdminChangePassword(ISender sender, AdminChangePasswordCommand command)
+    {
+        var result = await sender.Send(command);
+        return result.Status == 1 ? TypedResults.BadRequest(result) : TypedResults.Ok(result);
+    }
+
+    // New endpoint for GetAdminAllDetailQuery
+    public async Task<IResult> GetAdminAllDetail(ISender sender, [AsParameters] GetAdminAllDetailQuery request)
+    {
+        var result = await sender.Send(request);
+
+        // Return BadRequest if status is 1, otherwise return OK with the result
+        return result.Status == 1 ? TypedResults.BadRequest(result) : TypedResults.Ok(result);
+    }
+
+    public async Task<IResult> UpdateDetails(ISender sender, UpdateDetailsCommand command)
+    {
+        var result = await sender.Send(command);
+        return result.Status == 1 ? TypedResults.BadRequest(new { Success = false, Message = result.Message }) : TypedResults.Ok(new { Success = true, Message = result.Message });
+    }
+
+    public async Task<IResult> GetAdminListings(ISender sender, [AsParameters] GetAdminListingsQuery request)
+    {
+        var result = await sender.Send(request);
+        return result.Status == 1 ? TypedResults.BadRequest(result) : TypedResults.Ok(result);
     }
 }

@@ -11,6 +11,7 @@ using Escrow.Api.Application;
 using Escrow.Api.Infrastructure.Security;
 using Escrow.Api.Application.Common.Models.BankDtos;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Web.Endpoints.BankDetails;
 
@@ -19,7 +20,7 @@ public class BankDetails : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         var userGroup = app.MapGroup(this)
-        .RequireAuthorization(policy => policy.RequireRole("User")) // Enable OpenIddict authorization
+        .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User))) // Enable OpenIddict authorization
         .WithOpenApi()
         .AddEndpointFilter(async (context, next) =>
         {
@@ -43,15 +44,6 @@ public class BankDetails : EndpointGroupBase
         var result = await sender.Send(query);
         return TypedResults.Ok(Result<PaginatedList<BankDetailDTO>>.Success(StatusCodes.Status200OK,"Success", result));
     }
-
-    //[Authorize]
-    //public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService, CreateBankDetailCommand command)
-    //{       
-    //    var id = await sender.Send(command);
-    //    return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
-    //    //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
-    //}
-
 
     [Authorize]
     public async Task<IResult> CreateBankDetail(ISender sender, IJwtService jwtService, CreateBankDetailCommand command)

@@ -52,6 +52,7 @@ public class VerifyOTPHandler : IRequestHandler<VerifyOTPQuery, Result<VerifyOtp
         {
             AccessToken = token,
             UserId = res.Data.Id.ToString(),
+            IsProfileCompleted=res.Data.IsProfileCompleted
 
         };
         return Result<VerifyOtpDto>.Success(StatusCodes.Status200OK, "OTP verified successfully.", result);

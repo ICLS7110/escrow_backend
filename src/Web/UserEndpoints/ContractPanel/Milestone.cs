@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Application;
 using Escrow.Api.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Web.UserEndpoints.ContractPanel;
 
@@ -23,9 +24,9 @@ public class Milestone : EndpointGroupBase
             return await next(context);
         });
 
-        userGroup.MapGet("/", GetMilestoneDetails).RequireAuthorization(policy => policy.RequireRole("User"));
-        userGroup.MapPost("/", CreateMiliestone).RequireAuthorization(p => p.RequireRole("User"));
-        userGroup.MapPost("/update", UpdateMilestone).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapGet("/", GetMilestoneDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/", CreateMiliestone).RequireAuthorization(p => p.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/update", UpdateMilestone).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
     }
 
     [Authorize]

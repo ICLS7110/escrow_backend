@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,8 +16,8 @@ public class AdminSeedService
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
         // Create roles if they don't exist
-        if (!await roleManager.RoleExistsAsync("Admin"))
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
+        if (!await roleManager.RoleExistsAsync(nameof(Roles.Admin)))
+            await roleManager.CreateAsync(new IdentityRole(nameof(Roles.Admin)));
 
         if (!await roleManager.RoleExistsAsync("User"))
             await roleManager.CreateAsync(new IdentityRole("User"));
@@ -38,7 +39,7 @@ public class AdminSeedService
             var result = await userManager.CreateAsync(adminUser, "Admin@123"); // Use a strong password
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(adminUser, "Admin");
+                await userManager.AddToRoleAsync(adminUser, nameof(Roles.Admin));
             }
         }
     }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Application;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 
@@ -26,8 +27,8 @@ public class UserDetails : EndpointGroupBase
         });
         
                 // Get all users  
-        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole("User")); // Get user by ID
-        userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User))); // Get user by ID
+        userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
         
     }
 

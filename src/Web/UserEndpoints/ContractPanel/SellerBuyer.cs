@@ -2,6 +2,7 @@
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.ContractPanel.ContractCommands;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ public class SellerBuyer : EndpointGroupBase
             return await next(context);
         });
 
-        userGroup.MapPost("/", CreateSellerBuyerInvitation).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapPost("/", CreateSellerBuyerInvitation).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
     }
 
     [Authorize]

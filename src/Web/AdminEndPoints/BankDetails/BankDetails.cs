@@ -4,6 +4,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Escrow.Api.Web.AdminEndPoints.BankDetails;
@@ -13,7 +14,7 @@ public class BankDetails: EndpointGroupBase
     public override void Map(WebApplication app)
     {
         var userGroup = app.MapGroup(this)
-        .RequireAuthorization(policy => policy.RequireRole("Admin")) // Enable OpenIddict authorization
+        .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin))) // Enable OpenIddict authorization
         .WithOpenApi()
         .AddEndpointFilter(async (context, next) =>
         {
@@ -47,21 +48,7 @@ public class BankDetails: EndpointGroupBase
         //return TypedResults.Created($"/BankDetails/{id}", Result<int>.Success(StatusCodes.Status201Created, "Success.", id));
     }
 
-    //[Authorize]
-    //public async Task<IResult> CreateBankDetail(ISender sender, IJwtService jwtService, CreateBankDetailCommand command)
-    //{
-    //    var id = await sender.Send(command);
-    //    return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created, "Success.", id));
-    //    //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
-    //}
-
-    //[Authorize]
-    //public async Task<IResult> CreateBankDetail(ISender sender, IJwtService jwtService, CreateBankDetailCommand command)
-    //{
-    //    var id = await sender.Send(command);
-    //    return TypedResults.Ok(Result<int>.Success(StatusCodes.Status200OK, "Successfully", id));
-    //    //return TypedResults.Created($"/{nameof(BankDetails)}/{id}", id);
-    //}
+   
 
     [Authorize]
     public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService, UpdateBankDetailCommand command)

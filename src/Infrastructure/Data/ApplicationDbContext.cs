@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
+using Amazon.Auth.AccessControlPolicy;
 using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
@@ -39,6 +40,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<ContractDetails> ContractDetails => Set<ContractDetails>();
     public DbSet<MileStone> MileStones => Set<MileStone>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<Policy> Policies => Set<Policy>();
     public DbSet<SellerBuyerInvitation> SellerBuyerInvitations => Set<SellerBuyerInvitation>();
 
     protected override void OnModelCreating(ModelBuilder builder)

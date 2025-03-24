@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.AdminAuth.Queries
 {
@@ -22,13 +23,11 @@ namespace Escrow.Api.Application.AdminAuth.Queries
     public class GetAdminDetailQueryHandler : IRequestHandler<GetAdminDetailQuery, Result<AdminLoginDTO>>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
 
         public GetAdminDetailQueryHandler(IApplicationDbContext context, IMapper mapper, IJwtService jwtService)
         {
             _context = context;
-            _mapper = mapper;
             _jwtService = jwtService;
         }
 
@@ -50,11 +49,12 @@ namespace Escrow.Api.Application.AdminAuth.Queries
 
             var adminDto = new AdminLoginDTO
             {
+                Id = adminUser.Id,
                 Email = adminUser.Email,
                 PasswordHash = adminUser.PasswordHash,
                 Role = adminUser.Role,
                 Username = adminUser.Username,
-                Token = _jwtService.GetJWT(adminUser.Id.ToString(), "Admin")
+                Token = _jwtService.GetJWT(adminUser.Id.ToString(), nameof(Roles.Admin))
             };
 
             return Result<AdminLoginDTO>.Success(StatusCodes.Status200OK, "Admin login successfully.", adminDto);

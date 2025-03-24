@@ -23,6 +23,7 @@ public class UserDetailDto
     public string? CompanyEmail { get; set; }
     public string? LoginMethod { get; set; }
     public string? ProfilePicture { get; set; }
+    public string? AccountType { get; set; }
     public bool IsProfileCompleted { get; set; } = false;
 
     private class Mapping : Profile

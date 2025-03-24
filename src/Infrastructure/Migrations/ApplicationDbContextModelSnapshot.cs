@@ -46,6 +46,12 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -120,6 +126,12 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("FeesPaidBy")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -241,6 +253,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<int>("BuyerId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("BuyerPhoneNumber")
+                        .HasColumnType("text");
+
                     b.Property<int>("ContractId")
                         .HasColumnType("integer");
 
@@ -270,6 +285,9 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.Property<int>("SellerId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SellerPhoneNumber")
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -343,6 +361,9 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AccountType")
+                        .HasColumnType("text");
+
                     b.Property<string>("BusinessEmail")
                         .HasColumnType("text");
 
@@ -379,6 +400,12 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.Property<string>("Gender")
                         .HasColumnType("text");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsProfileCompleted")
                         .HasColumnType("boolean");

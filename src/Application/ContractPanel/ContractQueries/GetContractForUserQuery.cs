@@ -66,6 +66,8 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
                 SellerName = s.SellerName,
                 SellerMobile = s.SellerMobile,
                 Status = s.Status,
+                IsActive = s.IsActive,
+                IsDeleted = s.IsDeleted,
                 MileStones = _context.MileStones
                 .Where(m => m.ContractId == s.Id)
                 .Select(m => new MileStoneDTO

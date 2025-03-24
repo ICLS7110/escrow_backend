@@ -25,6 +25,8 @@ public class UserDetail : BaseAuditableEntity
     public string? LoginMethod { get; set; }
     public string? BusinessProof {  get; set; }
     public string? ProfilePicture {  get; set; }
-
+    public string? AccountType {  get; set; } 
     public bool IsProfileCompleted { get; set; } = false;
+    public bool IsDeleted { get; set; } = false;
+    public bool? IsActive { get; set; } = false;
 }
