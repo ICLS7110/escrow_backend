@@ -93,6 +93,11 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                     SellerName = s.SellerName,
                     SellerMobile = s.SellerMobile,
                     Status = s.Status,
+                    Created = s.Created,
+                    TaxAmount = s.TaxAmount,
+                    EscrowTax = s.EscrowTax,
+                    IsActive = s.IsActive,
+                    IsDeleted = s.IsDeleted,
                     MileStones = _context.MileStones
                         .Where(m => m.ContractId == s.Id)
                         .Select(m => new MileStoneDTO
@@ -112,6 +117,6 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
             return result;
         }
 
-         
+
     }
 }

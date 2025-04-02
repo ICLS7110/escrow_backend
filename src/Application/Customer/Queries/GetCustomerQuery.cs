@@ -34,7 +34,7 @@ namespace Escrow.Api.Application.Customers.Queries
 
 
             var query = _context.UserDetails
-                .Where(u => u.DeletedBy == 0 || u.DeletedBy == null) // Fetch only active customers
+                .Where(u => !u.IsDeleted) // Fetch only active customers
                 .AsQueryable();
 
             // 🔹 If ID is provided, fetch only that customer

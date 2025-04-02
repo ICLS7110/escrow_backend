@@ -1,20 +1,40 @@
 ﻿using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.AdminPanel;
+using Escrow.Api.Domain.Entities.AMLPanel;
+using Escrow.Api.Domain.Entities.Commissions;
+using Escrow.Api.Domain.Entities.ContactUsPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
+using Escrow.Api.Domain.Entities.Disputes;
+using Escrow.Api.Domain.Entities.EmailTemplates;
+using Escrow.Api.Domain.Entities.Notifications;
+using Escrow.Api.Domain.Entities.Pages;
+using Escrow.Api.Domain.Entities.TeamMembers;
+using Escrow.Api.Domain.Entities.Transactions;
 using Escrow.Api.Domain.Entities.UserPanel;
-using Escrow.Api.Domain.Entities.Policy;
 
 namespace Escrow.Api.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
 {
     DbSet<UserDetail> UserDetails { get; }
+    DbSet<Page> Pages { get; }
     DbSet<BankDetail> BankDetails { get; }
     DbSet<ContractDetails> ContractDetails { get; }
     DbSet<MileStone> MileStones { get; }
     DbSet<AdminUser> AdminUsers { get; }
     DbSet<SellerBuyerInvitation> SellerBuyerInvitations { get; }
-    DbSet<Policy> Policies { get; }
+    DbSet<CommissionMaster> CommissionMasters { get; }
+    DbSet<Transaction> Transactions { get; }
+    DbSet<Dispute> Disputes { get; }
+    DbSet<DisputeMessage> DisputeMessages { get; }
+    DbSet<AMLFlaggedTransaction> AMLFlaggedTransactions { get; }
+    DbSet<AMLSettings> AMLSettings { get; }
+    DbSet<AMLNotification> AMLNotifications { get; }
+    DbSet<AMLTransactionVerification> AMLTransactionVerifications { get; }
+    DbSet<ContactUs> ContactUs { get; }
+    DbSet<EmailTemplate> EmailTemplates { get; }
+    DbSet<TeamMember> TeamMembers { get; }
+    DbSet<Notification> Notifications { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

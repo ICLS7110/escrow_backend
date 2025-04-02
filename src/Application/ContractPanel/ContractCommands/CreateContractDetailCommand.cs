@@ -22,7 +22,8 @@ public record CreateContractDetailCommand : IRequest<int>
     public string? BuyerMobile { get; set; }
     public string? SellerName { get; set; }
     public string? SellerMobile { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public string? ContractDoc { get; set; }
+    public string Status { get; set; } = "pending";
 
     //public List<MileStoneDTO>? MileStones { get; set; }
 }
@@ -57,9 +58,10 @@ public class CreateContractDetailsHandler : IRequestHandler<CreateContractDetail
             SellerMobile = request.SellerMobile,
             SellerName = request.SellerName,
             Status = request.Status,
+            ContractDoc = request.ContractDoc,
             BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null,
             SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null,
-            UserDetailId = userid           
+            UserDetailId = userid
         };
         await _context.ContractDetails.AddAsync(entity);
         await _context.SaveChangesAsync(cancellationToken);

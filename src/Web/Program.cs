@@ -1,13 +1,16 @@
 
+using System.Text;
+using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
+using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
+using Escrow.Api.Infrastructure.Data.Configurations;
+using Escrow.Api.Infrastructure.Helpers;
 using Escrow.Api.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Escrow.Api.Application.DTOs;
-using Escrow.Api.Infrastructure.Helpers;
 
 
 
@@ -113,11 +116,16 @@ builder.AddInfrastructureServices();
 builder.AddWebServices();
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IEmailService, EmailConfiguration>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var app = builder.Build();
 app.UseCors("AllowAll");
+
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {

@@ -17,6 +17,7 @@ public class ContractDetails : BaseAuditableEntity
     public decimal? FeeAmount { get; set; }
     public string? BuyerName {  get; set; }
     public string? BuyerMobile { get; set; }
+    public string? ContractDoc { get; set; }
     public string? SellerName {  get; set; }
     public string? SellerMobile { get;  set; }
     public string Status {  get; set; } = string.Empty;

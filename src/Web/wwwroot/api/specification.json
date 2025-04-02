@@ -6,6 +6,602 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/Transactions/{transaction_id}": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "operationId": "GetApiTransactionsId",
+        "parameters": [
+          {
+            "name": "transaction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Transactions/search": {
+      "get": {
+        "tags": [
+          "Transactions"
+        ],
+        "operationId": "GetApiTransactionsSearch",
+        "parameters": [
+          {
+            "name": "Keyword",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "TransactionType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 4
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 5
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 6
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Transactions/export": {
+      "post": {
+        "tags": [
+          "Transactions"
+        ],
+        "operationId": "PostApiTransactionsExport",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportTransactionsCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Transactions/create": {
+      "post": {
+        "tags": [
+          "Transactions"
+        ],
+        "operationId": "PostApiTransactionsCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Team": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "operationId": "GetApiTeam",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 2
+          },
+          {
+            "name": "roleType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          },
+          {
+            "name": "lastDays",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Team/create": {
+      "post": {
+        "tags": [
+          "Team"
+        ],
+        "operationId": "PostApiTeamCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Team/update": {
+      "put": {
+        "tags": [
+          "Team"
+        ],
+        "operationId": "PutApiTeamUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeamCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Team/update-status": {
+      "put": {
+        "tags": [
+          "Team"
+        ],
+        "operationId": "PutApiTeamUpdateStatus",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTeamStatusCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Team/delete": {
+      "delete": {
+        "tags": [
+          "Team"
+        ],
+        "operationId": "DeleteApiTeamDelete",
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Pages": {
+      "get": {
+        "tags": [
+          "Pages"
+        ],
+        "operationId": "GetApiPages",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Pages/update": {
+      "put": {
+        "tags": [
+          "Pages"
+        ],
+        "operationId": "PutApiPagesUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePagesCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint": {
+      "get": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "GetApiNotificationEndpoint",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint/{id}": {
+      "get": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "GetApiNotificationEndpoint2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint/create": {
+      "post": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "PostApiNotificationEndpointCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNotificationCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint/update": {
+      "put": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "PutApiNotificationEndpointUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNotificationCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint/delete/{id}": {
+      "delete": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "DeleteApiNotificationEndpointDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Milestone": {
       "get": {
         "tags": [
@@ -106,6 +702,128 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateBuyerSellerCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/ContactUs/send": {
+      "post": {
+        "tags": [
+          "ContactUs"
+        ],
+        "operationId": "PostApiContactUsSend",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendContactMessageCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/ContactUs/messages": {
+      "get": {
+        "tags": [
+          "ContactUs"
+        ],
+        "operationId": "GetApiContactUsMessages",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10,
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/CommissionMaster": {
+      "get": {
+        "tags": [
+          "CommissionMaster"
+        ],
+        "operationId": "GetApiCommissionMaster",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/CommissionMaster/update": {
+      "put": {
+        "tags": [
+          "CommissionMaster"
+        ],
+        "operationId": "PutApiCommissionMasterUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommissionRateCommand"
               }
             }
           },
@@ -566,6 +1284,54 @@
         ]
       }
     },
+    "/api/UserDetails/delete-user": {
+      "put": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PutApiUserDetailsDeleteUser",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/UserDetails/auth/SocialMeadiaLogin": {
+      "post": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PostApiUserDetailsAuthSocialMeadiaLogin",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SocialLoginCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Contract": {
       "get": {
         "tags": [
@@ -630,6 +1396,21 @@
           "Contract"
         ],
         "operationId": "GetApiContractAllcontracts",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContractStatus"
+                }
+              ]
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -800,6 +1581,77 @@
           "required": true,
           "x-position": 1
         },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contract/list": {
+      "get": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "GetApiContractList",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContractStatus"
+                }
+              ]
+            },
+            "x-position": 1
+          },
+          {
+            "name": "searchKeyword",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 4
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 5
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -1181,6 +2033,257 @@
         }
       }
     },
+    "/api/EmailTemplate": {
+      "get": {
+        "tags": [
+          "EmailTemplate"
+        ],
+        "operationId": "GetApiEmailTemplate",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/EmailTemplate/{templateId}": {
+      "get": {
+        "tags": [
+          "EmailTemplate"
+        ],
+        "operationId": "GetApiEmailTemplate2",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/EmailTemplate/update": {
+      "post": {
+        "tags": [
+          "EmailTemplate"
+        ],
+        "operationId": "PostApiEmailTemplateUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmailTemplateCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/DisputeManagement": {
+      "get": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "GetApiDisputeManagement",
+        "parameters": [
+          {
+            "name": "Status",
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DisputeStatus"
+                }
+              ]
+            },
+            "x-position": 1
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/DisputeManagement/{disputeId}": {
+      "get": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "GetApiDisputeManagement2",
+        "parameters": [
+          {
+            "name": "disputeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/DisputeManagement/assign-arbitrator": {
+      "post": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "PostApiDisputeManagementAssignArbitrator",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignArbitratorCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/DisputeManagement/update-status": {
+      "post": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "PostApiDisputeManagementUpdateStatus",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDisputeStatusCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/DisputeManagement/escrow-decision": {
+      "post": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "PostApiDisputeManagementEscrowDecision",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EscrowDecisionCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Customers/add": {
       "post": {
         "tags": [
@@ -1428,6 +2531,169 @@
             "x-position": 4
           }
         ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/AML/transactions/flagged": {
+      "get": {
+        "tags": [
+          "AML"
+        ],
+        "operationId": "GetApiAMLTransactionsFlagged",
+        "parameters": [
+          {
+            "name": "StartDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "Status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 4
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/AML/settings": {
+      "get": {
+        "tags": [
+          "AML"
+        ],
+        "operationId": "GetApiAMLSettings",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "AML"
+        ],
+        "operationId": "PostApiAMLSettings",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAMLSettingsCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/AML/transactions/verify": {
+      "post": {
+        "tags": [
+          "AML"
+        ],
+        "operationId": "PostApiAMLTransactionsVerify",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AMLTransactionVerificationCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/AML/notifications": {
+      "get": {
+        "tags": [
+          "AML"
+        ],
+        "operationId": "GetApiAMLNotifications",
         "responses": {
           "200": {
             "description": ""
@@ -1823,6 +3089,201 @@
   },
   "components": {
     "schemas": {
+      "ExportTransactionsCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "keyword": {
+            "type": "string",
+            "nullable": true
+          },
+          "transactionType": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "CreateTransactionCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "type": {
+            "type": "string"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CreateTeamCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "roleType": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateTeamCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "roleType": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateTeamStatusCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdatePagesCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PageUpdateDto"
+            }
+          }
+        }
+      },
+      "PageUpdateDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreateNotificationCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "buyerPhoneNumber": {
+            "type": "string"
+          },
+          "sellerPhoneNumber": {
+            "type": "string"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateNotificationCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fromID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "toID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "CreateMilestoneCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -1894,6 +3355,18 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "milestones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MilestoneUpdateDTO"
+            }
+          }
+        }
+      },
+      "MilestoneUpdateDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
@@ -1915,9 +3388,6 @@
           "amount": {
             "type": "number",
             "format": "decimal"
-          },
-          "status": {
-            "type": "string"
           }
         }
       },
@@ -1934,6 +3404,51 @@
           "contractId": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "SendContactMessageCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateCommissionRateCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commissionRate": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "appliedGlobally": {
+            "type": "boolean"
+          },
+          "transactionType": {
+            "type": "string"
+          },
+          "taxRate": {
+            "type": "number",
+            "format": "decimal"
           }
         }
       },
@@ -2217,6 +3732,42 @@
           }
         }
       },
+      "SocialLoginCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ContractStatus": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Pending",
+          "Accepted",
+          "Rejected",
+          "Expired"
+        ],
+        "enum": [
+          "Pending",
+          "Accepted",
+          "Rejected",
+          "Expired"
+        ]
+      },
       "CreateContractDetailCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -2258,6 +3809,10 @@
             "nullable": true
           },
           "sellerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractDoc": {
             "type": "string",
             "nullable": true
           },
@@ -2311,6 +3866,10 @@
             "nullable": true
           },
           "sellerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractDoc": {
             "type": "string",
             "nullable": true
           },
@@ -2419,6 +3978,89 @@
           }
         }
       },
+      "UpdateEmailTemplateCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "templateId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      },
+      "DisputeStatus": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Pending",
+          "InReview",
+          "WaitingForResponse",
+          "Resolved",
+          "WaitingForBuyer",
+          "WaitingForSeller"
+        ],
+        "enum": [
+          "Pending",
+          "InReview",
+          "WaitingForResponse",
+          "Resolved",
+          "WaitingForBuyer",
+          "WaitingForSeller"
+        ]
+      },
+      "AssignArbitratorCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "disputeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "arbitratorId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateDisputeStatusCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "disputeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newStatus": {
+            "$ref": "#/components/schemas/DisputeStatus"
+          }
+        }
+      },
+      "EscrowDecisionCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "disputeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "releaseAmount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "releaseTo": {
+            "type": "string"
+          },
+          "adminDecision": {
+            "type": "string"
+          }
+        }
+      },
       "CreateCustomerCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -2449,6 +4091,36 @@
             "type": "string"
           },
           "emailAddress": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAMLSettingsCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "highAmountLimit": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "frequencyThreshold": {
+            "type": "string"
+          },
+          "benchmarkLimit": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
+      "AMLTransactionVerificationCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "transactionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "adminAction": {
             "type": "string"
           }
         }

@@ -32,6 +32,7 @@ public class Contract : EndpointGroupBase
         userGroup.MapGet("/buyersellercontracts", GetContractByBuyerSellerDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User), nameof(Roles.Admin)));
         userGroup.MapGet("/{id:int}", GetContractById).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin)));
         userGroup.MapPost("/change-status", ChangeContractStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User), nameof(Roles.Admin)));
+        userGroup.MapGet("/list", GetContracts).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User), nameof(Roles.Admin)));
     }
 
     private bool IsAdmin(IHttpContextAccessor httpContextAccessor) =>
@@ -53,10 +54,14 @@ public class Contract : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> GetAllContractDetails(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
+    public async Task<IResult> GetAllContractDetails(ISender sender, ContractStatus? status, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
     {
+        var userId = jwtService.GetUserId().ToInt();
+
         var query = new GetContractForUserQuery
         {
+            //Id = IsAdmin(httpContextAccessor) ? null : userId,
+            Status = status,
             PageNumber = 1,
             PageSize = 10
         };
@@ -127,4 +132,27 @@ public class Contract : EndpointGroupBase
 
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, result.Message, new()));
     }
+
+
+    [Authorize]
+    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, bool? isActive, int pageNumber = 1, int pageSize = 10)
+    {
+        var userId = jwtService.GetUserId().ToInt();
+        bool isAdmin = IsAdmin(httpContextAccessor);
+
+        var query = new GetContractsQuery
+        {
+            UserId = isAdmin ? null : userId,
+            Status = status?.ToString(),
+            SearchKeyword = searchKeyword,
+            IsActive = isActive, // Pass the active/inactive filter
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
+        var result = await sender.Send(query);
+
+        return TypedResults.Ok(result);
+    }
+
 }

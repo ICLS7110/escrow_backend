@@ -1,15 +1,15 @@
-﻿using Escrow.Api.Application.Common.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Escrow.Api.Application.UserPanel.Queries.GetUsers;
-using Escrow.Api.Application.UserPanel.Commands.CreateUser;
-using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
-using Escrow.Api.Application.UserPanel.Commands.DeleteUser;
-using Microsoft.AspNetCore.Authorization;
-
-using Escrow.Api.Application;
+﻿using Escrow.Api.Application;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Application.UserPanel.Commands.CreateUser;
+using Escrow.Api.Application.UserPanel.Commands.DeleteUser;
+using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
+using Escrow.Api.Application.UserPanel.Queries.GetUsers;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Infrastructure.Configuration;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 
@@ -18,50 +18,105 @@ public class UserDetails : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         var userGroup = app.MapGroup(this)
-        .RequireAuthorization() // Enable OpenIddict authorization
+        .RequireAuthorization()
         .WithOpenApi()
         .AddEndpointFilter(async (context, next) =>
         {
-            // Optional: Add custom authorization logic if needed
             return await next(context);
         });
-        
-                // Get all users  
-        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User))); // Get user by ID
+
+        // User management
+        userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
         userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPut("/delete-user", DeleteUser).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+
+        // Social logins
+        userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin);
         
     }
 
     [Authorize]
-    public async Task<IResult> GetUserDetails(ISender sender,IJwtService jwtService )
+    public async Task<IResult> GetUserDetails(ISender sender, IJwtService jwtService)
     {
-        var query = new GetUserDetailsQuery { Id = jwtService.GetUserId().ToInt(), PageNumber = 1, PageSize = 1};
-        var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(StatusCodes.Status200OK, "Success", result));
+        try
+        {
+            // 🔹 Ensure we get a valid user ID from the token
+            int? userId = jwtService.GetUserId()?.ToInt();
+
+            if (userId == null || userId <= 0)
+            {
+                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid user ID"));
+            }
+
+            var query = new GetUserDetailsQuery { Id = userId, PageNumber = 1, PageSize = 1 };
+            var result = await sender.Send(query);
+
+            if (result == null)
+            {
+                return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "User not found"));
+            }
+
+            return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(StatusCodes.Status200OK, "Success", result));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
     }
 
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
-    [Authorize]
-    public async Task<IResult> CreateUser(ISender sender, CreateUserCommand command)
-    {
-        var id = await sender.Send(command);
 
-        return TypedResults.Ok(Result<int>.Success(StatusCodes.Status201Created,"Success.", id));
-    }
-
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
     public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
-    {        
-         await sender.Send(command);
-         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"User details updated successfully.", new()));        
+    {
+        try
+        {
+            await sender.Send(command);
+            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details updated successfully.", new()));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
     }
 
-    //[Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     [Authorize]
-    public async Task<IResult> DeleteUser(ISender sender, int id)
+    public async Task<IResult> DeleteUser(ISender sender, IJwtService jwtService)
     {
-        await sender.Send(new DeleteUserCommand(id));
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details Deleted successfully.", new()));   
+        try
+        {
+            var userId = jwtService.GetUserId().ToInt();
+            await sender.Send(new DeleteUserCommand(userId));
+            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details deleted successfully.", new()));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
     }
+
+    public async Task<IResult> SocialMeadiaLogin(ISender sender, SocialLoginCommand command)
+    {
+        return await HandleSocialLogin(sender, command, command.Provider, "Google login successful");
+    }
+    private async Task<IResult> HandleSocialLogin(ISender sender, SocialLoginCommand command, string provider, string successMessage)
+    {
+        try
+        {
+
+            command.Provider = provider;
+            var result = await sender.Send(command);
+
+            if (result.Data == null)
+            {
+                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid login attempt."));
+            }
+
+            return TypedResults.Ok(Result<UserLoginDto>.Success(StatusCodes.Status200OK, successMessage, result.Data));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, $"Login failed: {ex.Message}"));
+        }
+    }
+
 }

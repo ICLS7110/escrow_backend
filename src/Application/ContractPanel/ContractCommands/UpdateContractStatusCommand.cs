@@ -41,9 +41,7 @@ public class UpdateContractStatusCommandHandler : IRequestHandler<UpdateContract
         if (buyer == null || seller == null) return false; // Return false if buyer or seller is not found
 
         var contract = await _context.ContractDetails
-            .FirstOrDefaultAsync(c => c.Id == request.ContractId
-                && c.BuyerDetailsId == buyer.Id
-                && c.SellerDetailsId == seller.Id, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == request.ContractId, cancellationToken);
 
         if (contract == null) return false; // Return false if the contract is not found
 

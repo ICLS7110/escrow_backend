@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Escrow.Api.Domain.Entities.ContractPanel;
 
 namespace Escrow.Api.Application.Common.Models.ContractDTOs
 {
@@ -20,10 +21,17 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? BuyerMobile { get; set; }
         public string? SellerName { get; set; }
         public string? SellerMobile { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? ContractDoc { get; set; }
         public string Status { get; set; } = string.Empty;
         public bool? IsActive { get; set; }
-        public bool? IsDeleted { get; set; } 
+        public bool? IsDeleted { get; set; }
+        public decimal? TaxAmount { get; set; }
+        public decimal? EscrowTax { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset LastModified { get; set; }
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
+        public SellerBuyerInvitation? InvitationDetails { get; set; }
     }
 }

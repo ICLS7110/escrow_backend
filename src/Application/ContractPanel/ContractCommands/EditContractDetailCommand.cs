@@ -27,6 +27,7 @@ public record EditContractDetailCommand : IRequest<Result<int>>
     public string? BuyerMobile { get; set; }
     public string? SellerName { get; set; }
     public string? SellerMobile { get; set; }
+    public string? ContractDoc { get; set; }
     public string Status { get; set; } = string.Empty;
 }
 
@@ -62,6 +63,7 @@ public class EditContractDetailCommandHandler : IRequestHandler<EditContractDeta
         entity.SellerMobile = request.SellerMobile;
         entity.SellerName = request.SellerName;
         entity.Status = request.Status;
+        entity.ContractDoc = request.ContractDoc;
         entity.BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null;
         entity.SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null;
 
