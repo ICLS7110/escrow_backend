@@ -7,6 +7,7 @@ using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands
@@ -85,7 +86,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
                 SellerPhoneNumber = request.SellerMobileNumber,
                 BuyerPhoneNumber = request.BuyerMobileNumber,
                 InvitationLink = GenerateInvitationLink(seller.Id, buyer.Id),
-                Status = "Pending",
+                Status = nameof(ContractStatus.Pending),
                 ContractId = request.ContractId
             };
 
