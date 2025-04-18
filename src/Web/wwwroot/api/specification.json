@@ -572,7 +572,7 @@
         ]
       }
     },
-    "/api/NotificationEndpoint/delete/{id}": {
+    "/api/NotificationEndpoint/delete": {
       "delete": {
         "tags": [
           "NotificationEndpoint"
@@ -581,15 +581,123 @@
         "parameters": [
           {
             "name": "id",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "nullable": true
             },
             "x-position": 1
           }
         ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint/mark-read": {
+      "post": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "PostApiNotificationEndpointMarkRead",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkNotificationAsReadCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/ContractReview": {
+      "get": {
+        "tags": [
+          "ContractReview"
+        ],
+        "operationId": "GetApiContractReview",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/ContractReview/create": {
+      "post": {
+        "tags": [
+          "ContractReview"
+        ],
+        "operationId": "PostApiContractReviewCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractReviewCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/ContractReview/update": {
+      "put": {
+        "tags": [
+          "ContractReview"
+        ],
+        "operationId": "PutApiContractReviewUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContractReviewCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": ""
@@ -672,6 +780,36 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EditMilestoneCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Milestone/status": {
+      "post": {
+        "tags": [
+          "Milestone"
+        ],
+        "operationId": "PostApiMilestoneStatus",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMilestoneStatusCommand"
               }
             }
           },
@@ -1302,6 +1440,36 @@
         ]
       }
     },
+    "/api/UserDetails/device-token": {
+      "post": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PostApiUserDetailsDeviceToken",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreDeviceTokenCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/UserDetails/auth/SocialMeadiaLogin": {
       "post": {
         "tags": [
@@ -1652,6 +1820,36 @@
             "x-position": 5
           }
         ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Contract/modify": {
+      "post": {
+        "tags": [
+          "Contract"
+        ],
+        "operationId": "PostApiContractModify",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyContractCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": ""
@@ -2031,6 +2229,140 @@
             "description": ""
           }
         }
+      }
+    },
+    "/api/PermissionManager/roles": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerRoles",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/menus": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerMenus",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/permissions": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerPermissions",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/role-permissions": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerRolePermissions",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/assign-permissions": {
+      "post": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "PostApiPermissionManagerAssignPermissions",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignPermissionsCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/EmailTemplate": {
@@ -2469,6 +2801,26 @@
               "nullable": true
             },
             "x-position": 4
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 5
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 6
           }
         ],
         "responses": {
@@ -2529,6 +2881,26 @@
               "nullable": true
             },
             "x-position": 4
+          },
+          {
+            "name": "StartDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 5
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 6
           }
         ],
         "responses": {
@@ -3085,6 +3457,46 @@
           }
         ]
       }
+    },
+    "/api/files/UploadMultipleImages": {
+      "post": {
+        "tags": [
+          "FileUpload"
+        ],
+        "operationId": "FileUpload_UploadMultipleImages",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Files": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3284,6 +3696,53 @@
           }
         }
       },
+      "MarkNotificationAsReadCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "notificationId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isRead": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "CreateContractReviewCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rating": {
+            "type": "string"
+          },
+          "reviewText": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateContractReviewCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reviewId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rating": {
+            "type": "string"
+          },
+          "reviewText": {
+            "type": "string"
+          }
+        }
+      },
       "CreateMilestoneCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -3306,8 +3765,8 @@
             "nullable": true
           },
           "escrowTax": {
-            "type": "integer",
-            "format": "int32",
+            "type": "number",
+            "format": "decimal",
             "nullable": true
           },
           "escrowFeeAmount": {
@@ -3344,9 +3803,21 @@
             "type": "string",
             "nullable": true
           },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
           "contractId": {
             "type": "integer",
             "format": "int32",
+            "nullable": true
+          },
+          "mileStoneEscrowAmount": {
+            "type": "string",
+            "nullable": true
+          },
+          "mileStoneTaxAmount": {
+            "type": "string",
             "nullable": true
           }
         }
@@ -3388,6 +3859,16 @@
           "amount": {
             "type": "number",
             "format": "decimal"
+          }
+        }
+      },
+      "UpdateMilestoneStatusCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "milestoneId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3732,6 +4213,16 @@
           }
         }
       },
+      "StoreDeviceTokenCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deviceToken": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "SocialLoginCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -3759,13 +4250,21 @@
           "Pending",
           "Accepted",
           "Rejected",
-          "Expired"
+          "Expired",
+          "Completed",
+          "Cancelled",
+          "Draft",
+          "Escrow"
         ],
         "enum": [
           "Pending",
           "Accepted",
           "Rejected",
-          "Expired"
+          "Expired",
+          "Completed",
+          "Cancelled",
+          "Draft",
+          "Escrow"
         ]
       },
       "CreateContractDetailCommand": {
@@ -3911,6 +4410,79 @@
           }
         }
       },
+      "ModifyContractCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "additionalNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "feesPaidBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "feeAmount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "buyerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "buyerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractDoc": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "invitationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mileStoneDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MileStoneDTO"
+            }
+          }
+        }
+      },
       "CreateBankDetailCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -3978,6 +4550,39 @@
           }
         }
       },
+      "AssignPermissionsCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "menuPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuPermissionDto"
+            }
+          }
+        }
+      },
+      "MenuPermissionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "menuId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
       "UpdateEmailTemplateCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -3990,6 +4595,9 @@
             "type": "string"
           },
           "body": {
+            "type": "string"
+          },
+          "name": {
             "type": "string"
           }
         }
@@ -4073,6 +4681,9 @@
           },
           "emailAddress": {
             "type": "string"
+          },
+          "profilePicture": {
+            "type": "string"
           }
         }
       },
@@ -4091,6 +4702,9 @@
             "type": "string"
           },
           "emailAddress": {
+            "type": "string"
+          },
+          "profilePicture": {
             "type": "string"
           }
         }
@@ -4212,6 +4826,9 @@
             "type": "string"
           },
           "role": {
+            "type": "string"
+          },
+          "image": {
             "type": "string"
           }
         }

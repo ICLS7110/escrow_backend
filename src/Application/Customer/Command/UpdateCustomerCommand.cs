@@ -17,6 +17,7 @@ namespace Escrow.Api.Application.Customer.Commands
         public string FullName { get; init; } = string.Empty;
         public string MobileNumber { get; init; } = string.Empty;
         public string EmailAddress { get; init; } = string.Empty;
+        public string ProfilePicture { get; init; } = string.Empty;
     }
 
     public class UpdateCustomerCommandHandler : IRequestHandler<UpdateCustomerCommand, Result<object>>
@@ -50,6 +51,7 @@ namespace Escrow.Api.Application.Customer.Commands
             customer.FullName = request.FullName;
             customer.PhoneNumber = request.MobileNumber;
             customer.EmailAddress = request.EmailAddress;
+            customer.ProfilePicture = request.ProfilePicture;
             customer.LastModified = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);

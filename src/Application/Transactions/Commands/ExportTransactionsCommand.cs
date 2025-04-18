@@ -89,7 +89,6 @@ public class ExportTransactionsCommandHandler : IRequestHandler<ExportTransactio
         try
         {
             // ✅ Set the license context
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             using (var package = new ExcelPackage())
             {

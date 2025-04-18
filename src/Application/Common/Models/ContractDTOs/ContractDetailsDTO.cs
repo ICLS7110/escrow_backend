@@ -28,6 +28,10 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public bool? IsDeleted { get; set; }
         public decimal? TaxAmount { get; set; }
         public decimal? EscrowTax { get; set; }
+        public string? CountryCode  { get; set; }
+        public string? LastModifiedBy { get; set; }
+        public string? BuyerPayableAmount { get; set; }
+        public string? SellerPayableAmount { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastModified { get; set; }
 

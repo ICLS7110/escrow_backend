@@ -34,6 +34,7 @@ public class GetNotificationByIdQueryHandler : IRequestHandler<GetNotificationBy
                 ContractId = n.ContractId,
                 Type = n.Type,
                 Title = n.Title,
+                IsRead = n.IsRead,
                 Description = n.Description,
             })
             .FirstOrDefaultAsync(cancellationToken);

@@ -32,8 +32,8 @@ namespace Escrow.Api.Application.AdminAuth.Commands
         public async Task<Result<object>> Handle(AdminForgotPasswordCommand request, CancellationToken cancellationToken)
         {
             // Check if the email exists
-            var adminUser = await _context.AdminUsers
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var adminUser = await _context.UserDetails
+                .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
 
             if (adminUser == null)
             {

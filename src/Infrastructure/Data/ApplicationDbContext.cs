@@ -9,10 +9,12 @@ using Escrow.Api.Domain.Entities.AMLPanel;
 using Escrow.Api.Domain.Entities.Commissions;
 using Escrow.Api.Domain.Entities.ContactUsPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
+using Escrow.Api.Domain.Entities.ContractReviews;
 using Escrow.Api.Domain.Entities.Disputes;
 using Escrow.Api.Domain.Entities.EmailTemplates;
 using Escrow.Api.Domain.Entities.Notifications;
 using Escrow.Api.Domain.Entities.Pages;
+using Escrow.Api.Domain.Entities.RoleMenuPermissions;
 using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.Transactions;
 using Escrow.Api.Domain.Entities.UserPanel;
@@ -61,6 +63,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<ContractReview> ContractReviews => Set<ContractReview>();
+    public DbSet<ContractDetailsLog> ContractDetailsLogs => Set<ContractDetailsLog>();
+    public DbSet<Menu> Menus => Set<Menu>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<RoleMenuPermission> RoleMenuPermissions => Set<RoleMenuPermission>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

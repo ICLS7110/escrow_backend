@@ -53,11 +53,12 @@ public class AML : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
+
     [Authorize]
     public async Task<IResult> UpdateAMLSettings(ISender sender, UpdateAMLSettingsCommand command)
     {
         var result = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "AML settings updated successfully."));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "AML settings updated successfully.", result.Data));
     }
 
     [Authorize]

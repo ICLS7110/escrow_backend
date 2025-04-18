@@ -28,7 +28,7 @@ public class DeleteCommandHandler : IRequestHandler<DeleteCommand, Result<bool>>
 
     public async Task<Result<bool>> Handle(DeleteCommand request, CancellationToken cancellationToken)
     {
-        var subAdminUser = await _context.AdminUsers
+        var subAdminUser = await _context.UserDetails
             .Where(x => x.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
 

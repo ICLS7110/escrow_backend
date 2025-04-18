@@ -28,7 +28,7 @@ public class ChangeStatusCommandHandler : IRequestHandler<ChangeStatusCommand, R
 
     public async Task<Result<bool>> Handle(ChangeStatusCommand request, CancellationToken cancellationToken)
     {
-        var subAdminUser = await _context.AdminUsers
+        var subAdminUser = await _context.UserDetails
             .Where(x => x.Id == request.Id)
             .FirstOrDefaultAsync(cancellationToken);
 

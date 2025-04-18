@@ -4,6 +4,7 @@ using Escrow.Api.Application.Notifications.Commands;
 using Escrow.Api.Application.Notifications.Queries;
 using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Escrow.Api.Web.UserEndpoints.Notifications;
 
@@ -20,7 +21,9 @@ public class NotificationEndpoint : EndpointGroupBase
         notificationGroup.MapGet("/{id}", GetNotificationById);
         notificationGroup.MapPost("/create", CreateNotification);
         notificationGroup.MapPut("/update", UpdateNotification);
-        notificationGroup.MapDelete("/delete/{id}", DeleteNotification);
+        notificationGroup.MapDelete("/delete", DeleteNotification);
+        notificationGroup.MapPost("/mark-read", MarkNotificationReadStatus);
+
     }
 
     /// <summary>
@@ -159,16 +162,55 @@ public class NotificationEndpoint : EndpointGroupBase
     /// Deletes a notification by ID.
     /// </summary>
     [Authorize]
-    public async Task<IResult> DeleteNotification(ISender sender, int id)
+    public async Task<IResult> DeleteNotification(ISender sender, int? id)
     {
         var result = await sender.Send(new DeleteNotificationCommand { Id = id });
 
-        if (result.Status == StatusCodes.Status404NotFound)
+        return result.Status switch
         {
-            return TypedResults.NotFound(result);
-        }
+            StatusCodes.Status404NotFound => TypedResults.NotFound(result),
+            StatusCodes.Status400BadRequest => TypedResults.BadRequest(result),
+            StatusCodes.Status200OK => TypedResults.Ok(result),
+            _ => TypedResults.StatusCode(result.Status)
+        };
+    }
 
+    [Authorize]
+    public async Task<IResult> MarkNotificationReadStatus(ISender sender, [FromBody] MarkNotificationAsReadCommand command)
+    {
+        // Remove this check since NotificationId can be null for "mark all"
+        var result = await sender.Send(command);
         return TypedResults.Ok(result);
     }
+
+    //[Authorize]
+    //public async Task<IResult> MarkNotificationReadStatus(ISender sender, [FromBody] MarkNotificationAsReadCommand command)
+    //{
+    //    if (command.NotificationId <= 0)
+    //    {
+    //        return TypedResults.BadRequest(new NotificationReadStatusResultDto
+    //        {
+    //            NotificationId = command.NotificationId,
+    //            IsRead = false
+    //        });
+    //    }
+
+    //    var result = await sender.Send(command);
+
+    //    if (result.IsRead == false && result.NotificationId == command.NotificationId)
+    //    {
+    //        // Assuming false means "not found" when unchanged
+    //        return TypedResults.NotFound(result);
+    //    }
+
+    //    return TypedResults.Ok(Result<NotificationReadStatusResultDto>.Success(
+    //        StatusCodes.Status200OK,
+    //        "Notification Marked successfully.",
+    //        result
+    //    ));
+    //    //return TypedResults.Ok(result);
+    //}
+
+
 }
 

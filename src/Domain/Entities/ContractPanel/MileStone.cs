@@ -13,8 +13,11 @@ public class MileStone : BaseAuditableEntity
     public string? Description { get; set; }
     public DateTimeOffset DueDate { get; set; }
     public string? Documents {  get; set; }
-    
+    public string? Status {  get; set; }
+    public string? MileStoneEscrowAmount { get; set; }
+    public string? MileStoneTaxAmount { get; set; }
     public int? ContractId { get; set; }
     [ForeignKey(nameof(ContractId))]
     public ContractDetails? ContractDetails { get; set; }
+    
 }

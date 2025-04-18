@@ -22,6 +22,8 @@ public class ContractDetails : BaseAuditableEntity
     public string? SellerMobile { get;  set; }
     public string Status {  get; set; } = string.Empty;
     public string? StatusReason { get; set; }    
+    public string? BuyerPayableAmount { get; set; }    
+    public string? SellerPayableAmount { get; set; }    
     public int? BuyerDetailsId { get; set; }
     public decimal? TaxAmount { get; set; }
     public decimal? EscrowTax { get; set; }

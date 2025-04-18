@@ -39,9 +39,10 @@ public class GetFlaggedTransactionsQueryHandler : IRequestHandler<GetFlaggedTran
                     on transaction.UserId equals user.UserId into userGroup
                     from user in userGroup.DefaultIfEmpty() // ✅ LEFT JOIN to get User details
                     where
-                        (!request.StartDate.HasValue || transaction.Created >= request.StartDate.Value) &&
-                        (!request.EndDate.HasValue || transaction.Created <= request.EndDate.Value) &&
-                        (string.IsNullOrWhiteSpace(request.Status) || transaction.Status == request.Status)
+    (!request.StartDate.HasValue || transaction.Created >= DateTime.SpecifyKind(request.StartDate.Value.Date, DateTimeKind.Utc)) &&
+    (!request.EndDate.HasValue || transaction.Created <= DateTime.SpecifyKind(request.EndDate.Value.Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc)) &&
+    (string.IsNullOrWhiteSpace(request.Status) || transaction.Status == request.Status)
+
                     orderby transaction.Created descending
                     select new FlaggedTransactionDto
                     {

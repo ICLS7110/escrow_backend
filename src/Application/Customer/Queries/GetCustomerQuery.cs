@@ -16,6 +16,8 @@ namespace Escrow.Api.Application.Customers.Queries
         public string? Filter { get; init; }
         public int? PageNumber { get; init; } = 1;
         public int? PageSize { get; init; } = 10;
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
     }
 
     public class GetCustomerQueryHandler : IRequestHandler<GetCustomerQuery, PaginatedList<CustomerDto>>
@@ -49,6 +51,15 @@ namespace Escrow.Api.Application.Customers.Queries
                 query = query.Where(x => x.FullName != null && x.FullName.Contains(request.Filter) || x.PhoneNumber != null && x.PhoneNumber.Contains(request.Filter) || x.EmailAddress != null && x.EmailAddress.Contains(request.Filter));
             }
 
+            if (request.StartDate.HasValue)
+            {
+                query = query.Where(x => x.Created >= request.StartDate.Value);
+            }
+
+            if (request.EndDate.HasValue)
+            {
+                query = query.Where(x => x.Created <= request.EndDate.Value);
+            }
             return await query
                 .Select(s => new CustomerDto
                 {

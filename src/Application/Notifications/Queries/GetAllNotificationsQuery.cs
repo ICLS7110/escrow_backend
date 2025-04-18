@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.Notifications.Queries;
@@ -27,13 +28,13 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
 
     public async Task<Result<PaginatedList<NotificationDTO>>> Handle(GetAllNotificationsQuery request, CancellationToken cancellationToken)
     {
-        var userId = _jwtService.GetUserId();
-        var query = _context.Notifications.AsQueryable();
+        var userId = _jwtService.GetUserId().ToInt();
+        var query = _context.Notifications.Where(x => x.RecordState == RecordState.Active).AsQueryable();
 
 
-        if (!string.IsNullOrEmpty(userId))
+        if (!string.IsNullOrEmpty(userId.ToString()))
         {
-            query.Where(x => x.CreatedBy == userId).ToList();
+            query.Where(x => x.CreatedBy == userId.ToString() || x.FromID == userId || x.ToID == userId).ToList();
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -50,6 +51,7 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
                 Type = n.Type,
                 Title = n.Title,
                 Description = n.Description,
+                IsRead = n.IsRead,
             })
             .ToListAsync(cancellationToken);
 

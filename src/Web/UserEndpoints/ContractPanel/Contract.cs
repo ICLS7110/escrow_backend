@@ -33,6 +33,8 @@ public class Contract : EndpointGroupBase
         userGroup.MapGet("/{id:int}", GetContractById).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin)));
         userGroup.MapPost("/change-status", ChangeContractStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User), nameof(Roles.Admin)));
         userGroup.MapGet("/list", GetContracts).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User), nameof(Roles.Admin)));
+        userGroup.MapPost("/modify", ModifyContract).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User), nameof(Roles.Admin)));
+
     }
 
     private bool IsAdmin(IHttpContextAccessor httpContextAccessor) =>
@@ -133,26 +135,36 @@ public class Contract : EndpointGroupBase
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, result.Message, new()));
     }
 
-
     [Authorize]
     public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, bool? isActive, int pageNumber = 1, int pageSize = 10)
     {
-        var userId = jwtService.GetUserId().ToInt();
-        bool isAdmin = IsAdmin(httpContextAccessor);
+        var actualUserId = jwtService.GetUserId().ToInt();
 
         var query = new GetContractsQuery
         {
-            UserId = isAdmin ? null : userId,
-            Status = status?.ToString(),
+            UserId = IsAdmin(httpContextAccessor) ? null : actualUserId,
+            Status = status,
             SearchKeyword = searchKeyword,
-            IsActive = isActive, // Pass the active/inactive filter
+            IsActive = isActive,
             PageNumber = pageNumber,
             PageSize = pageSize
         };
 
         var result = await sender.Send(query);
 
-        return TypedResults.Ok(result);
+        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(
+            StatusCodes.Status200OK, "Contracts retrieved successfully.", result));
+    }
+
+    [Authorize]
+    public async Task<IResult> ModifyContract(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ModifyContractCommand command)
+    {
+        var result = await sender.Send(command);
+
+        if (result.Status != StatusCodes.Status200OK)
+            return TypedResults.BadRequest(Result<object>.Failure(result.Status, result.Message));
+
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contract modified successfully.", new()));
     }
 
 }

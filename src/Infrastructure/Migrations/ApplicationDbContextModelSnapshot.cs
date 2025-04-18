@@ -17,7 +17,7 @@ namespace Escrow.Api.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -257,6 +257,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("text");
+
                     b.Property<bool?>("IsActive")
                         .HasColumnType("boolean");
 
@@ -407,6 +410,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("BuyerName")
                         .HasColumnType("text");
 
+                    b.Property<string>("BuyerPayableAmount")
+                        .HasColumnType("text");
+
                     b.Property<string>("ContractDoc")
                         .HasColumnType("text");
 
@@ -464,6 +470,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("SellerName")
                         .HasColumnType("text");
 
+                    b.Property<string>("SellerPayableAmount")
+                        .HasColumnType("text");
+
                     b.Property<string>("ServiceDescription")
                         .IsRequired()
                         .HasColumnType("text");
@@ -494,6 +503,64 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.HasIndex("UserDetailId");
 
                     b.ToTable("ContractDetails");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.ContractDetailsLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ChangedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ChangedFields")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NewData")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Operation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreviousData")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContractDetailsLogs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.MileStone", b =>
@@ -537,12 +604,21 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("MileStoneEscrowAmount")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MileStoneTaxAmount")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("RecordState")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -605,6 +681,61 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SellerBuyerInvitations");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractReviews.ContractReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Rating")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RevieweeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReviewerId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContractReviews");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Disputes.Dispute", b =>
@@ -809,6 +940,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<int>("FromID")
                         .HasColumnType("integer");
 
+                    b.Property<bool?>("IsRead")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -884,6 +1018,123 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Pages");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.RoleMenuPermissions.Menu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Menus");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.RoleMenuPermissions.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.RoleMenuPermissions.RoleMenuPermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RoleMenuPermissions");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.TeamMembers.TeamMember", b =>
@@ -1081,6 +1332,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<int?>("DeletedBy")
                         .HasColumnType("integer");
 
+                    b.Property<string>("DeviceToken")
+                        .HasColumnType("text");
+
                     b.Property<string>("EmailAddress")
                         .HasColumnType("text");
 
@@ -1109,6 +1363,12 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<string>("LoginMethod")
                         .HasColumnType("text");
 
+                    b.Property<string>("OTP")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
@@ -1117,6 +1377,9 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.Property<int>("RecordState")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()

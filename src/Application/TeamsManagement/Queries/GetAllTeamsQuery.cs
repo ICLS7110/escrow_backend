@@ -1,5 +1,6 @@
 ﻿
 
+using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
@@ -67,7 +68,8 @@ namespace Escrow.Api.Application.TeamsManagement.Queries
                                 {
                                     FullName = user.FullName,
                                     EmailAddress = user.EmailAddress,
-                                    PhoneNumber = user.PhoneNumber
+                                    PhoneNumber = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(user.PhoneNumber), // ✅ Call Helper
+                                    CountryCode = PhoneNumberHelper.ExtractCountryCode(user.PhoneNumber), // ✅ Call Helper
                                 } : null
                             };
 

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Domain.Entities.UserPanel;
 
 namespace Escrow.Api.Application.AdminAuth.Queries
 {
@@ -37,10 +38,9 @@ namespace Escrow.Api.Application.AdminAuth.Queries
             {
                 return Result<AdminLoginDTO>.Failure(StatusCodes.Status400BadRequest, "Email and Password are required.");
             }
-
-            var adminUser = await _context.AdminUsers
-                .Where(x => x.Email == request.Email && x.PasswordHash == request.Password)
-                .FirstOrDefaultAsync(cancellationToken);
+            
+            var adminUser = await _context.UserDetails
+                .FirstOrDefaultAsync(x => x.EmailAddress == request.Email && x.Password == request.Password);
 
             if (adminUser == null)
             {
@@ -50,11 +50,11 @@ namespace Escrow.Api.Application.AdminAuth.Queries
             var adminDto = new AdminLoginDTO
             {
                 Id = adminUser.Id,
-                Email = adminUser.Email,
-                PasswordHash = adminUser.PasswordHash,
+                Email = adminUser.EmailAddress,
+                PasswordHash = adminUser.Password,
                 Role = adminUser.Role,
-                Username = adminUser.Username,
-                Token = _jwtService.GetJWT(adminUser.Id.ToString(), nameof(Roles.Admin))
+                Username = adminUser.FullName,
+                Token = _jwtService.GetJWT(adminUser.Id.ToString())
             };
 
             return Result<AdminLoginDTO>.Success(StatusCodes.Status200OK, "Admin login successfully.", adminDto);

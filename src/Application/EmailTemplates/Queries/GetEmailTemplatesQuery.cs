@@ -7,6 +7,8 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models.EmailTemplate;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using MediatR;
 
 namespace Escrow.Api.Application.EmailTemplates.Queries;
 public class GetEmailTemplatesQuery : IRequest<Result<List<EmailTemplateDTO>>>
@@ -26,7 +28,7 @@ public class GetEmailTemplatesQueryHandler : IRequestHandler<GetEmailTemplatesQu
     {
         var templates = await _context.EmailTemplates
             .Where(t => !t.IsDeleted) // Exclude deleted templates
-            .OrderByDescending(t => t.Created)
+            .OrderByDescending(t => t.LastModified) // Order by Last Modified Date
             .Select(t => new EmailTemplateDTO
             {
                 Id = t.Id,

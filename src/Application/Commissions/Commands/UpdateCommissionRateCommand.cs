@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
+using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.Commissions.Commands;
 public record UpdateCommissionRateCommand(int Id, decimal CommissionRate, bool AppliedGlobally, string TransactionType, decimal TaxRate) : IRequest<Result<int>>;
@@ -43,6 +44,6 @@ public class UpdateCommissionRateCommandHandler : IRequestHandler<UpdateCommissi
         commission.LastModified = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(200, "Commission rate updated successfully.", commission.Id);
+        return Result<int>.Success(StatusCodes.Status200OK, "Commission rate updated successfully.", commission.Id);
     }
 }

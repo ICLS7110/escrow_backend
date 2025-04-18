@@ -5,6 +5,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,11 +34,11 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
 
         public async Task<string> Handle(CreateBuyerSellerCommand request, CancellationToken cancellationToken)
         {
-            // Check if the contract exists
-            var contractExists = await _context.ContractDetails
-                .AnyAsync(c => c.Id == request.ContractId, cancellationToken);
+            // Check if the contract exists and retrieve it
+            var contract = await _context.ContractDetails
+                .FirstOrDefaultAsync(c => c.Id == request.ContractId, cancellationToken);
 
-            if (!contractExists)
+            if (contract == null)
             {
                 throw new ValidationException("The specified contract does not exist.");
             }
@@ -50,8 +51,10 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             {
                 seller = new UserDetail
                 {
+                    UserId = Guid.NewGuid().ToString(),
                     PhoneNumber = request.SellerMobileNumber,
-                    Created = DateTime.UtcNow
+                    Created = DateTime.UtcNow,
+                    Role = nameof(Roles.User)
                 };
                 _context.UserDetails.Add(seller);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -65,8 +68,10 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             {
                 buyer = new UserDetail
                 {
+                    UserId = Guid.NewGuid().ToString(),
                     PhoneNumber = request.BuyerMobileNumber,
-                    Created = DateTime.UtcNow
+                    Created = DateTime.UtcNow,
+                    Role = nameof(Roles.User)
                 };
                 _context.UserDetails.Add(buyer);
                 await _context.SaveChangesAsync(cancellationToken);
@@ -85,10 +90,75 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             };
 
             _context.SellerBuyerInvitations.Add(invitation);
+
+            // Update the contract status to "Pending"
+            contract.Status = nameof(ContractStatus.Pending);
+            _context.ContractDetails.Update(contract);
+
             // Save all changes
             await _context.SaveChangesAsync(cancellationToken);
 
-            return invitation.InvitationLink; // Return the generated invitation link
+            return invitation.InvitationLink;
         }
+
+        //public async Task<string> Handle(CreateBuyerSellerCommand request, CancellationToken cancellationToken)
+        //{
+        //    // Check if the contract exists
+        //    var contractExists = await _context.ContractDetails
+        //        .AnyAsync(c => c.Id == request.ContractId, cancellationToken);
+
+        //    if (!contractExists)
+        //    {
+        //        throw new ValidationException("The specified contract does not exist.");
+        //    }
+
+        //    // Find or create Seller
+        //    var seller = await _context.UserDetails
+        //        .FirstOrDefaultAsync(u => u.PhoneNumber == request.SellerMobileNumber, cancellationToken);
+
+        //    if (seller == null)
+        //    {
+        //        seller = new UserDetail
+        //        {
+        //            PhoneNumber = request.SellerMobileNumber,
+        //            Created = DateTime.UtcNow
+        //        };
+        //        _context.UserDetails.Add(seller);
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+
+        //    // Find or create Buyer
+        //    var buyer = await _context.UserDetails
+        //        .FirstOrDefaultAsync(u => u.PhoneNumber == request.BuyerMobileNumber, cancellationToken);
+
+        //    if (buyer == null)
+        //    {
+        //        buyer = new UserDetail
+        //        {
+        //            PhoneNumber = request.BuyerMobileNumber,
+        //            Created = DateTime.UtcNow
+        //        };
+        //        _context.UserDetails.Add(buyer);
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+
+        //    // Create an invitation record
+        //    var invitation = new SellerBuyerInvitation
+        //    {
+        //        SellerId = seller.Id,
+        //        BuyerId = buyer.Id,
+        //        SellerPhoneNumber = request.SellerMobileNumber,
+        //        BuyerPhoneNumber = request.BuyerMobileNumber,
+        //        InvitationLink = GenerateInvitationLink(seller.Id, buyer.Id),
+        //        Status = "Pending",
+        //        ContractId = request.ContractId
+        //    };
+
+        //    _context.SellerBuyerInvitations.Add(invitation);
+        //    // Save all changes
+        //    await _context.SaveChangesAsync(cancellationToken);
+
+        //    return invitation.InvitationLink; // Return the generated invitation link
+        //}
     }
 }

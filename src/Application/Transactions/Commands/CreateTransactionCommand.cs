@@ -79,8 +79,28 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
         _context.Transactions.Add(entity);
 
         // Update ContractDetails status to 'Accepted'
-        contract.Status = nameof(ContractStatus.Accepted); // Assuming Status is a string, change as needed
+        contract.Status = nameof(ContractStatus.Escrow); // Assuming Status is a string, change as needed
         _context.ContractDetails.Update(contract);
+
+        // Get all milestones for the contract
+        var milestones = await _context.MileStones
+            .Where(m => m.ContractId == request.ContractId)
+            .ToListAsync(cancellationToken);
+
+        // If milestones exist, update their statuses to 'Escrow'
+        if (milestones.Any())
+        {
+            foreach (var milestone in milestones)
+            {
+                milestone.Status = nameof(MilestoneStatus.Escrow);
+                milestone.LastModified = DateTime.UtcNow;
+                milestone.LastModifiedBy = userId.ToString();
+            }
+
+            _context.MileStones.UpdateRange(milestones);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
 

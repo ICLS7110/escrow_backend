@@ -16,6 +16,7 @@ namespace Escrow.Api.Application.Customer.Commands
         public string FullName { get; init; } = string.Empty;
         public string MobileNumber { get; init; } = string.Empty;
         public string EmailAddress { get; init; } = string.Empty;
+        public string ProfilePicture { get; init; } = string.Empty;
     }
 
     public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, Result<object>>
@@ -31,21 +32,24 @@ namespace Escrow.Api.Application.Customer.Commands
         {
             // Check if email already exists
             var existingCustomer = await _context.UserDetails
-                .FirstOrDefaultAsync(c => c.EmailAddress == request.EmailAddress, cancellationToken);
+                .FirstOrDefaultAsync(c => c.EmailAddress == request.EmailAddress || c.PhoneNumber == request.MobileNumber, cancellationToken);
 
             if (existingCustomer != null)
             {
-                return Result<object>.Failure(StatusCodes.Status400BadRequest, "Email already exists.");
+                return Result<object>.Failure(StatusCodes.Status400BadRequest, "Email Or MobileNumber already exists.");
             }
 
             var newCustomer = new UserDetail
             {
+                UserId= Guid.NewGuid().ToString(),
                 FullName = request.FullName,
                 PhoneNumber = request.MobileNumber,
                 EmailAddress = request.EmailAddress,
+                ProfilePicture = request.ProfilePicture,
                 IsActive=true,
                 Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow
+                LastModified = DateTime.UtcNow,
+                Role= nameof(Roles.User)
             };
 
             _context.UserDetails.Add(newCustomer);

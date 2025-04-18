@@ -3,6 +3,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
+using OfficeOpenXml.FormulaParsing.Utilities;
 
 public record UpdateDetailsCommand : IRequest<Result<string>>
 {
@@ -10,6 +11,7 @@ public record UpdateDetailsCommand : IRequest<Result<string>>
     public string UserName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+    public string Image { get; set; } = string.Empty;
 }
 
 public class UpdateDetailsCommandHandler : IRequestHandler<UpdateDetailsCommand, Result<string>>
@@ -23,7 +25,7 @@ public class UpdateDetailsCommandHandler : IRequestHandler<UpdateDetailsCommand,
 
     public async Task<Result<string>> Handle(UpdateDetailsCommand request, CancellationToken cancellationToken)
     {
-        var adminUser = await _context.AdminUsers.FindAsync(new object[] { request.Id }, cancellationToken);
+        var adminUser = await _context.UserDetails.FindAsync(new object[] { request.Id }, cancellationToken);
 
         if (adminUser == null)
         {
@@ -33,14 +35,15 @@ public class UpdateDetailsCommandHandler : IRequestHandler<UpdateDetailsCommand,
         // If the provided role matches the existing role, proceed with updating details
         if (adminUser.Role == request.Role)
         {
-            adminUser.Username = request.UserName;
+            adminUser.FullName = request.UserName;
 
             // If role is NOT "Sub-Admin", update both Name and Email
-            if (adminUser.Role != "Sub-Admin")
+            if (adminUser.Role.ToLower() != "sub-admin")
             {
-                adminUser.Email = request.Email;
+                adminUser.FullName = request.Email;
             }
 
+            adminUser.ProfilePicture = request.Image;
             adminUser.LastModified = DateTime.UtcNow;
             await _context.SaveChangesAsync(cancellationToken);
 

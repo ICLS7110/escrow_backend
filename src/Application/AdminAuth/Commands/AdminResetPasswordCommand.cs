@@ -28,8 +28,8 @@ namespace Escrow.Api.Application.AdminAuth.Commands
 
         public async Task<Result<object>> Handle(AdminResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            var adminUser = await _context.AdminUsers
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var adminUser = await _context.UserDetails
+                .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
 
             if (adminUser == null)
             {
@@ -41,7 +41,7 @@ namespace Escrow.Api.Application.AdminAuth.Commands
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP.");
             }
 
-            adminUser.PasswordHash = request.NewPassword;
+            adminUser.Password = request.NewPassword;
 
             await _context.SaveChangesAsync(cancellationToken);
 

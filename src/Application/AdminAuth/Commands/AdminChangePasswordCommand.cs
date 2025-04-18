@@ -41,8 +41,8 @@ namespace Escrow.Api.Application.AdminAuth.Commands
             }
 
             // Fetch admin user
-            var adminUser = await _context.AdminUsers
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var adminUser = await _context.UserDetails
+                .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
 
             if (adminUser == null)
             {
@@ -50,13 +50,13 @@ namespace Escrow.Api.Application.AdminAuth.Commands
             }
 
             // Ensure new password is not the same as old password
-            if (adminUser.PasswordHash == request.NewPassword)
+            if (adminUser.Password == request.NewPassword)
             {
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "New password cannot be the same as the old password.");
             }
 
             // Update password
-            adminUser.PasswordHash = request.NewPassword;
+            adminUser.Password = request.NewPassword;
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result<object>.Success(StatusCodes.Status200OK, "Password changed successfully.");

@@ -2,6 +2,7 @@
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Application.UserPanel.Commands;
 using Escrow.Api.Application.UserPanel.Commands.CreateUser;
 using Escrow.Api.Application.UserPanel.Commands.DeleteUser;
 using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
@@ -29,6 +30,9 @@ public class UserDetails : EndpointGroupBase
         userGroup.MapGet("/", GetUserDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
         userGroup.MapPost("/update", UpdateUserDetail).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
         userGroup.MapPut("/delete-user", DeleteUser).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+
+        // Device token management
+        userGroup.MapPost("/device-token", StoreDeviceToken).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
         // Social logins
         userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin);
@@ -119,4 +123,20 @@ public class UserDetails : EndpointGroupBase
         }
     }
 
+
+    [Authorize]
+    public async Task<IResult> StoreDeviceToken(ISender sender, StoreDeviceTokenCommand command)
+    {
+        try
+        {
+            // Send the command to the handler
+            var result = await sender.Send(command);
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            // Return failure response in case of an exception
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
+    }
 }

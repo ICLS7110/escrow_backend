@@ -39,29 +39,31 @@ namespace Escrow.Api.Application.AdminAuth.Queries
             int pageSize = request.PageSize ?? 10;
 
 
-            var query = _context.AdminUsers.AsQueryable();
+            var query = _context.UserDetails.AsQueryable();
 
             if (!string.IsNullOrEmpty(request.Role))
             {
-                query = query.Where(x => x.Role.ToLower() == request.Role.ToLower());
+
+                query = query.Where(x => x.Role!.ToLower() == request.Role!.ToLower());
             }
 
             if (!string.IsNullOrEmpty(request.Name))
             {
-                query = query.Where(x => x.Username != null && x.Username.Contains(request.Name));
+                query = query.Where(x => x.FullName != null && x.FullName.Contains(request.Name));
             }
 
             var totalRecords = await query.CountAsync(cancellationToken);
 
             var listings = await query
-                .Where(x => x.IsDeleted == false || x.IsDeleted == null)
+                .Where(x => x.IsDeleted == false)
                 .Select(x => new AllAdminDetail
                 {
                     Id = x.Id,
-                    Username = x.Username,
-                    Email = x.Email,
-                    PasswordHash = x.PasswordHash,
+                    Username = x.FullName,
+                    Email = x.EmailAddress,
+                    PasswordHash = x.Password,
                     Role = x.Role,
+                    Image = x.ProfilePicture,
                     Created = x.Created,
                     CreatedBy = x.CreatedBy,
                     LastModified = x.LastModified,

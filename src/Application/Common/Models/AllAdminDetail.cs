@@ -13,6 +13,7 @@ namespace Escrow.Api.Application.Common.Models
         public string? Email { get; set; }
         public string? PasswordHash { get; set; }
         public string? Role { get; set; }
+        public string? Image { get; set; }
         public DateTimeOffset Created { get; set; }
         public string? CreatedBy { get; set; }
         public DateTimeOffset LastModified { get; set; }

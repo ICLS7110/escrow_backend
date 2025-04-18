@@ -20,27 +20,27 @@ using Twilio.TwiML.Messaging;
 namespace Escrow.Api.Infrastructure.Configuration;
 public class FileService : IFileService
 {
-    private readonly IOptions<AWSS3> _awss3;        
-    public FileService( IOptions<AWSS3> awss3)
+    private readonly IOptions<AWSS3> _awss3;
+    public FileService(IOptions<AWSS3> awss3)
     {
-            _awss3 = awss3;
-       
+        _awss3 = awss3;
+
     }
     public async Task<List<string>> UploadFilesForUser(List<IFormFile> files)
     {
         var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserUploads");
         if (!Directory.Exists(directoryPath))
-        { 
+        {
             Directory.CreateDirectory(directoryPath);
         }
 
         var fileUrls = new List<string>();
         foreach (var file in files)
-        { 
-            if(file.Length> 0)
+        {
+            if (file.Length > 0)
             {
                 var fileName = $"{Guid.NewGuid()}$${file.FileName}";
-                var filePath= Path.Combine(directoryPath, fileName);
+                var filePath = Path.Combine(directoryPath, fileName);
                 using (var strem = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(strem);
@@ -56,10 +56,10 @@ public class FileService : IFileService
     public async Task<List<string>> UploadFilesonAWS(List<IFormFile> files)
     {
         var fileUrls = new List<string>();
-        
+
         var awsCredentials = new BasicAWSCredentials(_awss3.Value.AccessKey, _awss3.Value.SecretKey);
         using var s3Client = new AmazonS3Client(awsCredentials, Amazon.RegionEndpoint.GetBySystemName(_awss3.Value.Region));
-       
+
 
         foreach (var file in files)
         {

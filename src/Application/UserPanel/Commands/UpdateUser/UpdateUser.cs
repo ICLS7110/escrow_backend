@@ -13,6 +13,7 @@ using Escrow.Api.Domain.Events.UserPanel;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
@@ -58,7 +59,11 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
                 entity.FullName = request.FullName;
                 entity.EmailAddress = request.EmailAddress;
                 entity.Gender = request.Gender;
-                entity.DateOfBirth = DateTime.SpecifyKind(request.DateOfBirth ?? DateTime.UtcNow, DateTimeKind.Unspecified);
+                //entity.DateOfBirth = DateTime.SpecifyKind(request.DateOfBirth ?? DateTime.UtcNow, DateTimeKind.Unspecified);
+                entity.DateOfBirth = request.DateOfBirth.HasValue
+    ? DateTime.SpecifyKind(request.DateOfBirth.Value, DateTimeKind.Unspecified)
+    : (DateTime?)null;
+
                 entity.BusinessManagerName = request.BusinessManagerName;
                 entity.BusinessEmail = request.BusinessEmail;
                 entity.VatId = request.VatId;
@@ -66,7 +71,8 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
                 entity.CompanyEmail = request.CompanyEmail;
                 entity.ProfilePicture = request.ProfilePicture;
                 entity.AccountType = request.AccountType;
-                entity.IsProfileCompleted = Convert.ToBoolean(request.IsProfileCompleted);
+                entity.IsProfileCompleted = true;
+                entity.Role = nameof(Roles.User);
 
                 //await _context.UserDetails.AddAsync(entity);
                 await _context.SaveChangesAsync(cancellationToken);

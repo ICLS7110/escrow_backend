@@ -31,8 +31,8 @@ namespace Escrow.Api.Application.AdminAuth.Commands
                 return Result<string>.Failure(StatusCodes.Status400BadRequest, "Email and OTP are required.");
             }
 
-            var adminUser = await _context.AdminUsers
-                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var adminUser = await _context.UserDetails
+                .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
 
             if (adminUser == null)
             {

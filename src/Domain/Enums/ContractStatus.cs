@@ -13,7 +13,11 @@ namespace Escrow.Api.Domain.Enums
         Pending,
         Accepted,
         Rejected,
-        Expired
+        Expired,
+        Completed,
+        Cancelled,
+        Draft,
+        Escrow
     }
 
 }

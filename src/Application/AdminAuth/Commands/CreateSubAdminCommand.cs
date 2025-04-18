@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.AdminPanel;
+using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Security;
 using MediatR;
 
@@ -32,25 +33,26 @@ public class CreateSubAdminCommandHandler : IRequestHandler<CreateSubAdminComman
 
     public async Task<int> Handle(CreateSubAdminCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await _context.AdminUsers.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+        var existingUser = await _context.UserDetails.FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
 
         if (existingUser != null)
         {
             throw new Exception("Email already exists.");
         }
 
-        var entity = new AdminUser
+        var entity = new UserDetail
         {
-            Username = request.Username,
-            Email = request.Email,
+            UserId = Guid.NewGuid().ToString(),
+            FullName = request.Username,
+            EmailAddress = request.Email,
+            Password = request.Password,
             Role = request.Role,
-            PasswordHash = request.Password,
             IsActive = true,
             Created = DateTime.UtcNow,
             CreatedBy = _jwtService.GetUserId().ToString()
         };
 
-        _context.AdminUsers.Add(entity);
+        _context.UserDetails.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
 
         return entity.Id;

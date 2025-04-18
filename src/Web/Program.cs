@@ -8,6 +8,7 @@ using Escrow.Api.Infrastructure.Data.Configurations;
 using Escrow.Api.Infrastructure.Helpers;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -119,6 +120,10 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IEmailService, EmailConfiguration>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 100_000_000; // 100 MB
+});
 
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);

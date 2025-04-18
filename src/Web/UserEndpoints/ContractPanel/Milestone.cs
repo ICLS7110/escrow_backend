@@ -9,6 +9,7 @@ using Escrow.Api.Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Escrow.Api.Domain.Enums;
 using System.Text.Json;
+using Escrow.Api.Application.ContractPanel.ContractCommands;
 
 namespace Escrow.Api.Web.UserEndpoints.ContractPanel;
 
@@ -27,6 +28,7 @@ public class Milestone : EndpointGroupBase
         userGroup.MapGet("/", GetMilestoneDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
         userGroup.MapPost("/", CreateMilestone).RequireAuthorization(p => p.RequireRole(nameof(Roles.User)));
         userGroup.MapPost("/update", UpdateMilestones).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/status", UpdateMilestoneStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User))); // ✅ Mapped missing endpoint
     }
 
     [Authorize]
@@ -109,4 +111,19 @@ public class Milestone : EndpointGroupBase
             );
         }
     }
+
+
+    [Authorize] 
+    public async Task<IResult> UpdateMilestoneStatus(ISender sender,IJwtService jwtService,IHttpContextAccessor httpContextAccessor,UpdateMilestoneStatusCommand command)
+    {
+        var result = await sender.Send(command);
+
+        //if (result.Status != StatusCodes.Status200OK)
+        //{
+        //    return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "No milestones Status were updated."));
+        //}
+
+        return TypedResults.Ok(result);
+    }
+
 }

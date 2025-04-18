@@ -27,7 +27,7 @@ namespace Escrow.Api.Application.AML.Queries
         {
             var notifications = await _context.AMLNotifications
                 .AsNoTracking() // Optimized read queries
-                .OrderByDescending(n => n.CreatedAt) // Fetch latest first
+                .OrderByDescending(n => n.LastModified) // Fetch latest first
                 .Select(n => new AMLNotificationDto
                 {
                     Id = n.Id,

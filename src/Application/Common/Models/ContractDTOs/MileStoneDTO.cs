@@ -16,7 +16,10 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? Description { get; set; }
         public DateTimeOffset DueDate { get; set; }
         public string? Documents { get; set; }
+        public string? Status { get; set; }
         public int? ContractId { get; set; }
+        public string? MileStoneEscrowAmount { get; set; }
+        public string? MileStoneTaxAmount { get; set; }
     }
 
    

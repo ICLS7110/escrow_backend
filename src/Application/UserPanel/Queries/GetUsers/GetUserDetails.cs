@@ -62,9 +62,11 @@ public class GetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, P
                 BusinessEmail = s.BusinessEmail,
                 VatId = s.VatId,
                 LoginMethod = s.LoginMethod,
+                BusinessProof = s.BusinessProof,
                 ProfilePicture = s.ProfilePicture,
                 AccountType = s.AccountType,
                 IsProfileCompleted = s.IsProfileCompleted,
+                DeviceToken = s.DeviceToken,
                 CompanyEmail = s.CompanyEmail
             })
             .PaginatedListAsync(pageNumber, pageSize);

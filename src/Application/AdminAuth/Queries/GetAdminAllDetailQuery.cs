@@ -35,7 +35,7 @@ namespace Escrow.Api.Application.AdminAuth.Queries
                 return Result<AllAdminDetail>.Failure(StatusCodes.Status400BadRequest, "Admin ID is required.");
             }
 
-            var adminUser = await _context.AdminUsers
+            var adminUser = await _context.UserDetails
                 .Where(x => x.Id == request.AdminId)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -48,10 +48,11 @@ namespace Escrow.Api.Application.AdminAuth.Queries
             var adminDetailDto = new AllAdminDetail
             {
                 Id = adminUser.Id,
-                Username = adminUser.Username,
-                Email = adminUser.Email,
-                PasswordHash = adminUser.PasswordHash,
+                Username = adminUser.FullName,
+                Email = adminUser.EmailAddress,
+                PasswordHash = adminUser.Password,
                 Role = adminUser.Role,
+                Image = adminUser.ProfilePicture,
                 Created = adminUser.Created,
                 CreatedBy = adminUser.CreatedBy,
                 LastModified = adminUser.LastModified,
@@ -64,6 +65,4 @@ namespace Escrow.Api.Application.AdminAuth.Queries
             return Result<AllAdminDetail>.Success(StatusCodes.Status200OK, "Admin details retrieved successfully.", adminDetailDto);
         }
     }
-
-
 }

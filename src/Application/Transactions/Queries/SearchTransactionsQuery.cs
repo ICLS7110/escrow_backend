@@ -53,7 +53,7 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
         // 🔍 Filtering logic
         if (!string.IsNullOrEmpty(request.Keyword))
         {
-            query = query.Where(t => t.TransactionType != null && t.TransactionType.Contains(request.Keyword));
+            query = query.Where(t => t.TransactionType != null && t.TransactionType.Contains(request.Keyword) || t.Id.ToString() == request.Keyword);
         }
 
         if (!string.IsNullOrEmpty(request.TransactionType))
@@ -63,13 +63,28 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
 
         if (request.StartDate.HasValue)
         {
-            query = query.Where(t => t.TransactionDateTime >= request.StartDate.Value);
+            var startDateUtc = DateTime.SpecifyKind(request.StartDate.Value.Date, DateTimeKind.Utc);
+            query = query.Where(t => t.TransactionDateTime >= startDateUtc);
         }
 
         if (request.EndDate.HasValue)
         {
-            query = query.Where(t => t.TransactionDateTime <= request.EndDate.Value);
+            var endDate = request.EndDate.Value.Date.AddDays(1).AddTicks(-1);
+            var endDateUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+            query = query.Where(t => t.TransactionDateTime <= endDateUtc);
         }
+
+
+
+        //if (request.StartDate.HasValue)
+        //{
+        //    query = query.Where(t => t.TransactionDateTime.Date >= Convert.ToDateTime(request.StartDate.Value).Date);
+        //}
+
+        //if (request.EndDate.HasValue)
+        //{
+        //    query = query.Where(t => t.TransactionDateTime.Date <= request.EndDate.Value);
+        //}
 
         // 📌 Apply Pagination
         var paginatedTransactions = await query

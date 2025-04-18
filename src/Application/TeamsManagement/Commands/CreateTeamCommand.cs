@@ -1,8 +1,10 @@
 ﻿using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Constants;
 using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.UserPanel;
+using Escrow.Api.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +17,8 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public string? RoleType { get; set; }
-        public string? ContractId { get; set; }
+        //public string? ContractId { get; set; }
+        public List<string> ContractId { get; set; } = new();
     }
 
     public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Result<object>>
@@ -45,7 +48,7 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "RoleType is required.");
 
             // ✅ Validate ContractId (optional but recommended check)
-            if (string.IsNullOrWhiteSpace(request.ContractId))
+            if (request.ContractId.Count() > 0)
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "ContractId is required.");
 
             // ✅ Check if a user with the same email already exists
@@ -64,12 +67,14 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
                 // ✅ Create a new UserDetail entry
                 var newUser = new UserDetail
                 {
+                    UserId = Guid.NewGuid().ToString(),
                     FullName = request.Name,
                     EmailAddress = request.Email,
                     PhoneNumber = request.PhoneNumber,
                     IsActive = true,
                     Created = DateTime.UtcNow,
-                    CreatedBy = createdBy.ToString()
+                    CreatedBy = createdBy.ToString(),
+                    Role = nameof(Domain.Enums.Roles.User),
                 };
 
                 _context.UserDetails.Add(newUser);
@@ -99,7 +104,7 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
             {
                 UserId = userId,
                 RoleType = request.RoleType,
-                ContractId = request.ContractId,
+                ContractId = request.ContractId.ToString(),
                 Created = DateTime.UtcNow,
                 IsActive = true,
                 IsDeleted = false,

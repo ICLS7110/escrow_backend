@@ -47,13 +47,12 @@ public class VerifyOTPHandler : IRequestHandler<VerifyOTPQuery, Result<VerifyOtp
         if (res.Data is null)
             return Result<VerifyOtpDto>.Failure(StatusCodes.Status404NotFound, $"Not Found");
 
-        var token = _jwtService.GetJWT(res.Data.Id.ToString(),"User");
+        var token = _jwtService.GetJWT(res.Data.Id.ToString());
         var result = new VerifyOtpDto
         {
             AccessToken = token,
             UserId = res.Data.Id.ToString(),
             IsProfileCompleted=res.Data.IsProfileCompleted
-
         };
         return Result<VerifyOtpDto>.Success(StatusCodes.Status200OK, "OTP verified successfully.", result);
         

@@ -50,12 +50,14 @@ public class SocialLoginCommandHandler : IRequestHandler<SocialLoginCommand, Res
                 // Create a new user
                 user = new UserDetail
                 {
+                    UserId = Guid.NewGuid().ToString(),
                     FullName = request.FullName ?? string.Empty,
                     EmailAddress = request.Email,
                     LoginMethod = request.Provider,
                     IsActive = true,
                     IsProfileCompleted = false,
-                    Created = DateTime.UtcNow
+                    Created = DateTime.UtcNow,
+                    Role = nameof(Roles.User),
                 };
 
                 _context.UserDetails.Add(user);
@@ -63,7 +65,7 @@ public class SocialLoginCommandHandler : IRequestHandler<SocialLoginCommand, Res
             }
 
             // Generate JWT Token
-            var token = _jwtService.GetJWT(user.Id.ToString(), nameof(Roles.User));
+            var token = _jwtService.GetJWT(user.Id.ToString());
 
             var userDto = new UserLoginDto
             {
