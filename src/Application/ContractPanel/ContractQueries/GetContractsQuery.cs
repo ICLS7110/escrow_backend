@@ -116,6 +116,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                 IsDeleted = c.IsDeleted,
                 TaxAmount = c.TaxAmount,
                 EscrowTax = c.EscrowTax,
+                BuyerId = c.BuyerDetailsId.ToString(),
+                SellerId = c.SellerDetailsId.ToString(),
                 CountryCode = PhoneNumberHelper.ExtractCountryCode(c.BuyerMobile),
                 Created = c.Created,
                 ContractDoc = c.ContractDoc,

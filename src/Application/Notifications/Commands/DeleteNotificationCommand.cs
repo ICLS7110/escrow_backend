@@ -27,7 +27,7 @@ namespace Escrow.Api.Application.Notifications.Commands
         {
             var userId = _jwtTokenService.GetUserId().ToInt();
             // Case 1: Delete single notification by ID
-            if (request.Id.HasValue)
+            if (request.Id.HasValue && request.Id.Value > 0)
             {
                 if (request.Id <= 0)
                 {
@@ -37,7 +37,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                 var notification = await _context.Notifications.FindAsync(new object[] { request.Id.Value }, cancellationToken);
                 if (notification == null)
                 {
-                    return Result<object>.Failure(StatusCodes.Status404NotFound, "Notification not found.");
+                    return Result<object>.Success(StatusCodes.Status200OK, "Notification not found.",new());
                 }
                 notification.RecordState = RecordState.Deleted;
                 notification.DeletedBy = userId;
@@ -61,7 +61,7 @@ namespace Escrow.Api.Application.Notifications.Commands
 
             if (!notifications.Any())
             {
-                return Result<object>.Failure(StatusCodes.Status404NotFound, "No notifications found for this user.");
+                return Result<object>.Success(StatusCodes.Status200OK, "No notifications found for this user.",new());
             }
 
             _context.Notifications.RemoveRange(notifications);

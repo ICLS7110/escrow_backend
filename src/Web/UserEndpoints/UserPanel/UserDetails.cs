@@ -33,6 +33,7 @@ public class UserDetails : EndpointGroupBase
 
         // Device token management
         userGroup.MapPost("/device-token", StoreDeviceToken).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/set-notified-status", UpdateNotificationStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
         // Social logins
         userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin);
@@ -136,6 +137,23 @@ public class UserDetails : EndpointGroupBase
         catch (Exception ex)
         {
             // Return failure response in case of an exception
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
+    }
+
+
+
+    [Authorize]
+    public async Task<IResult> UpdateNotificationStatus(ISender sender)
+    {
+        try
+        {
+            var query = new UpdateNotificationStatusCommand(); 
+            var result = await sender.Send(query);
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
             return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
         }
     }

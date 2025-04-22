@@ -52,7 +52,7 @@ public class Contract : EndpointGroupBase
             PageSize = 10
         };
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+        return TypedResults.Ok(Result<PaginatedList<ContractDTO>>.Success(StatusCodes.Status200OK, "Success", result));
     }
 
     [Authorize]
@@ -68,7 +68,7 @@ public class Contract : EndpointGroupBase
             PageSize = 10
         };
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+        return TypedResults.Ok(Result<PaginatedList<ContractDTO>>.Success(StatusCodes.Status200OK, "Success", result));
     }
 
     [Authorize]

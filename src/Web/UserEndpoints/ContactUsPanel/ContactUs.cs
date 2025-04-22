@@ -20,14 +20,14 @@ public class ContactUs : EndpointGroupBase
             .WithOpenApi()
             .AddEndpointFilter(async (context, next) => await next(context));
 
-        contactUsGroup.MapPost("/send", SendContactMessage)
-                      .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        contactUsGroup.MapPost("/send", SendContactMessage).AllowAnonymous();
+
 
         contactUsGroup.MapGet("/messages", GetContactMessages)
                       .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin)));
     }
 
-    [Authorize]
+    
     public async Task<IResult> SendContactMessage(ISender sender, [FromBody] SendContactMessageCommand request)
     {
         if (request == null)

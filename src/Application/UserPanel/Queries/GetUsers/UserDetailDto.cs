@@ -28,6 +28,7 @@ public class UserDetailDto
     public string? ProfilePicture { get; set; }
     public string? AccountType { get; set; }
     public bool IsProfileCompleted { get; set; } = false;
+    public bool? IsNotified { get; set; } = false;
 
     private class Mapping : Profile
     {

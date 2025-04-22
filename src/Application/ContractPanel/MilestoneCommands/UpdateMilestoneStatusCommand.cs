@@ -31,79 +31,92 @@ public class UpdateMilestoneStatusCommandHandler : IRequestHandler<UpdateMilesto
 
         // Fetch the related contract
         var contract = await _context.ContractDetails
-            .FirstOrDefaultAsync(c => c.Id == milestone.ContractId, cancellationToken);
+        .FirstOrDefaultAsync(c => c.Id == milestone.ContractId, cancellationToken);
 
         if (contract == null)
             return Result<object>.Failure(404, "Related contract not found.");
 
-        // Retrieve the commission master to calculate the commission and tax
-        var commission = await _context.CommissionMasters
-            .Where(c => c.AppliedGlobally && c.TransactionType == "Service")
-            .OrderByDescending(c => c.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (commission == null)
-            return Result<object>.Failure(404, "Commission information not found.");
-
-        // Extract and calculate fee amount, escrow tax, and tax amount
-        decimal feeAmount = contract.FeeAmount ?? 0;
-        decimal escrowTax = commission.CommissionRate ;
-        decimal taxRate = commission.TaxRate;
-
-        decimal escrowAmount = (feeAmount * escrowTax) / 100;
-        decimal taxAmount = (escrowAmount * taxRate) / 100;
-        decimal totalAmount = feeAmount + taxAmount + escrowAmount;
-
-        // Decide who pays the fee
-        decimal buyerPayableAmount = 0;
-        decimal sellerPayableAmount = 0;
-
-        if (contract.FeesPaidBy.ToLower() == "buyer")
+        if (milestone.Status != nameof(MilestoneStatus.Escrow))
         {
-            buyerPayableAmount = feeAmount + escrowAmount;
-            sellerPayableAmount = feeAmount - taxAmount;
-        }
-        else if (contract.FeesPaidBy.ToLower() == "seller")
-        {
-            sellerPayableAmount = feeAmount - taxAmount - escrowAmount;
-            buyerPayableAmount = feeAmount;
-        }
-        else if (contract.FeesPaidBy.ToLower() == "50" || contract.FeesPaidBy.ToLower() == "halfpayment")
-        {
-            buyerPayableAmount = feeAmount + (escrowAmount / 2);
-            sellerPayableAmount = feeAmount - taxAmount - (escrowAmount / 2);
-        }
-        else
-        {
-            return Result<object>.Failure(400, "Invalid FeesPaidBy value.");
-        }
+            // Retrieve the commission master to calculate the commission and tax
+            var commission = await _context.CommissionMasters
+                .Where(c => c.AppliedGlobally && c.TransactionType == "Service")
+                .OrderByDescending(c => c.Id)
+                .FirstOrDefaultAsync(cancellationToken);
 
-        // Prevent overdrawing balances
-        if (decimal.TryParse(contract.BuyerPayableAmount, out var buyerBalance) && buyerBalance < buyerPayableAmount)
-            return Result<object>.Failure(400, "Deduction exceeds available buyer balance.");
+            if (commission == null)
+                return Result<object>.Failure(404, "Commission information not found.");
 
-        if (decimal.TryParse(contract.SellerPayableAmount, out var sellerBalance) && sellerBalance < sellerPayableAmount)
-            return Result<object>.Failure(400, "Deduction exceeds available seller balance.");
+            // Extract and calculate fee amount, escrow tax, and tax amount
+            decimal feeAmount = milestone.Amount;
+            decimal escrowTax = commission.CommissionRate;
+            decimal taxRate = commission.TaxRate;
 
-        // Update contract amounts
-        contract.BuyerPayableAmount = (buyerBalance - buyerPayableAmount).ToString("F2");
-        contract.SellerPayableAmount = (sellerBalance - sellerPayableAmount).ToString("F2");
-        contract.LastModified = DateTime.UtcNow;
-        contract.LastModifiedBy = userId;
-        _context.ContractDetails.Update(contract);
+            decimal escrowAmount = (feeAmount * escrowTax) / 100;
+            decimal taxAmount = (escrowAmount * taxRate) / 100;
+            decimal totalAmount = feeAmount + taxAmount + escrowAmount;
 
+            // Decide who pays the fee
+            decimal buyerPayableAmount = 0;
+            decimal sellerPayableAmount = 0;
+
+            if (contract.FeesPaidBy.ToLower() == "buyer")
+            {
+                buyerPayableAmount = feeAmount + escrowAmount;
+                sellerPayableAmount = feeAmount - taxAmount;
+            }
+            else if (contract.FeesPaidBy.ToLower() == "seller")
+            {
+                sellerPayableAmount = feeAmount - taxAmount - escrowAmount;
+                buyerPayableAmount = feeAmount;
+            }
+            else if (contract.FeesPaidBy.ToLower() == "50" || contract.FeesPaidBy.ToLower() == "halfpayment")
+            {
+                buyerPayableAmount = feeAmount + (escrowAmount / 2);
+                sellerPayableAmount = feeAmount - taxAmount - (escrowAmount / 2);
+            }
+            else
+            {
+                return Result<object>.Failure(400, "Invalid FeesPaidBy value.");
+            }
+
+            // Prevent overdrawing balances
+            if (decimal.TryParse(contract.BuyerPayableAmount, out var buyerBalance) && buyerBalance < buyerPayableAmount)
+                return Result<object>.Failure(400, "Deduction exceeds available buyer balance.");
+
+            if (decimal.TryParse(contract.SellerPayableAmount, out var sellerBalance) && sellerBalance < sellerPayableAmount)
+                return Result<object>.Failure(400, "Deduction exceeds available seller balance.");
+
+            // Update contract amounts
+            contract.BuyerPayableAmount = (buyerBalance - buyerPayableAmount).ToString("F2");
+            contract.SellerPayableAmount = (sellerBalance - sellerPayableAmount).ToString("F2");
+
+        }
         // Update milestone status
         if (milestone.Status == nameof(MilestoneStatus.Pending))
         {
             milestone.Status = nameof(MilestoneStatus.Escrow);
+            contract.Status = nameof(ContractStatus.Accepted);
         }
         else if (milestone.Status == nameof(MilestoneStatus.Escrow))
         {
             milestone.Status = nameof(MilestoneStatus.Released);
+
+        }
+        // Check if all milestones are in escrow
+        var allMilestonesInEscrow = await _context.MileStones
+    .Where(m => m.ContractId == milestone.ContractId)
+    .AllAsync(m => m.Status == nameof(MilestoneStatus.Escrow) || m.Status == nameof(MilestoneStatus.Released), cancellationToken);
+
+        if (allMilestonesInEscrow)
+        {
+            contract.Status = nameof(ContractStatus.Escrow);
         }
 
         milestone.LastModified = DateTime.UtcNow;
         milestone.LastModifiedBy = userId;
+
+        _context.ContractDetails.Update(contract);
 
         _context.MileStones.Update(milestone);
         await _context.SaveChangesAsync(cancellationToken);

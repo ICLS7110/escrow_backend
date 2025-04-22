@@ -3,6 +3,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands;
 
@@ -30,28 +31,55 @@ public class UpdateContractStatusCommandHandler : IRequestHandler<UpdateContract
 
     public async Task<bool> Handle(UpdateContractStatusCommand request, CancellationToken cancellationToken)
     {
-        int userId = _jwtService.GetUserId().ToInt(); // Get the authenticated user's ID
+        try
+        {
+            int userId = _jwtService.GetUserId().ToInt(); // Get the authenticated user's ID
 
-        var buyer = await _context.UserDetails
-            .FirstOrDefaultAsync(u => u.PhoneNumber == request.BuyerPhoneNumber, cancellationToken);
+            var buyer = await _context.UserDetails
+                .FirstOrDefaultAsync(u => u.PhoneNumber == request.BuyerPhoneNumber, cancellationToken);
 
-        var seller = await _context.UserDetails
-            .FirstOrDefaultAsync(u => u.PhoneNumber == request.SellerPhoneNumber, cancellationToken);
+            var seller = await _context.UserDetails
+                .FirstOrDefaultAsync(u => u.PhoneNumber == request.SellerPhoneNumber, cancellationToken);
 
-        if (buyer == null || seller == null) return false; // Return false if buyer or seller is not found
+            if (buyer == null || seller == null) return false; // Return false if buyer or seller is not found
 
-        var contract = await _context.ContractDetails
-            .FirstOrDefaultAsync(c => c.Id == request.ContractId, cancellationToken);
+            var contract = await _context.ContractDetails
+                .FirstOrDefaultAsync(c => c.Id == request.ContractId, cancellationToken);
 
-        if (contract == null) return false; // Return false if the contract is not found
+            if (contract == null) return false; // Return false if the contract is not found
 
-        // Update contract status details
-        contract.Status = request.Status;
-        contract.StatusReason = request.StatusReason;
-        contract.LastModified = DateTime.UtcNow;
-        contract.LastModifiedBy = userId.ToString(); // Store the user ID who modified the contract
 
-        await _context.SaveChangesAsync(cancellationToken);
+            if (request.Status.ToString().Equals(nameof(ContractStatus.Completed), StringComparison.OrdinalIgnoreCase))
+            {
+                var milestones = await _context.MileStones
+                    .Where(m => m.ContractId == request.ContractId && m.RecordState == 0)
+                    .ToListAsync(cancellationToken);
+
+                foreach (var milestone in milestones)
+                {
+                    milestone.Status = nameof(MilestoneStatus.Completed); // Use your actual enum/value
+                    milestone.LastModified = DateTime.UtcNow;
+                    milestone.LastModifiedBy = userId.ToString();
+                }
+
+                _context.MileStones.UpdateRange(milestones);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+
+            // Update contract status details
+            contract.Status = request.Status;
+            contract.StatusReason = request.StatusReason;
+            contract.LastModified = DateTime.UtcNow;
+            contract.LastModifiedBy = contract.LastModifiedBy; // Store the user ID who modified the contract
+
+            _context.ContractDetails.Update(contract);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+
+            var exp = ex;
+        }
         return true;
     }
 }

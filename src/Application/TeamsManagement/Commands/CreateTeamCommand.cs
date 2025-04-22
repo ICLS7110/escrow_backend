@@ -48,8 +48,11 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "RoleType is required.");
 
             // ✅ Validate ContractId (optional but recommended check)
-            if (request.ContractId.Count() > 0)
+            if (request.ContractId.Count() == 0)
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "ContractId is required.");
+
+
+            var contractIdCsv = string.Join(",", request.ContractId);
 
             // ✅ Check if a user with the same email already exists
             UserDetail? existingUser = null;
@@ -104,7 +107,7 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
             {
                 UserId = userId,
                 RoleType = request.RoleType,
-                ContractId = request.ContractId.ToString(),
+                ContractId = contractIdCsv,
                 Created = DateTime.UtcNow,
                 IsActive = true,
                 IsDeleted = false,

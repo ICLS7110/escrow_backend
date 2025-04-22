@@ -39,7 +39,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             // Toggle IsActive status
             contract.IsActive = contract.IsActive == null ? true : !contract.IsActive;
             contract.LastModified = DateTime.UtcNow;
-            contract.LastModifiedBy = userId.ToString(); // Store modifier ID
+            contract.LastModifiedBy = contract.LastModifiedBy == null ? userId.ToString() : contract.LastModifiedBy;
 
             await _context.SaveChangesAsync(cancellationToken);
 

@@ -12,7 +12,8 @@ public class TeamDTO
     public string TeamId { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public string? RoleType { get; set; }
-    public string? ContractId { get; set; }
+    public List<string>? ContractId { get; set; }
+
     public bool? IsActive { get; set; }
     public DateTimeOffset? Created { get; set; }
     public virtual UserDetailDto? User { get; set; }

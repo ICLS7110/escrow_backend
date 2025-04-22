@@ -33,4 +33,5 @@ public class UserDetail : BaseAuditableEntity
     public string? DeviceToken { get; set; } // Store Firebase Device Token
     public bool IsDeleted { get; set; } = false;
     public bool? IsActive { get; set; } = false;
+    public bool? IsNotified { get; set; } = false;
 }

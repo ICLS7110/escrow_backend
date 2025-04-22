@@ -70,8 +70,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
 
             if (request.FeesPaidBy.ToLower() == "buyer")
             {
-                buyerPayableAmount = feeAmount + escrowAmount;
-                sellerPayableAmount = feeAmount - taxAmount;
+                buyerPayableAmount = feeAmount + escrowAmount + taxAmount;
+                sellerPayableAmount = feeAmount;
             }
             else if (request.FeesPaidBy.ToLower() == "seller")
             {
@@ -80,8 +80,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             }
             else if (request.FeesPaidBy.ToLower() == "50" || request.FeesPaidBy.ToLower() == "halfPayment")
             {
-                buyerPayableAmount = feeAmount + (escrowAmount / 2);
-                sellerPayableAmount = feeAmount - taxAmount - (escrowAmount / 2);
+                buyerPayableAmount = feeAmount + (taxAmount / 2) + (escrowAmount / 2);
+                sellerPayableAmount = feeAmount - (taxAmount / 2) - (escrowAmount / 2);
             }
 
             var entity = new ContractDetails
@@ -131,26 +131,27 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             await _context.SaveChangesAsync(cancellationToken);
 
             // Send Push Notification and Save Notification Record
-            await SendNotificationAsync(userId, buyerId, sellerId, entity.Id, cancellationToken);
+            await SendNotificationAsync(userId, buyerId, sellerId, entity.Id, entity.Role, cancellationToken);
 
             return entity.Id;
         }
-        private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, CancellationToken cancellationToken)
+
+        private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
         {
-            var title = "New Contract Created";
-            var description = "A new contract has been created. Please check the details.";
+            var creator = await _context.UserDetails
+                .Where(u => u.Id == creatorId)
+                .Select(u => new { u.Id, u.FullName, u.IsNotified })
+                .FirstOrDefaultAsync(cancellationToken);
 
             var users = await _context.UserDetails
                 .Where(u => u.Id == buyerId || u.Id == sellerId)
-                .ToDictionaryAsync(u => u.Id, u => u.DeviceToken, cancellationToken);
+                .ToDictionaryAsync(u => u.Id, u => new { u.FullName, u.DeviceToken, u.IsNotified }, cancellationToken);
 
             var notifications = new List<Notification>();
-
-            if (users.TryGetValue(buyerId, out var buyerToken) && !string.IsNullOrEmpty(buyerToken))
+            if (users.TryGetValue(buyerId, out var buyerInfo))
             {
-                //await _firebaseNotification.SendPushNotificationAsync(buyerToken, title, description);
-
-                await _firebaseNotification.SendPushNotificationAsync(buyerToken, title, description, new { ContractId = contractId, Type= "Contract" });
+                var title = "New Contract Created";
+                var description = $"{creator?.FullName} has created a new contract for you, {buyerInfo.FullName}. Please review the details.";
 
                 notifications.Add(new Notification
                 {
@@ -160,13 +161,48 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
                     Title = title,
                     Description = description,
                     Type = "Contract",
-                    IsRead=false
+                    IsRead = false
                 });
+
+                if (!string.IsNullOrEmpty(buyerInfo.DeviceToken) && buyerInfo.IsNotified == true)
+                {
+                    await _firebaseNotification.SendPushNotificationAsync(
+                        buyerInfo.DeviceToken!,
+                        title,
+                        description,
+                        new { ContractId = contractId, Type = "Contract", Role = role }
+                    );
+                }
+
             }
 
-            if (users.TryGetValue(sellerId, out var sellerToken) && !string.IsNullOrEmpty(sellerToken))
+
+            //if (users.TryGetValue(buyerId, out var buyerInfo))
+            //{
+            //    var title = "New Contract Created";
+            //    var description = $"{creator?.FullName} has created a new contract for you, {buyerInfo.FullName}. Please review the details.";
+
+            //    notifications.Add(new Notification
+            //    {
+            //        FromID = creatorId,
+            //        ToID = buyerId,
+            //        ContractId = contractId,
+            //        Title = title,
+            //        Description = description,
+            //        Type = "Contract",
+            //        IsRead = false
+            //    });
+
+            //    if (!string.IsNullOrEmpty(buyerInfo.DeviceToken))
+            //    {
+            //        await _firebaseNotification.SendPushNotificationAsync(buyerInfo.DeviceToken, title, description, new { ContractId = contractId, Type = "Contract", Role = role });
+            //    }
+            //}
+
+            if (users.TryGetValue(sellerId, out var sellerInfo))
             {
-                await _firebaseNotification.SendPushNotificationAsync(sellerToken, title, description, new { ContractId = contractId, Type = "Contract" });
+                var title = "New Contract Created";
+                var description = $"{creator?.FullName} has created a new contract for you, {sellerInfo.FullName}. Please review the details.";
 
                 notifications.Add(new Notification
                 {
@@ -178,6 +214,11 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
                     Type = "Contract",
                     IsRead = false
                 });
+
+                if (!string.IsNullOrEmpty(sellerInfo.DeviceToken) && sellerInfo.IsNotified == true)
+                {
+                    await _firebaseNotification.SendPushNotificationAsync(sellerInfo.DeviceToken, title, description, new { ContractId = contractId, Type = "Contract", Role = role });
+                }
             }
 
             if (notifications.Any())
@@ -186,6 +227,82 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
+
+
+
+        //Working Send Notification Code 
+
+        //private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string Role, CancellationToken cancellationToken)
+        //{
+        //    var title = "New Contract Created";
+        //    var description = "A new contract has been created. Please check the details.";
+
+        //    var users = await _context.UserDetails
+        //        .Where(u => u.Id == buyerId || u.Id == sellerId)
+        //        .ToDictionaryAsync(u => u.Id, u => u.DeviceToken, cancellationToken);
+
+        //    var notifications = new List<Notification>();
+
+        //    if (users.TryGetValue(buyerId, out var buyerToken))
+        //    {
+        //        notifications.Add(new Notification
+        //        {
+        //            FromID = creatorId,
+        //            ToID = buyerId,
+        //            ContractId = contractId,
+        //            Title = title,
+        //            Description = description,
+        //            Type = "Contract",
+        //            IsRead = false
+        //        });
+        //        //await _firebaseNotification.SendPushNotificationAsync(buyerToken, title, description);
+        //        if (!string.IsNullOrEmpty(buyerToken))
+        //        {
+        //            await _firebaseNotification.SendPushNotificationAsync(buyerToken, title, description, new { ContractId = contractId, Type = "Contract", Role = Role });
+        //        }
+        //    }
+        //    try
+        //    {
+        //        if (users.TryGetValue(sellerId, out var sellerToken))
+        //        {
+        //            notifications.Add(new Notification
+        //            {
+        //                FromID = creatorId,
+        //                ToID = sellerId,
+        //                ContractId = contractId,
+        //                Title = title,
+        //                Description = description,
+        //                Type = "Contract",
+        //                IsRead = false
+        //            });
+        //            if (!string.IsNullOrEmpty(sellerToken))
+        //            {
+        //                await _firebaseNotification.SendPushNotificationAsync(sellerToken, title, description, new { ContractId = contractId, Type = "Contract", Role = Role });
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        var x= ex;
+        //    }
+
+        //    if (notifications.Any())
+        //    {
+        //        await _context.Notifications.AddRangeAsync(notifications, cancellationToken);
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+        //}
+
+
+
+
+
+
+
+
+
+
 
         //private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, CancellationToken cancellationToken)
         //{

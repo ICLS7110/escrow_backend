@@ -450,6 +450,15 @@
         "operationId": "GetApiNotificationEndpoint",
         "parameters": [
           {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
             "name": "pageNumber",
             "in": "query",
             "schema": {
@@ -457,7 +466,7 @@
               "format": "int32",
               "default": 1
             },
-            "x-position": 1
+            "x-position": 2
           },
           {
             "name": "pageSize",
@@ -467,7 +476,7 @@
               "format": "int32",
               "default": 10
             },
-            "x-position": 2
+            "x-position": 3
           }
         ],
         "responses": {
@@ -880,12 +889,7 @@
           "200": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/ContactUs/messages": {
@@ -1458,6 +1462,24 @@
           "required": true,
           "x-position": 1
         },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/UserDetails/set-notified-status": {
+      "post": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PostApiUserDetailsSetNotifiedStatus",
         "responses": {
           "200": {
             "description": ""
@@ -3562,8 +3584,10 @@
             "nullable": true
           },
           "contractId": {
-            "type": "string",
-            "nullable": true
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -3594,8 +3618,11 @@
             "nullable": true
           },
           "contractId": {
-            "type": "string",
-            "nullable": true
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

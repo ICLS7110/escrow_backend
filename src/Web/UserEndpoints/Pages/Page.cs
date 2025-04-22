@@ -11,8 +11,8 @@ public class Pages : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        var adminGroup = app.MapGroup(this)
-            .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User))) // Restrict access to Admins & Users
+        var adminGroup = app.MapGroup(this).AllowAnonymous()
+           
             .WithOpenApi();
 
         adminGroup.MapGet("/", GetAllPages);
@@ -23,7 +23,6 @@ public class Pages : EndpointGroupBase
     /// Retrieves all pages or a specific page by ID.
     /// Supports pagination.
     /// </summary>
-    [Authorize]
     public async Task<IResult> GetAllPages(ISender sender, int? id, int pageNumber = 1, int pageSize = 10)
     {
         var result = await sender.Send(new GetAllPagesQuery
@@ -33,15 +32,14 @@ public class Pages : EndpointGroupBase
             PageSize = pageSize
         });
 
-        if (result == null || !result.Items.Any())
-        {
-            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No pages found."));
-        }
+        //if (result == null || !result.Items.Any())
+        //{
+        //    return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No pages found."));
+        //}
 
         return TypedResults.Ok(Result<PaginatedList<PagesDTO>>.Success(StatusCodes.Status200OK, "Pages retrieved successfully.", result));
     }
 
-    [Authorize]
     public async Task<IResult> UpdatePages(ISender sender, UpdatePagesCommand command)
     {
         var result = await sender.Send(command);

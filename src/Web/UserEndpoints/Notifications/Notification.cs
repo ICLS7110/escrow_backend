@@ -30,7 +30,7 @@ public class NotificationEndpoint : EndpointGroupBase
     /// Retrieves all notifications with optional pagination.
     /// </summary>
     [Authorize]
-    public async Task<IResult> GetAllNotifications(ISender sender, int pageNumber = 1, int pageSize = 10)
+    public async Task<IResult> GetAllNotifications(ISender sender,string? filter, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber < 1 || pageSize < 1)
         {
@@ -43,10 +43,11 @@ public class NotificationEndpoint : EndpointGroupBase
         var result = await sender.Send(new GetAllNotificationsQuery
         {
             PageNumber = pageNumber,
+            Filter = filter,
             PageSize = pageSize
         });
 
-        if (result == null || result.Data == null || result.Data.Items.Count == 0)
+        if (result == null)
         {
             return TypedResults.NotFound(Result<object>.Failure(
                 StatusCodes.Status404NotFound,
