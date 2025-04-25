@@ -70,7 +70,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
                 entity.BusinessProof = request.BusinessProof;
                 entity.CompanyEmail = request.CompanyEmail;
                 entity.ProfilePicture = request.ProfilePicture;
-                entity.AccountType = request.AccountType;
+                entity.AccountType = request.AccountType == null ? entity.AccountType : request.AccountType;
                 entity.IsProfileCompleted = true;
                 entity.Role = nameof(Roles.User);
 

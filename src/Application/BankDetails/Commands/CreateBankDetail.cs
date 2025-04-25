@@ -12,6 +12,7 @@ using Escrow.Api.Infrastructure.Security;
 namespace Escrow.Api.Application.BankDetails.Commands;
 public record CreateBankDetailCommand : IRequest<int>
 {
+    public string AccountHolderId { get; set; } = string.Empty;
     public string AccountHolderName { get; set; } = string.Empty;
     public string IBANNumber { get; set; } = string.Empty;
     public string BICCode { get; set; } = string.Empty;
@@ -36,6 +37,7 @@ public class CreateBankDetailCommandHandler : IRequestHandler<CreateBankDetailCo
         var entity = new BankDetail
         {
             UserDetailId = _jwtService.GetUserId().ToInt(),
+            AccountHolderId = request.AccountHolderName,
             AccountHolderName = request.AccountHolderName,
             IBANNumber = _AESService.Encrypt( request.IBANNumber),
             BankName = _AESService.Encrypt(request.BankName),

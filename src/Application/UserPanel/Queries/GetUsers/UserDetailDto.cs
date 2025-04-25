@@ -29,6 +29,7 @@ public class UserDetailDto
     public string? AccountType { get; set; }
     public bool IsProfileCompleted { get; set; } = false;
     public bool? IsNotified { get; set; } = false;
+    public string? SocialId { get; set; }
 
     private class Mapping : Profile
     {

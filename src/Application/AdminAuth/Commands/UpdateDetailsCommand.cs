@@ -2,6 +2,7 @@
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml.FormulaParsing.Utilities;
 
@@ -36,11 +37,12 @@ public class UpdateDetailsCommandHandler : IRequestHandler<UpdateDetailsCommand,
         if (adminUser.Role == request.Role)
         {
             adminUser.FullName = request.UserName;
+            
 
             // If role is NOT "Sub-Admin", update both Name and Email
-            if (adminUser.Role.ToLower() != "sub-admin")
+            if (adminUser.Role.ToLower() == nameof(Roles.Admin).ToLower())
             {
-                adminUser.FullName = request.Email;
+                adminUser.EmailAddress = request.Email;
             }
 
             adminUser.ProfilePicture = request.Image;

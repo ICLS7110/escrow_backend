@@ -1,5 +1,4 @@
-﻿
-using System.Text;
+﻿using System.Text;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Infrastructure.Configuration;

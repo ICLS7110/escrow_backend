@@ -13,6 +13,7 @@ public record GetAllPagesQuery : IRequest<PaginatedList<PagesDTO>>
     public int? Id { get; init; } = 0;
     public int? PageNumber { get; init; } = 1;
     public int? PageSize { get; init; } = 10;
+    public string? Slug { get; init; } = string.Empty;
 }
 
 public class GetAllPagesQueryHandler : IRequestHandler<GetAllPagesQuery, PaginatedList<PagesDTO>>
@@ -37,6 +38,11 @@ public class GetAllPagesQueryHandler : IRequestHandler<GetAllPagesQuery, Paginat
         if (request.Id.HasValue && request.Id.Value > 0)
         {
             query = query.Where(x => x.Id == request.Id.Value);
+        } 
+        
+        if (!string.IsNullOrEmpty(request.Slug))
+        {
+            query = query.Where(x => x.Slug == request.Slug);
         }
 
         return await query
@@ -47,7 +53,8 @@ public class GetAllPagesQueryHandler : IRequestHandler<GetAllPagesQuery, Paginat
                 Slug = p.Slug,
                 Content = p.Content,
                 IsActive = p.IsActive,
-                DeletedBy = p.DeletedBy
+                DeletedBy = p.DeletedBy,
+                Ar_Content=p.Ar_Description,
             })
             .OrderBy(x => x.Title)
             .PaginatedListAsync(pageNumber, pageSize);

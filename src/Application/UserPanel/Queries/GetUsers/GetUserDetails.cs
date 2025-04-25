@@ -69,6 +69,7 @@ public class GetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, P
                 DeviceToken = s.DeviceToken,
                 CompanyEmail = s.CompanyEmail,
                 IsNotified = s.IsNotified,
+                SocialId = s.SocialId
             })
             .PaginatedListAsync(pageNumber, pageSize);
     }

@@ -110,8 +110,15 @@ public class Contract : EndpointGroupBase
     [Authorize]
     public async Task<IResult> CreateContractDetails(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, CreateContractDetailCommand command)
     {
-        var id = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract Created Successfully.", new { contractId = id }));
+        try
+        {
+            var id = await sender.Send(command);
+            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract Created Successfully.", new { contractId = id }));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
     }
 
     [Authorize]
@@ -136,7 +143,7 @@ public class Contract : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, bool? isActive, int pageNumber = 1, int pageSize = 10)
+    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, bool? priceFilter, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
     {
         var actualUserId = jwtService.GetUserId().ToInt();
 
@@ -145,7 +152,9 @@ public class Contract : EndpointGroupBase
             UserId = IsAdmin(httpContextAccessor) ? null : actualUserId,
             Status = status,
             SearchKeyword = searchKeyword,
+            PriceFilter = priceFilter,
             IsActive = isActive,
+            IsMilestone = isMilestone,
             PageNumber = pageNumber,
             PageSize = pageSize
         };
@@ -166,5 +175,4 @@ public class Contract : EndpointGroupBase
 
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contract modified successfully.", new()));
     }
-
 }

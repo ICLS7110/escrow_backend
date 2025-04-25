@@ -12,7 +12,7 @@ public class Pages : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         var adminGroup = app.MapGroup(this).AllowAnonymous()
-           
+
             .WithOpenApi();
 
         adminGroup.MapGet("/", GetAllPages);
@@ -23,10 +23,11 @@ public class Pages : EndpointGroupBase
     /// Retrieves all pages or a specific page by ID.
     /// Supports pagination.
     /// </summary>
-    public async Task<IResult> GetAllPages(ISender sender, int? id, int pageNumber = 1, int pageSize = 10)
+    public async Task<IResult> GetAllPages(ISender sender, int? id, string? slug, int pageNumber = 1, int pageSize = 10)
     {
         var result = await sender.Send(new GetAllPagesQuery
         {
+            Slug = slug,
             Id = id,
             PageNumber = pageNumber,
             PageSize = pageSize

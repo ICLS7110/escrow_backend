@@ -380,6 +380,15 @@
             "x-position": 1
           },
           {
+            "name": "slug",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
             "name": "pageNumber",
             "in": "query",
             "schema": {
@@ -387,7 +396,7 @@
               "format": "int32",
               "default": 1
             },
-            "x-position": 2
+            "x-position": 3
           },
           {
             "name": "pageSize",
@@ -397,19 +406,14 @@
               "format": "int32",
               "default": 10
             },
-            "x-position": 3
+            "x-position": 4
           }
         ],
         "responses": {
           "200": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/Pages/update": {
@@ -434,12 +438,7 @@
           "200": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
+        }
       }
     },
     "/api/NotificationEndpoint": {
@@ -1514,12 +1513,32 @@
           "200": {
             "description": ""
           }
+        }
+      }
+    },
+    "/api/UserDetails/update-mobile-number": {
+      "post": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PostApiUserDetailsUpdateMobileNumber",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMobileNumberCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
         },
-        "security": [
-          {
-            "JWT": []
+        "responses": {
+          "200": {
+            "description": ""
           }
-        ]
+        }
       }
     },
     "/api/Contract": {
@@ -1813,13 +1832,31 @@
             "x-position": 2
           },
           {
-            "name": "isActive",
+            "name": "priceFilter",
             "in": "query",
             "schema": {
               "type": "boolean",
               "nullable": true
             },
             "x-position": 3
+          },
+          {
+            "name": "isMilestone",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 5
           },
           {
             "name": "pageNumber",
@@ -1829,7 +1866,7 @@
               "format": "int32",
               "default": 1
             },
-            "x-position": 4
+            "x-position": 6
           },
           {
             "name": "pageSize",
@@ -1839,7 +1876,7 @@
               "format": "int32",
               "default": 10
             },
-            "x-position": 5
+            "x-position": 7
           }
         ],
         "responses": {
@@ -2251,6 +2288,37 @@
             "description": ""
           }
         }
+      }
+    },
+    "/api/Auth/login": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "GetApiAuthLogin",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "GetApiAuthMe",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/PermissionManager/roles": {
@@ -3100,6 +3168,122 @@
         ]
       }
     },
+    "/api/Dashboard/users-count": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "GetApiDashboardUsersCount",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Dashboard/contracts-worth": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "GetApiDashboardContractsWorth",
+        "parameters": [
+          {
+            "name": "StartDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Dashboard/admin-commission-last-12-months": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "GetApiDashboardAdminCommissionLast12Months",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Dashboard/escrow-amount": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "GetApiDashboardEscrowAmount",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/SubAdmin/Add": {
       "post": {
         "tags": [
@@ -3662,6 +3846,10 @@
             "nullable": true
           },
           "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "ar_Description": {
             "type": "string",
             "nullable": true
           }
@@ -4257,14 +4445,25 @@
           "provider": {
             "type": "string"
           },
-          "token": {
-            "type": "string"
-          },
-          "fullName": {
+          "sId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateMobileNumberCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "socialId": {
             "type": "string",
             "nullable": true
           },
-          "email": {
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobileNumber": {
             "type": "string",
             "nullable": true
           }
@@ -4514,6 +4713,9 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "accountHolderId": {
+            "type": "string"
+          },
           "accountHolderName": {
             "type": "string"
           },
@@ -4535,6 +4737,9 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          },
+          "accountHolderId": {
+            "type": "string"
           },
           "accountHolderName": {
             "type": "string"

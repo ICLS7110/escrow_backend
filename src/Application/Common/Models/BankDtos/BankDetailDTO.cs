@@ -8,6 +8,7 @@ namespace Escrow.Api.Application.Common.Models.BankDtos;
 public class BankDetailDTO
 {
     public int Id { get; set; }
+    public string AccountHolderId { get; set; } = string.Empty;
     public string AccountHolderName { get; set; } = string.Empty;
     public string IBANNumber { get; set; } = string.Empty;
     public string BICCode { get; set; } = string.Empty;

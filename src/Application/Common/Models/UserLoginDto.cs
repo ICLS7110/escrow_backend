@@ -11,4 +11,5 @@ public class UserLoginDto
     public string? FullName { get; set; }
     public string? EmailAddress { get; set; }
     public string Token { get; set; } = string.Empty;
+    public bool? IsProfileCompleted { get; set; } 
 }

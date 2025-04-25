@@ -12,7 +12,7 @@ public class PermissionManager : EndpointGroupBase
     public override void Map(WebApplication app)
     {
         var group = app.MapGroup(this)
-            .RequireAuthorization(policy => policy.RequireRole("Admin"))
+            .RequireAuthorization(policy => policy.RequireRole("Admin",nameof(Roles.Admin)))
             .WithOpenApi();
 
         group.MapGet("/roles", GetRoles);

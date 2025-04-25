@@ -13,6 +13,7 @@ namespace Escrow.Api.Application.BankDetails.Commands;
 public record UpdateBankDetailCommand: IRequest<Result<int>>
 {
     public int Id { get; set; }    
+    public string AccountHolderId { get; set; } = string.Empty;
     public string AccountHolderName { get; set; } = string.Empty;
     public string IBANNumber { get; set; } = string.Empty;
     public string BICCode { get; set; } = string.Empty;
@@ -40,6 +41,7 @@ public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCo
         if (entity == null)
             return Result<int>.Failure(StatusCodes.Status404NotFound, "Bank Details Not Found.");
 
+        entity.AccountHolderId = request.AccountHolderId;
         entity.AccountHolderName = request.AccountHolderName;
         entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
         entity.BICCode = request.BICCode;

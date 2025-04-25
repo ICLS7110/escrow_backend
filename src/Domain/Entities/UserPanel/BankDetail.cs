@@ -10,6 +10,7 @@ public class BankDetail: BaseAuditableEntity
     public int UserDetailId { get; set; }
     public UserDetail UserDetail { get; set; } = null!;
 
+    public string AccountHolderId { get; set; } = String.Empty;
     public string AccountHolderName { get; set; } = String.Empty;
     public string IBANNumber { get; set; } = String.Empty;
     public string BICCode { get; set; } = String.Empty;

@@ -11,6 +11,7 @@ public class PagesDTO
     public string? Title { get; set; }
     public string? Slug { get; set; }
     public string? Content { get; set; }
+    public string? Ar_Content { get; set; }
     public bool? IsActive { get; set; }
     public DateTime Created { get; set; }
     public string? CreatedBy { get; set; }

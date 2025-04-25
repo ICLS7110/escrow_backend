@@ -16,6 +16,7 @@ public class NotificationDTO
     public string Description { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public bool? IsRead { get; set; }
+    public string? unreadCount { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 

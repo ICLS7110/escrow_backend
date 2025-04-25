@@ -3,12 +3,10 @@ using Escrow.Api.Infrastructure.Authentication.Services;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OpenIddict.Abstractions;
 using System.Security.Claims;
 
 using Escrow.Api.Application.Authentication.Interfaces;
 using Microsoft.IdentityModel.Tokens;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -22,6 +20,8 @@ using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.BankDetails.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Domain.Entities.DTOs;
+using Microsoft.AspNetCore.Authentication;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Escrow.Api.Web.Endpoints.Authentication
 {
@@ -41,21 +41,81 @@ namespace Escrow.Api.Web.Endpoints.Authentication
 
             userGroup.MapPost("/request-otp", RequestOtp);
             userGroup.MapPost("/verify-otp", VerifyOtp);
+
+            userGroup.MapGet("/login", Login);
+            //userGroup.MapGet("/logout", Logout);
+            userGroup.MapGet("/me", GetUserInfo);
         }
         [AllowAnonymous]
         public async Task<IResult> RequestOtp([FromServices] ISender sender, [FromBody] RequestOtpQuery query)
         {
             var result = await sender.Send(query);
-            return TypedResults.Ok(result);
+
+            if (result.Status == StatusCodes.Status200OK)
+            {
+                return TypedResults.Ok(result); // or return what makes sense
+            }
+
+            return TypedResults.BadRequest(result); // or Unauthorized/NotFound/etc. depending on failure reason
+            
+            
         }
+
         [AllowAnonymous]
-        public async Task<IResult> VerifyOtp([FromServices] ISender sender, [FromBody] VerifyOTPQuery command) 
+        public async Task<IResult> VerifyOtp([FromServices] ISender sender, [FromBody] VerifyOTPQuery command)
         {
-
             var result = await sender.Send(command);
-            return TypedResults.Ok(result);
 
+            if (result.Status == StatusCodes.Status200OK)
+            {
+                return TypedResults.Ok(result); // or return what makes sense
+            }
+
+            return TypedResults.BadRequest(result); // or Unauthorized/NotFound/etc. depending on failure reason
         }
+
+        //[AllowAnonymous]
+        //public async Task<IResult> VerifyOtp([FromServices] ISender sender, [FromBody] VerifyOTPQuery command) 
+        //{
+
+        //    var result = await sender.Send(command);
+        //    return TypedResults.Ok(result);
+
+        //}
+
+
+        [AllowAnonymous]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public IResult Login(HttpContext context)
+        {
+            var props = new AuthenticationProperties
+            {
+                RedirectUri = "https://welink-sa.com/contact-us" // must match redirect URI registered with Google
+            };
+
+
+            return Results.Challenge(props, new[] { "oidc" });
+        }
+
+
+        //[AllowAnonymous]
+        //public async Task<IResult> Logout(HttpContext context)
+        //{
+        //    await context.SignOutAsync("Cookies");
+        //    await context.SignOutAsync("oidc");
+
+        //    return Results.Ok("Logged out.");
+        //}
+
+        [Authorize]
+        public IResult GetUserInfo(HttpContext context)
+        {
+            var claims = context.User.Claims
+                .Select(c => new { c.Type, c.Value });
+
+            return Results.Ok(claims);
+        }
+
 
     }
 }

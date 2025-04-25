@@ -67,7 +67,7 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             var newUser = new UserDetail
             {
                 UserId = Guid.NewGuid().ToString(),
-                FullName = phoneNumber,
+                FullName = "",
                 PhoneNumber = phoneNumber,
                 Role = nameof(Roles.User),
                 IsActive = true,

@@ -1,4 +1,5 @@
 ﻿using Escrow.Api.Application;
+using Escrow.Api.Application.BankDetails.Queries;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
@@ -11,6 +12,8 @@ using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
 
@@ -36,8 +39,10 @@ public class UserDetails : EndpointGroupBase
         userGroup.MapPost("/set-notified-status", UpdateNotificationStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
         // Social logins
-        userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin);
-        
+        userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin).AllowAnonymous();
+
+        userGroup.MapPost("/update-mobile-number", UpdateMobileNumber).AllowAnonymous();
+
     }
 
     [Authorize]
@@ -69,7 +74,6 @@ public class UserDetails : EndpointGroupBase
         }
     }
 
-
     [Authorize]
     public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
     {
@@ -99,6 +103,7 @@ public class UserDetails : EndpointGroupBase
         }
     }
 
+    [AllowAnonymous]
     public async Task<IResult> SocialMeadiaLogin(ISender sender, SocialLoginCommand command)
     {
         return await HandleSocialLogin(sender, command, command.Provider, "Google login successful");
@@ -124,7 +129,6 @@ public class UserDetails : EndpointGroupBase
         }
     }
 
-
     [Authorize]
     public async Task<IResult> StoreDeviceToken(ISender sender, StoreDeviceTokenCommand command)
     {
@@ -141,8 +145,6 @@ public class UserDetails : EndpointGroupBase
         }
     }
 
-
-
     [Authorize]
     public async Task<IResult> UpdateNotificationStatus(ISender sender)
     {
@@ -156,5 +158,12 @@ public class UserDetails : EndpointGroupBase
         {
             return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
         }
+    }
+
+    [AllowAnonymous]
+    public async Task<IResult> UpdateMobileNumber([FromServices] ISender sender, [FromBody] UpdateMobileNumberCommand  query)
+    {
+        var result = await sender.Send(query);
+        return TypedResults.Ok(result);
     }
 }

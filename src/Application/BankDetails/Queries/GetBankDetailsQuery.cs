@@ -50,7 +50,8 @@ public class GetBankDetailsQueryHandler : IRequestHandler<GetBankDetailsQuery, P
         return await query
             .Select(s => new BankDetailDTO
             {
-                Id = s.Id,                
+                Id = s.Id,
+                AccountHolderId = s.AccountHolderId,
                 AccountHolderName = s.AccountHolderName,
                 IBANNumber = _AESService.Decrypt(s.IBANNumber),
                 BankName = _AESService.Decrypt(s.BankName),

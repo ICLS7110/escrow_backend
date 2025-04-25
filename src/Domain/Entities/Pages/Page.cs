@@ -12,4 +12,5 @@ public class Page : BaseAuditableEntity
     public string Content { get; set; } = string.Empty; // Policy text
     public bool? IsActive { get; set; }
     public bool? IsDeleted { get; set; }
+    public string? Ar_Description { get; set; }
 }

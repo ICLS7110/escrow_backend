@@ -41,6 +41,15 @@ public class JwtService : IJwtService
 
         var role = user.Role ?? nameof(Roles.User); // Default fallback role if null
 
+        if (user != null && user.Role != null && user.Role.Contains("sub-admin"))
+        {
+            role = nameof(Roles.Admin);
+
+            // Now fetch the data (replace this with your actual data-fetching logic)
+        }
+
+        
+
         var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, userId),

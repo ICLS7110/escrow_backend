@@ -22,12 +22,12 @@ public record SendContactMessageCommand : IRequest<Result<int>>
 public class SendContactMessageHandler : IRequestHandler<SendContactMessageCommand, Result<int>>
 {
     private readonly IApplicationDbContext _context;
-    // private readonly IEmailService _emailService;
+    private readonly IEmailService _emailService;
 
-    public SendContactMessageHandler(IApplicationDbContext context) // , IEmailService emailService
+    public SendContactMessageHandler(IApplicationDbContext context, IEmailService emailService) // 
     {
         _context = context;
-        // _emailService = emailService;
+        _emailService = emailService;
     }
 
     public async Task<Result<int>> Handle(SendContactMessageCommand request, CancellationToken cancellationToken)
@@ -45,6 +45,10 @@ public class SendContactMessageHandler : IRequestHandler<SendContactMessageComma
                 return Result<int>.Failure(StatusCodes.Status400BadRequest, errorMessages);
             }
             */
+
+
+           
+            await _emailService.SendEmailAsync(request.Email, request.Title, request.Name, request.Message);
 
             // 🔹 Step 1: Store Message in Database
             var contactMessage = new ContactUs

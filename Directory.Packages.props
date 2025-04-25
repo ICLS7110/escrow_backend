@@ -24,6 +24,7 @@
     <PackageVersion Include="libphonenumber-csharp" Version="8.13.52" />
     <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.4" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspnetVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
@@ -37,14 +38,19 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Identity.Web" Version="3.8.3" />
+    <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.2.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
-    <PackageVersion Include="OpenIddict.Abstractions" Version="6.0.0" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="6.2.0" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="6.0.0" />
-    <PackageVersion Include="OpenIddict.Core" Version="6.0.0" />
-    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.0.0" />
+    <PackageVersion Include="OpenIddict.Core" Version="6.2.0" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.2.0" />
+    <PackageVersion Include="OpenIddict.Server" Version="6.2.0" />
+    <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="6.2.0" />
     <PackageVersion Include="OpenIddict.Validation" Version="6.0.0" />
     <PackageVersion Include="OpenIddict.Validation.AspNetCore" Version="6.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EfcoreVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />

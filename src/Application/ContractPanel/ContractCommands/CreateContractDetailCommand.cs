@@ -4,11 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.Notifications;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands
@@ -47,15 +49,23 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
         {
             int userId = _jwtService.GetUserId().ToInt();
 
+            if (request.BuyerMobile == request.SellerMobile)
+            {
+                throw new InvalidOperationException("Buyer and Seller mobile numbers cannot be the same.");
+            }
+            //if (request.BuyerMobile == request.SellerMobile)
+            //{
+            //    return Result<int>.Failure(StatusCodes.Status400BadRequest,"Buyer and Seller mobile numbers cannot be the same.");
+            //}
             // Get or create buyer/seller
             int buyerId = await GetOrCreateUserId(request.BuyerName, request.BuyerMobile, cancellationToken);
             int sellerId = await GetOrCreateUserId(request.SellerName, request.SellerMobile, cancellationToken);
 
             // Get commission rule
             var commission = await _context.CommissionMasters
-                .Where(c => c.AppliedGlobally || c.TransactionType == request.ServiceType)
-                .OrderByDescending(c => c.AppliedGlobally)
-                .FirstOrDefaultAsync(cancellationToken);
+               .Where(c => c.AppliedGlobally || c.TransactionType == "Service")
+               .OrderByDescending(c => c.Id)
+               .FirstOrDefaultAsync(cancellationToken);
 
             decimal feeAmount = request.FeeAmount ?? 0;
             decimal escrowTax = commission?.CommissionRate ?? 0;
@@ -136,97 +146,233 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             return entity.Id;
         }
 
+
+
+
         private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
         {
-            var creator = await _context.UserDetails
+            // Fetch creator's name for use in notification message only (not stored)
+            var creatorName = await _context.UserDetails
                 .Where(u => u.Id == creatorId)
-                .Select(u => new { u.Id, u.FullName, u.IsNotified })
+                .Select(u => u.FullName)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            // Fetch buyer and seller user data
             var users = await _context.UserDetails
-                .Where(u => u.Id == buyerId || u.Id == sellerId)
-                .ToDictionaryAsync(u => u.Id, u => new { u.FullName, u.DeviceToken, u.IsNotified }, cancellationToken);
+                .Where(u => u.Id == buyerId || u.Id == sellerId) // Get buyer and seller records
+                .ToListAsync(cancellationToken);
 
-            var notifications = new List<Notification>();
-            if (users.TryGetValue(buyerId, out var buyerInfo))
+            // Filter out the record that does not match creatorId
+            var userToNotify = users.FirstOrDefault(u => u.Id != creatorId); // This will give you the user who is not the creator
+
+            // If we have a user to notify, proceed with the notification logic
+            if (userToNotify != null)
             {
-                var title = "New Contract Created";
-                var description = $"{creator?.FullName} has created a new contract for you, {buyerInfo.FullName}. Please review the details.";
+                var userInfo = new { userToNotify.FullName, userToNotify.DeviceToken, userToNotify.IsNotified };
 
-                notifications.Add(new Notification
+                // Create and send the notification
+                var title = "New Contract Created";
+                var description = $"{creatorName} has created a new contract for you, {userInfo.FullName}. Please review the details.";
+
+                // Save notification to DB (note: FromID is NOT added here)
+                var notification = new Notification
                 {
-                    FromID = creatorId,
-                    ToID = buyerId,
+                    ToID = userToNotify.Id,
                     ContractId = contractId,
                     Title = title,
                     Description = description,
                     Type = "Contract",
-                    IsRead = false
-                });
+                    IsRead = false,
+                    Created = DateTime.UtcNow,
+                };
 
-                if (!string.IsNullOrEmpty(buyerInfo.DeviceToken) && buyerInfo.IsNotified == true)
+                // Save the notification in the database
+                await _context.Notifications.AddAsync(notification, cancellationToken);
+
+                // Send push notification if applicable
+                if (!string.IsNullOrEmpty(userInfo.DeviceToken) && userInfo.IsNotified == true)
                 {
                     await _firebaseNotification.SendPushNotificationAsync(
-                        buyerInfo.DeviceToken!,
+                        userInfo.DeviceToken,
                         title,
                         description,
                         new { ContractId = contractId, Type = "Contract", Role = role }
                     );
                 }
 
-            }
-
-
-            //if (users.TryGetValue(buyerId, out var buyerInfo))
-            //{
-            //    var title = "New Contract Created";
-            //    var description = $"{creator?.FullName} has created a new contract for you, {buyerInfo.FullName}. Please review the details.";
-
-            //    notifications.Add(new Notification
-            //    {
-            //        FromID = creatorId,
-            //        ToID = buyerId,
-            //        ContractId = contractId,
-            //        Title = title,
-            //        Description = description,
-            //        Type = "Contract",
-            //        IsRead = false
-            //    });
-
-            //    if (!string.IsNullOrEmpty(buyerInfo.DeviceToken))
-            //    {
-            //        await _firebaseNotification.SendPushNotificationAsync(buyerInfo.DeviceToken, title, description, new { ContractId = contractId, Type = "Contract", Role = role });
-            //    }
-            //}
-
-            if (users.TryGetValue(sellerId, out var sellerInfo))
-            {
-                var title = "New Contract Created";
-                var description = $"{creator?.FullName} has created a new contract for you, {sellerInfo.FullName}. Please review the details.";
-
-                notifications.Add(new Notification
-                {
-                    FromID = creatorId,
-                    ToID = sellerId,
-                    ContractId = contractId,
-                    Title = title,
-                    Description = description,
-                    Type = "Contract",
-                    IsRead = false
-                });
-
-                if (!string.IsNullOrEmpty(sellerInfo.DeviceToken) && sellerInfo.IsNotified == true)
-                {
-                    await _firebaseNotification.SendPushNotificationAsync(sellerInfo.DeviceToken, title, description, new { ContractId = contractId, Type = "Contract", Role = role });
-                }
-            }
-
-            if (notifications.Any())
-            {
-                await _context.Notifications.AddRangeAsync(notifications, cancellationToken);
+                // Save changes to the database
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
+
+
+
+        //private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
+        //{
+        //    // Fetch creator's name for use in notification message only (not stored)
+        //    var creatorName = await _context.UserDetails
+        //        .Where(u => u.Id == creatorId)
+        //        .Select(u => u.FullName)
+        //        .FirstOrDefaultAsync(cancellationToken);
+
+        //    // Fetch buyer and seller user data
+        //    var users = await _context.UserDetails
+        //        .Where(u => u.Id == buyerId || u.Id == sellerId)
+        //        .ToDictionaryAsync(u => u.Id, u => new { u.FullName, u.DeviceToken, u.IsNotified }, cancellationToken);
+
+        //    var notifications = new List<Notification>();
+
+        //    // Helper method to create and send notification
+        //    async Task HandleNotificationAsync(int toUserId, dynamic userInfo)
+        //    {
+        //        var title = "New Contract Created";
+        //        var description = $"{creatorName} has created a new contract for you, {userInfo.FullName}. Please review the details.";
+
+        //        // Save notification to DB (note: FromID is NOT added here)
+        //        notifications.Add(new Notification
+        //        {
+        //            ToID = toUserId,
+        //            ContractId = contractId,
+        //            Title = title,
+        //            Description = description,
+        //            Type = "Contract",
+        //            IsRead = false
+        //        });
+
+        //        // Send push notification if applicable
+        //        if (!string.IsNullOrEmpty(userInfo.DeviceToken) && userInfo.IsNotified == true)
+        //        {
+        //            await _firebaseNotification.SendPushNotificationAsync(
+        //                userInfo.DeviceToken,
+        //                title,
+        //                description,
+        //                new { ContractId = contractId, Type = "Contract", Role = role }
+        //            );
+        //        }
+        //    }
+
+        //    // Handle buyer notification
+        //    if (users.TryGetValue(buyerId, out var buyerInfo))
+        //    {
+        //        await HandleNotificationAsync(buyerId, buyerInfo);
+        //    }
+
+        //    // Handle seller notification
+        //    if (users.TryGetValue(sellerId, out var sellerInfo))
+        //    {
+        //        await HandleNotificationAsync(sellerId, sellerInfo);
+        //    }
+
+        //    // Save all notifications at once
+        //    if (notifications.Any())
+        //    {
+        //        await _context.Notifications.AddRangeAsync(notifications, cancellationToken);
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+        //}
+
+
+
+
+
+
+
+
+
+
+
+
+        //private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
+        //{
+        //    var creator = await _context.UserDetails
+        //        .Where(u => u.Id == creatorId)
+        //        .Select(u => new { u.Id, u.FullName, u.IsNotified })
+        //        .FirstOrDefaultAsync(cancellationToken);
+
+        //    var users = await _context.UserDetails
+        //        .Where(u => u.Id == buyerId || u.Id == sellerId)
+        //        .ToDictionaryAsync(u => u.Id, u => new { u.FullName, u.DeviceToken, u.IsNotified }, cancellationToken);
+
+        //    var notifications = new List<Notification>();
+        //    if (users.TryGetValue(buyerId, out var buyerInfo))
+        //    {
+        //        var title = "New Contract Created";
+        //        var description = $"{creator?.FullName} has created a new contract for you, {buyerInfo.FullName}. Please review the details.";
+
+        //        notifications.Add(new Notification
+        //        {
+        //            FromID = creatorId,
+        //            ToID = buyerId,
+        //            ContractId = contractId,
+        //            Title = title,
+        //            Description = description,
+        //            Type = "Contract",
+        //            IsRead = false
+        //        });
+
+        //        if (!string.IsNullOrEmpty(buyerInfo.DeviceToken) && buyerInfo.IsNotified == true)
+        //        {
+        //            await _firebaseNotification.SendPushNotificationAsync(
+        //                buyerInfo.DeviceToken!,
+        //                title,
+        //                description,
+        //                new { ContractId = contractId, Type = "Contract", Role = role }
+        //            );
+        //        }
+
+        //    }
+
+
+        //    //if (users.TryGetValue(buyerId, out var buyerInfo))
+        //    //{
+        //    //    var title = "New Contract Created";
+        //    //    var description = $"{creator?.FullName} has created a new contract for you, {buyerInfo.FullName}. Please review the details.";
+
+        //    //    notifications.Add(new Notification
+        //    //    {
+        //    //        FromID = creatorId,
+        //    //        ToID = buyerId,
+        //    //        ContractId = contractId,
+        //    //        Title = title,
+        //    //        Description = description,
+        //    //        Type = "Contract",
+        //    //        IsRead = false
+        //    //    });
+
+        //    //    if (!string.IsNullOrEmpty(buyerInfo.DeviceToken))
+        //    //    {
+        //    //        await _firebaseNotification.SendPushNotificationAsync(buyerInfo.DeviceToken, title, description, new { ContractId = contractId, Type = "Contract", Role = role });
+        //    //    }
+        //    //}
+
+        //    if (users.TryGetValue(sellerId, out var sellerInfo))
+        //    {
+        //        var title = "New Contract Created";
+        //        var description = $"{creator?.FullName} has created a new contract for you, {sellerInfo.FullName}. Please review the details.";
+
+        //        notifications.Add(new Notification
+        //        {
+        //            FromID = creatorId,
+        //            ToID = sellerId,
+        //            ContractId = contractId,
+        //            Title = title,
+        //            Description = description,
+        //            Type = "Contract",
+        //            IsRead = false
+        //        });
+
+        //        if (!string.IsNullOrEmpty(sellerInfo.DeviceToken) && sellerInfo.IsNotified == true)
+        //        {
+        //            await _firebaseNotification.SendPushNotificationAsync(sellerInfo.DeviceToken, title, description, new { ContractId = contractId, Type = "Contract", Role = role });
+        //        }
+        //    }
+
+        //    if (notifications.Any())
+        //    {
+        //        await _context.Notifications.AddRangeAsync(notifications, cancellationToken);
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+        //}
 
 
 

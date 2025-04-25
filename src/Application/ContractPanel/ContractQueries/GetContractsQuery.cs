@@ -21,6 +21,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
         public ContractStatus? Status { get; init; }
         public string? SearchKeyword { get; init; }
         public bool? IsActive { get; init; }
+        public bool? PriceFilter { get; init; }
+        public bool? IsMilestone { get; init; }
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 10;
     }
@@ -36,7 +38,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
 
         public async Task<PaginatedList<ContractDetailsDTO>> Handle(GetContractsQuery request, CancellationToken cancellationToken)
         {
-            List<string> activeStatuses = new() { nameof(ContractStatus.Accepted), nameof(ContractStatus.Completed) };
+            List<string> activeStatuses = new() { nameof(ContractStatus.Accepted), nameof(ContractStatus.Completed),nameof(ContractStatus.Escrow)};
             List<string> inactiveStatuses = new() { nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired) };
             var query = _context.ContractDetails.AsQueryable();
 
@@ -62,6 +64,11 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
             if (!string.IsNullOrEmpty(request.SearchKeyword))
                 query = query.Where(c => c.ContractTitle.Contains(request.SearchKeyword) || c.Id.ToString() == request.SearchKeyword || c.BuyerMobile == request.SearchKeyword || c.SellerMobile == request.SearchKeyword);
 
+            if (request.PriceFilter == true)
+                query = query.Where(c => c.FeeAmount >= 2000);
+            else if (request.PriceFilter == false)
+                query = query.Where(c => c.FeeAmount <= 2000);
+
 
             if (request.IsActive.HasValue)
             {
@@ -74,6 +81,20 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                     query = query.Where(c => inactiveStatuses.Contains(c.Status));
                 }
             }
+
+            // ✅ Add this block
+            if (request.IsMilestone == true)
+            {
+                var contractIdsWithMilestones = await _context.MileStones
+                    .Select(m => m.ContractId)
+                    .Distinct()
+                    .ToListAsync(cancellationToken);
+
+                query = query.Where(c =>
+                    contractIdsWithMilestones.Contains(c.Id) &&
+                    activeStatuses.Contains(c.Status));
+            }
+
 
             //if (request.IsActive.HasValue)
             //    query = query.Where(c => c.IsActive == request.IsActive);
@@ -149,7 +170,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                         Status = inv.Status,
                         Created = inv.Created
                     }).FirstOrDefault()
-            }).ToList();
+            }).OrderByDescending(x => x.Created).ToList();
 
             return new PaginatedList<ContractDetailsDTO>(contractDTOs, totalCount, request.PageNumber, request.PageSize);
         }

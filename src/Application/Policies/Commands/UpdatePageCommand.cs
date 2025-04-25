@@ -18,6 +18,7 @@ public class PageUpdateDto
     public int? Id { get; init; }
     public string? Name { get; init; }
     public string? Description { get; init; }
+    public string? Ar_Description { get; init; }
 }
 
 public class UpdatePagesCommandHandler : IRequestHandler<UpdatePagesCommand, Result<object>>
@@ -60,6 +61,7 @@ public class UpdatePagesCommandHandler : IRequestHandler<UpdatePagesCommand, Res
             {
                 page.Title = string.IsNullOrWhiteSpace(updateData.Name) ? page.Title : updateData.Name;
                 page.Content = string.IsNullOrWhiteSpace(updateData.Description) ? page.Content : updateData.Description;
+                page.Ar_Description = string.IsNullOrWhiteSpace(updateData.Ar_Description) ? page.Ar_Description : updateData.Ar_Description;
                 page.IsActive = true;
                 page.LastModified = DateTime.UtcNow;
                 page.LastModifiedBy = "System"; // Replace with actual user ID

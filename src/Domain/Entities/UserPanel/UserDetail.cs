@@ -31,6 +31,7 @@ public class UserDetail : BaseAuditableEntity
     public string? AccountType {  get; set; } 
     public bool IsProfileCompleted { get; set; } = false;
     public string? DeviceToken { get; set; } // Store Firebase Device Token
+    public string? SocialId { get; set; } // Store Firebase Device Token
     public bool IsDeleted { get; set; } = false;
     public bool? IsActive { get; set; } = false;
     public bool? IsNotified { get; set; } = false;

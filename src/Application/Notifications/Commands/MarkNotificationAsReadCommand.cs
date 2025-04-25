@@ -58,7 +58,7 @@ public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotifica
 
             return Result<NotificationReadStatusResultDto>.Success(
                 StatusCodes.Status200OK,
-                "Notification marked successfully.",
+                request.IsRead == true ? "Notification marked as read successfully.": "Notification marked as unread successfully.",
                 new NotificationReadStatusResultDto
                 {
                     NotificationId = xnotification.Id,
@@ -87,7 +87,7 @@ public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotifica
 
         return Result<NotificationReadStatusResultDto>.Success(
             StatusCodes.Status200OK,
-            "All notifications marked successfully.",
+            request.IsRead == true ? "All notifications marked as read successfully." : "All notifications marked as unread successfully.",
             new NotificationReadStatusResultDto
             {
                 NotificationId = 0,

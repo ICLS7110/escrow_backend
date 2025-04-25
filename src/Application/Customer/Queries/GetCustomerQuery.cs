@@ -7,6 +7,7 @@ using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.EntityFrameworkCore;
 using Escrow.Api.Application.Common.Mappings;
+using Escrow.Api.Domain.Enums;
 
 namespace Escrow.Api.Application.Customers.Queries
 {
@@ -36,7 +37,7 @@ namespace Escrow.Api.Application.Customers.Queries
 
 
             var query = _context.UserDetails
-                .Where(u => !u.IsDeleted) // Fetch only active customers
+                .Where(u => !u.IsDeleted && u.Role == nameof(Roles.User)) // Fetch only active customers
                 .AsQueryable();
 
             // 🔹 If ID is provided, fetch only that customer
@@ -83,7 +84,7 @@ namespace Escrow.Api.Application.Customers.Queries
                     CompanyEmail = s.CompanyEmail,
                     IsActive = s.IsActive,
                 })
-                .OrderBy(x => x.FullName)
+                .OrderByDescending(x => x.Created)
                 .PaginatedListAsync(pageNumber, pageSize);
         }
     }
