@@ -1835,7 +1835,8 @@
             "name": "priceFilter",
             "in": "query",
             "schema": {
-              "type": "boolean",
+              "type": "integer",
+              "format": "int32",
               "nullable": true
             },
             "x-position": 3

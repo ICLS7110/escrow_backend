@@ -48,10 +48,5 @@ public class EmailTemplate : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
-    //[Authorize]
-    //public async Task<IResult> UpdateEmailTemplateStatus(ISender sender, [FromBody] UpdateEmailTemplateStatusCommand command)
-    //{
-    //    var result = await sender.Send(command);
-    //    return TypedResults.Ok(result);
-    //}
+   
 }

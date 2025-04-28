@@ -53,20 +53,7 @@ public class Dashboard : EndpointGroupBase
         return TypedResults.Ok(result); // Already formatted by handler
     }
 
-    //[Authorize]
-    //public async Task<IResult> GetAdminCommissionLast12Months(ISender sender)
-    //{
-    //    var result = await sender.Send(new GetAdminCommissionLast12MonthsQuery());
-    //    return TypedResults.Ok(result); // No need to wrap again
-    //}
-
-
-    //[Authorize]
-    //public async Task<IResult> GetProjectedCommissionNext6Months(ISender sender)
-    //{
-    //    var result = await sender.Send(new GetProjectedCommissionNext6MonthsQuery());
-    //    return TypedResults.Ok(Result<List<MonthlyValueDto>>.Success(StatusCodes.Status200OK, "Projected commission data retrieved.", result));
-    //}
+    
 
     [Authorize]
     public async Task<IResult> GetAmountInEscrow(ISender sender)

@@ -103,8 +103,15 @@ public class Contract : EndpointGroupBase
     public async Task<IResult> UpdateContractDetail(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, EditContractDetailCommand command)
     {
 
-        await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Contract details updated successfully.", new()));
+        var result = await sender.Send(command);
+        return TypedResults.Ok(
+    Result<object>.Success(
+        StatusCodes.Status204NoContent,
+        "Contract details updated successfully.",
+        new { contractId = result.Data } 
+    )
+);
+
     }
 
     [Authorize]
@@ -143,7 +150,7 @@ public class Contract : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, bool? priceFilter, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
+    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, int? priceFilter, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
     {
         var actualUserId = jwtService.GetUserId().ToInt();
 

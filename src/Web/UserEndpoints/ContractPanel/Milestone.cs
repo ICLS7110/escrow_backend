@@ -73,7 +73,7 @@ public class Milestone : EndpointGroupBase
             }
 
             // ✅ Success response
-            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Milestones created/updated successfully.", null));
+            return TypedResults.Ok(result);
         }
         catch (Exception ex)
         {
@@ -113,8 +113,8 @@ public class Milestone : EndpointGroupBase
     }
 
 
-    [Authorize] 
-    public async Task<IResult> UpdateMilestoneStatus(ISender sender,IJwtService jwtService,IHttpContextAccessor httpContextAccessor,UpdateMilestoneStatusCommand command)
+    [Authorize]
+    public async Task<IResult> UpdateMilestoneStatus(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, UpdateMilestoneStatusCommand command)
     {
         var result = await sender.Send(command);
 

@@ -90,12 +90,4 @@ public class PermissionManager : EndpointGroupBase
 
     }
 
-
-
-    //[Authorize]
-    //public async Task<IResult> AssignPermissionsToRole(ISender sender, [FromBody] AssignPermissionsCommand command)
-    //{
-    //    var result = await sender.Send(command);
-    //    return TypedResults.Ok(result);
-    //}
 }

@@ -133,34 +133,4 @@ public class EditContractDetailCommandHandler : IRequestHandler<EditContractDeta
         return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
     }
 
-
-    //public async Task<Result<int>> Handle(EditContractDetailCommand request, CancellationToken cancellationToken)
-    //{
-    //    int userid = _jwtService.GetUserId().ToInt();
-    //    var entity = await _context.ContractDetails.FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid);
-    //    if (entity == null)
-    //    {
-    //        return Result<int>.Failure(StatusCodes.Status404NotFound, "Contract Not Found.");
-    //    }
-
-    //    entity.Role = request.Role;
-    //    entity.ContractTitle = request.ContractTitle;
-    //    entity.ServiceType = request.ServiceType;
-    //    entity.ServiceDescription = request.ServiceDescription;
-    //    entity.AdditionalNote = request.AdditionalNote;
-    //    entity.FeesPaidBy = request.FeesPaidBy;
-    //    entity.FeeAmount = request.FeeAmount;
-    //    entity.BuyerName = request.BuyerName;
-    //    entity.BuyerMobile = request.BuyerMobile;
-    //    entity.SellerMobile = request.SellerMobile;
-    //    entity.SellerName = request.SellerName;
-    //    entity.Status = request.Status;
-    //    entity.ContractDoc = request.ContractDoc;
-    //    entity.BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null;
-    //    entity.SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null;
-
-    //    _context.ContractDetails.Update(entity);
-    //    await _context.SaveChangesAsync(cancellationToken);
-    //    return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
-    //}
 }
