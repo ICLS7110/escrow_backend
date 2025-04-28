@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="UserEndpoints\BankDetails\" />
     <None Include="wwwroot\welink-logo.png" />
   </ItemGroup>
 
