@@ -6,6 +6,10 @@ using Escrow.Api.Application.ContractPanel.MilestoneQueries;
 using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Application;
 using Escrow.Api.Application.Common.Models;
+using Microsoft.AspNetCore.Mvc;
+using Escrow.Api.Domain.Enums;
+using System.Text.Json;
+using Escrow.Api.Application.ContractPanel.ContractCommands;
 
 namespace Escrow.Api.Web.UserEndpoints.ContractPanel;
 
@@ -18,51 +22,108 @@ public class Milestone : EndpointGroupBase
         .WithOpenApi()
         .AddEndpointFilter(async (context, next) =>
         {
-            // Optional: Add custom authorization logic if needed
             return await next(context);
         });
 
-        userGroup.MapGet("/", GetMilestoneDetails).RequireAuthorization(policy => policy.RequireRole("User"));
-        //userGroup.MapGet("/summary", GetMilestonesSummary).RequireAuthorization(policy => policy.RequireRole("User"));
-        userGroup.MapPost("/", CreateMiliestone).RequireAuthorization(p => p.RequireRole("User"));
-        userGroup.MapPost("/update", UpdateMilestone).RequireAuthorization(policy => policy.RequireRole("User"));
+        userGroup.MapGet("/", GetMilestoneDetails).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/", CreateMilestone).RequireAuthorization(p => p.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/update", UpdateMilestones).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/status", UpdateMilestoneStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User))); // ✅ Mapped missing endpoint
     }
 
     [Authorize]
     public async Task<IResult> GetMilestoneDetails(ISender sender, IJwtService jwtService, int? contractId)
     {
-        var query = new GetMilestoneQuery { Id = jwtService.GetUserId().ToInt(), ContractId = contractId, PageNumber = 1, PageSize = 10 };
+        if (contractId == null || contractId <= 0)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid contract ID."));
+        }
+
+        var query = new GetMilestoneQuery
+        {
+            Id = jwtService.GetUserId().ToInt(),
+            ContractId = contractId,
+            PageNumber = 1,
+            PageSize = 10
+        };
+
         var result = await sender.Send(query);
+
         return TypedResults.Ok(Result<PaginatedList<MileStoneDTO>>.Success(StatusCodes.Status200OK, "Success", result));
     }
 
-    /*[Authorize]
-    public async Task<IResult> GetMilestonesSummary(ISender sender, IJwtService jwtService, int? contractId)
-    {
-        var query = new GetMilestoneQuery { Id = jwtService.GetUserId().ToInt(), ContractId = contractId, PageNumber = 1, PageSize = 10 };
-        var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<MileStoneDTO>>.Success(StatusCodes.Status200OK, "Success", result));
-    }*/
-
     [Authorize]
-    public async Task<IResult> CreateMiliestone(ISender sender, List<CreateMilestoneCommand> commands)
+    public async Task<IResult> CreateMilestone(ISender sender, CreateMilestoneCommand command)
     {
-        foreach (var command in commands)
+        // ✅ Validate request payload
+        if (command?.MileStoneDetails == null || !command.MileStoneDetails.Any())
         {
-            await sender.Send(command);
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data. Milestone details are required."));
         }
-        //var id = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Milestone Created Successfully.", new()));
+
+
+        try
+        {
+            var result = await sender.Send(command);
+
+            // ✅ Ensure `result` is valid
+            if (result == null)
+            {
+                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "No milestones were created or updated."));
+            }
+
+            // ✅ Success response
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] CreateMilestone: {ex}");
+            return TypedResults.Json(
+                Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected server error occurred."),
+                statusCode: StatusCodes.Status500InternalServerError
+            );
+        }
     }
 
+
     [Authorize]
-    public async Task<IResult> UpdateMilestone(ISender sender, List<EditMilestoneCommand> commands)
+    public async Task<IResult> UpdateMilestones(ISender sender, EditMilestoneCommand command)
     {
-        foreach (var command in commands)
+        if (command == null || command.Milestones == null || !command.Milestones.Any())
         {
-            await sender.Send(command);
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data. Milestone updates are required."));
         }
-        //await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Milestone details updated successfully.", new()));
+
+        try
+        {
+            var result = await sender.Send(command);
+
+            return result?.Data != null && result.Data.Any()
+                ? TypedResults.Ok(Result<List<int>>.Success(StatusCodes.Status200OK, "Milestones updated successfully.", result.Data))
+                : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No milestones were updated."));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] UpdateMilestones: {ex.Message}");
+            return TypedResults.Json(
+                Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected server error occurred."),
+                statusCode: StatusCodes.Status500InternalServerError
+            );
+        }
     }
+
+
+    [Authorize]
+    public async Task<IResult> UpdateMilestoneStatus(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, UpdateMilestoneStatusCommand command)
+    {
+        var result = await sender.Send(command);
+
+        //if (result.Status != StatusCodes.Status200OK)
+        //{
+        //    return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "No milestones Status were updated."));
+        //}
+
+        return TypedResults.Ok(result);
+    }
+
 }

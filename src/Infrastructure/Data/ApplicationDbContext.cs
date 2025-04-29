@@ -1,9 +1,14 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
+using Amazon.Auth.AccessControlPolicy;
 using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities;
+using Escrow.Api.Domain.Entities.Commissions;
 using Escrow.Api.Domain.Entities.ContractPanel;
+using Escrow.Api.Domain.Entities.ContractReviews;
+using Escrow.Api.Domain.Entities.Notifications;
+using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Configuration;
@@ -16,7 +21,7 @@ using Microsoft.Extensions.Options;
 namespace Escrow.Api.Infrastructure.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
-{    
+{
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,14 +35,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
-   
+
     public DbSet<UserDetail> UserDetails { get; set; }
-
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
-
     public DbSet<ContractDetails> ContractDetails => Set<ContractDetails>();
     public DbSet<MileStone> MileStones => Set<MileStone>();
-
+    public DbSet<SellerBuyerInvitation> SellerBuyerInvitations => Set<SellerBuyerInvitation>();
+    public DbSet<ContractReview> ContractReviews => Set<ContractReview>();
+    public DbSet<ContractDetailsLog> ContractDetailsLogs => Set<ContractDetailsLog>();
+    public DbSet<CommissionMaster> CommissionMasters => Set<CommissionMaster>();
+    public DbSet<Notification>  Notifications => Set<Notification>();
+    public DbSet<TeamMember>  TeamMembers => Set<TeamMember>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

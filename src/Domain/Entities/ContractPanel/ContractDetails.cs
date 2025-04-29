@@ -17,16 +17,23 @@ public class ContractDetails : BaseAuditableEntity
     public decimal? FeeAmount { get; set; }
     public string? BuyerName {  get; set; }
     public string? BuyerMobile { get; set; }
+    public string? ContractDoc { get; set; }
     public string? SellerName {  get; set; }
     public string? SellerMobile { get;  set; }
     public string Status {  get; set; } = string.Empty;
     public string? StatusReason { get; set; }    
+    public string? BuyerPayableAmount { get; set; }    
+    public string? SellerPayableAmount { get; set; }    
     public int? BuyerDetailsId { get; set; }
+    public decimal? TaxAmount { get; set; }
+    public decimal? EscrowTax { get; set; }
     public UserDetail? BuyerDetails { get; set; }
     public int? SellerDetailsId { get; set; }
     public UserDetail? SellerDetails { get; set; }
 
     public int? UserDetailId { get; set; }
+    public bool? IsActive { get; set; }
+    public bool? IsDeleted { get; set; }
     public UserDetail? UserDetail { get; set; }
     
     public ICollection<MileStone>? MileStones { get; set; } 

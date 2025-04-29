@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
@@ -24,7 +25,7 @@ public static class DependencyInjection
             .AddDbContextCheck<ApplicationDbContext>();
 
         builder.Services.AddTransient<ExceptionHandlingMiddleware>();
-       // builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+        // builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 
         // Customise default API behaviour
@@ -64,7 +65,7 @@ public static class DependencyInjection
 
 
 
-    
+
 
 
 }

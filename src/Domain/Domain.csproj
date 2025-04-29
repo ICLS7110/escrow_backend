@@ -17,4 +17,8 @@
     <PackageReference Include="MediatR" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Entities\Notifications\" />
+  </ItemGroup>
+
 </Project>
