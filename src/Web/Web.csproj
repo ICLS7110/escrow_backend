@@ -6,11 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AdminEndPoints\PermissionManagers\**" />
+    <Content Remove="AdminEndPoints\PermissionManagers\**" />
+    <EmbeddedResource Remove="AdminEndPoints\PermissionManagers\**" />
+    <None Remove="AdminEndPoints\PermissionManagers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="UserEndpoints\UserDetails.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
