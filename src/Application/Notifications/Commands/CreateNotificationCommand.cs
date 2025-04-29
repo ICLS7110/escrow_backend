@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Application.Notifications.Commands
 {
-    public class CreateNotificationCommand : IRequest<Result<int>>
+    public class CreateNotificationCommand : IRequest<Result<object>>
     {
         public string BuyerPhoneNumber { get; set; } = string.Empty;
         public string SellerPhoneNumber { get; set; } = string.Empty;
@@ -23,7 +23,7 @@ namespace Escrow.Api.Application.Notifications.Commands
         public string Description { get; set; } = string.Empty;
     }
 
-    public class CreateNotificationCommandHandler : IRequestHandler<CreateNotificationCommand, Result<int>>
+    public class CreateNotificationCommandHandler : IRequestHandler<CreateNotificationCommand, Result<object>>
     {
         private readonly IApplicationDbContext _context;
         private readonly INotificationService _notificationService;
@@ -39,15 +39,15 @@ namespace Escrow.Api.Application.Notifications.Commands
             _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
         }
 
-        public async Task<Result<int>> Handle(CreateNotificationCommand request, CancellationToken cancellationToken)
+        public async Task<Result<object>> Handle(CreateNotificationCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(request.BuyerPhoneNumber) || string.IsNullOrWhiteSpace(request.SellerPhoneNumber))
-                    return Result<int>.Failure(StatusCodes.Status400BadRequest, "Phone numbers are required.");
+                    return Result<object>.Failure(StatusCodes.Status400BadRequest, "Phone numbers are required.");
 
                 if (request.ContractId <= 0)
-                    return Result<int>.Failure(StatusCodes.Status400BadRequest, "Invalid ContractId.");
+                    return Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid ContractId.");
 
                 var currentUserId = _jwtService.GetUserId();
 
@@ -60,7 +60,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                         UserId = Guid.NewGuid().ToString(),
                         PhoneNumber = request.BuyerPhoneNumber,
                         Created = DateTime.UtcNow,
-                        Role= nameof(Roles.User)
+                        Role = nameof(Roles.User)
                     };
                     _context.UserDetails.Add(buyer);
                     await _context.SaveChangesAsync(cancellationToken);
@@ -85,13 +85,13 @@ namespace Escrow.Api.Application.Notifications.Commands
                 int fromId, toId;
                 string? targetDeviceToken = null;
 
-                if (buyer.UserId == currentUserId)
+                if (buyer.Id.ToString() == currentUserId)
                 {
                     fromId = buyer.Id;
                     toId = seller.Id;
                     targetDeviceToken = seller.DeviceToken;
                 }
-                else if (seller.UserId == currentUserId)
+                else if (seller.Id.ToString() == currentUserId)
                 {
                     fromId = seller.Id;
                     toId = buyer.Id;
@@ -99,7 +99,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                 }
                 else
                 {
-                    return Result<int>.Failure(StatusCodes.Status403Forbidden, "Unauthorized user context.");
+                    return Result<object>.Failure(StatusCodes.Status403Forbidden, "Unauthorized user context.");
                 }
 
                 // Create notification record
@@ -118,7 +118,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                // Send Push Notification to ToID
+                // Send Push Notification
                 if (!string.IsNullOrWhiteSpace(targetDeviceToken))
                 {
                     try
@@ -136,12 +136,16 @@ namespace Escrow.Api.Application.Notifications.Commands
                     }
                 }
 
-                return Result<int>.Success(StatusCodes.Status200OK, "Notification created and push sent (if available).", notification.Id);
+                return Result<object>.Success(
+                    StatusCodes.Status200OK,
+                    "Notification created successfully.",
+                    new { NotificationId = notification.Id }
+                );
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Error] CreateNotificationCommandHandler: {ex.Message}");
-                return Result<int>.Failure(StatusCodes.Status500InternalServerError, "Unexpected Server Error.");
+                return Result<object>.Failure(StatusCodes.Status500InternalServerError, "Unexpected Server Error.");
             }
         }
     }

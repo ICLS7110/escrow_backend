@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.Common.Models;
+﻿using Amazon.S3.Model.Internal.MarshallTransformations;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Application.Notifications.Commands;
 using Escrow.Api.Application.Notifications.Queries;
@@ -99,41 +100,28 @@ public class NotificationEndpoint : EndpointGroupBase
     {
         try
         {
-            if (command == null)
-            {
-                Console.WriteLine("CreateNotification: Received null command.");
-                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request payload."));
-            }
-
-            Console.WriteLine($"CreateNotification: Received request for Title={command.Title}, Buyer={command.BuyerPhoneNumber}, Seller={command.SellerPhoneNumber}");
 
             var result = await sender.Send(command);
-
-            Console.WriteLine($"CreateNotification Response: Status={result.Status}, Message={result.Message}, Data={result.Data}");
-
-            if (result.Status == StatusCodes.Status200OK && result.Data > 0)
+            if (result.Status == StatusCodes.Status400BadRequest)
             {
-                // Return Created (201) with the new notification ID in response
-                return TypedResults.Created($"/api/notifications/{result.Data}",
-                    Result<int>.Success(StatusCodes.Status201Created, "Notification created successfully.", result.Data));
+                return TypedResults.BadRequest(result);
             }
 
-            return result.Status switch
+            if (result.Status == StatusCodes.Status404NotFound)
             {
-                StatusCodes.Status400BadRequest => TypedResults.BadRequest(result),
-                StatusCodes.Status404NotFound => TypedResults.NotFound(result),
-                StatusCodes.Status500InternalServerError => TypedResults.Json(result, statusCode: StatusCodes.Status500InternalServerError),
-                StatusCodes.Status201Created => TypedResults.Created($"/api/notifications/{result.Data}", result),
-                StatusCodes.Status200OK => TypedResults.Created($"/api/notifications/{result.Data}", result),
-                _ => TypedResults.Ok(result)
-            };
+                return TypedResults.NotFound(result);
+            }
+
+            return TypedResults.Ok(result);
 
         }
         catch (Exception ex)
         {
             Console.WriteLine($"CreateNotification Exception: {ex.Message} | StackTrace: {ex.StackTrace}");
-            return TypedResults.Json(Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected error occurred."),
-                statusCode: StatusCodes.Status500InternalServerError);
+            return TypedResults.Json(
+                Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected error occurred."),
+                statusCode: StatusCodes.Status500InternalServerError
+            );
         }
     }
 

@@ -91,7 +91,8 @@ public class FileUploadController : ControllerBase
             {
                 if (file.Length > 0)
                 {
-                    var fileName = $"{Guid.NewGuid()}$${file.FileName}";
+                    var fileName = $"We_link_{file.FileName}";
+                    //var fileName = $"{Guid.NewGuid()}$${file.FileName}";
                     var filePath = Path.Combine(uploadPath, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
