@@ -1,13 +1,14 @@
 
-using Escrow.Api.Infrastructure.Data;
-using Escrow.Api.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Helpers;
+using Escrow.Api.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 
 
@@ -67,10 +68,11 @@ builder.Services.AddOpenIddict()
     options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });*/
-builder.Services.AddAuthentication(options =>{
+builder.Services.AddAuthentication(options =>
+{
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options=> 
+}).AddJwtBearer(options =>
 {
     options.Events = new JwtBearerEvents
     {
@@ -85,7 +87,8 @@ builder.Services.AddAuthentication(options =>{
     var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
         ?? throw new InvalidOperationException("Jwt:IssuerSigningKey is missing in the configuration.");
 
-    options.TokenValidationParameters = new TokenValidationParameters {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -113,8 +116,11 @@ builder.AddInfrastructureServices();
 builder.AddWebServices();
 builder.Services.AddControllers();
 
-builder.Logging.AddConsole();
-builder.Logging.SetMinimumLevel(LogLevel.Debug);
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 app.UseCors("AllowAll");
@@ -164,7 +170,7 @@ app.UseAntiforgery();
 app.Map("/", () => Results.Redirect("/api"));
 
 app.MapEndpoints();
-
+Log.Information("Starting web application");
 app.Run();
 
 public partial class Program { }

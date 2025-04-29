@@ -1,22 +1,18 @@
 ﻿using System.Reflection;
-using System.Reflection.Emit;
-using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Domain.Entities;
+using Escrow.Api.Domain.Entities.AnbConnectWebhook;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
-using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
-{    
+{
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,13 +26,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
-   
+
     public DbSet<UserDetail> UserDetails { get; set; }
 
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
 
     public DbSet<ContractDetails> ContractDetails => Set<ContractDetails>();
     public DbSet<MileStone> MileStones => Set<MileStone>();
+
+    public DbSet<AnbWebhookLog> AnbWebhookLogs => Set<AnbWebhookLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -48,6 +46,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Entity<BankDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
         builder.Entity<UserDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
+        builder.Entity<AnbWebhookLog>().Property(t => t.Payload).HasColumnType("json");
     }
 
     public Task<int> SaveChangesAsync()
