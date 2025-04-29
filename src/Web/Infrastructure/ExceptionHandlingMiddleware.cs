@@ -20,13 +20,14 @@ public class ExceptionHandlingMiddleware : IMiddleware
         {
             await _next(context);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
 
             await ExceptionHandlerAsync(context, e);
         }
     }
 
-  
+
     private async Task ExceptionHandlerAsync(HttpContext context, Exception exception)
     {
         Result<object> result = Result<object>.Failure(500, "Unexpected Server Error.");

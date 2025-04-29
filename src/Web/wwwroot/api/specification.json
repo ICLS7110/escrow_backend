@@ -6,94 +6,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Milestone": {
-      "get": {
-        "tags": [
-          "Milestone"
-        ],
-        "operationId": "GetApiMilestone",
-        "parameters": [
-          {
-            "name": "contractId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "Milestone"
-        ],
-        "operationId": "PostApiMilestone",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateMilestoneCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      }
-    },
-    "/api/Milestone/update": {
-      "post": {
-        "tags": [
-          "Milestone"
-        ],
-        "operationId": "PostApiMilestoneUpdate",
-        "requestBody": {
-          "x-name": "command",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EditMilestoneCommand"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      }
-    },
     "/api/Users/register": {
       "post": {
         "tags": [
@@ -931,6 +843,160 @@
         ]
       }
     },
+    "/api/Auth/request-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "PostApiAuthRequestOtp",
+        "requestBody": {
+          "x-name": "query",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Auth/verify-otp": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "PostApiAuthVerifyOtp",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOTPQuery"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Milestone": {
+      "get": {
+        "tags": [
+          "Milestone"
+        ],
+        "operationId": "GetApiMilestone",
+        "parameters": [
+          {
+            "name": "contractId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Milestone"
+        ],
+        "operationId": "PostApiMilestone",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMilestoneCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Milestone/update": {
+      "post": {
+        "tags": [
+          "Milestone"
+        ],
+        "operationId": "PostApiMilestoneUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditMilestoneCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/AnbNotifications/webhook": {
+      "post": {
+        "tags": [
+          "AnbNotifications"
+        ],
+        "operationId": "HandleAnbNotification",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/files/Upload-Files": {
       "post": {
         "tags": [
@@ -974,246 +1040,10 @@
           }
         ]
       }
-    },
-    "/api/auth/request-otp": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "Auth_RequestOtp",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RequestOtpDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/auth/verify-otp": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "operationId": "Auth_VerifyOtp",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyOtpDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
-      "CreateMilestoneCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "documents": {
-            "type": "string",
-            "nullable": true
-          },
-          "contractId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "contractDetails": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ContractDetailsDTO"
-              }
-            ]
-          }
-        }
-      },
-      "ContractDetailsDTO": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "role": {
-            "type": "string"
-          },
-          "contractTitle": {
-            "type": "string"
-          },
-          "serviceType": {
-            "type": "string"
-          },
-          "serviceDescription": {
-            "type": "string"
-          },
-          "additionalNote": {
-            "type": "string",
-            "nullable": true
-          },
-          "feesPaidBy": {
-            "type": "string"
-          },
-          "feeAmount": {
-            "type": "number",
-            "format": "decimal",
-            "nullable": true
-          },
-          "buyerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "buyerMobile": {
-            "type": "string",
-            "nullable": true
-          },
-          "sellerName": {
-            "type": "string",
-            "nullable": true
-          },
-          "sellerMobile": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "string"
-          },
-          "mileStones": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/MileStoneDTO"
-            }
-          }
-        }
-      },
-      "MileStoneDTO": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "amount": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "documents": {
-            "type": "string",
-            "nullable": true
-          },
-          "contractId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "contractDetails": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ContractDetailsDTO"
-              }
-            ]
-          }
-        }
-      },
-      "EditMilestoneCommand": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "contractId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "milestoneTitle": {
-            "type": "string"
-          },
-          "milestoneDescription": {
-            "type": "string"
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "amount": {
-            "type": "number",
-            "format": "decimal"
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      },
       "HttpValidationProblemDetails": {
         "allOf": [
           {
@@ -1542,6 +1372,107 @@
           }
         }
       },
+      "MileStoneDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "documents": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "contractDetails": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContractDetailsDTO"
+              }
+            ]
+          }
+        }
+      },
+      "ContractDetailsDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "role": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": "string"
+          },
+          "serviceType": {
+            "type": "string"
+          },
+          "serviceDescription": {
+            "type": "string"
+          },
+          "additionalNote": {
+            "type": "string",
+            "nullable": true
+          },
+          "feesPaidBy": {
+            "type": "string"
+          },
+          "feeAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "buyerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "buyerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerMobile": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string"
+          },
+          "mileStones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MileStoneDTO"
+            }
+          }
+        }
+      },
       "EditContractDetailCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -1635,7 +1566,7 @@
           }
         }
       },
-      "RequestOtpDto": {
+      "RequestOtpQuery": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1647,7 +1578,7 @@
           }
         }
       },
-      "VerifyOtpDto": {
+      "VerifyOTPQuery": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1658,6 +1589,75 @@
             "type": "string"
           },
           "otp": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateMilestoneCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "documents": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "contractDetails": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ContractDetailsDTO"
+              }
+            ]
+          }
+        }
+      },
+      "EditMilestoneCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "milestoneTitle": {
+            "type": "string"
+          },
+          "milestoneDescription": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "status": {
             "type": "string"
           }
         }
