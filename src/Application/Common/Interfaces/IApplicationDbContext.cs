@@ -1,7 +1,7 @@
-﻿using System.Globalization;
-using Escrow.Api.Domain.Entities;
+﻿using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.AMLPanel;
+using Escrow.Api.Domain.Entities.AnbConnectWebhook;
 using Escrow.Api.Domain.Entities.Commissions;
 using Escrow.Api.Domain.Entities.ContactUsPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
@@ -19,7 +19,7 @@ using Escrow.Api.Domain.Enums;
 namespace Escrow.Api.Application.Common.Interfaces;
 
 public interface IApplicationDbContext
-{
+{   
     DbSet<UserDetail> UserDetails { get; }
     DbSet<Page> Pages { get; }
     DbSet<BankDetail> BankDetails { get; }
@@ -44,6 +44,7 @@ public interface IApplicationDbContext
     DbSet<Menu> Menus { get; }
     DbSet<RoleMenuPermission> RoleMenuPermissions { get; }
     DbSet<Permission> Permissions { get; }
+    DbSet<AnbWebhookLog> AnbWebhookLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

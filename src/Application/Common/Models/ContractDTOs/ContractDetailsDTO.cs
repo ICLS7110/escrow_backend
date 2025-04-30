@@ -39,6 +39,8 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
         public SellerBuyerInvitation? InvitationDetails { get; set; }
+        public List<TeamDTO> TeamMembers { get; set; } = new();
+
     }
 
     public class ContractDTO
@@ -75,5 +77,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
         public SellerBuyerInvitation? InvitationDetails { get; set; }
+        public List<TeamDTO> TeamMembers { get; set; } = new();
+
     }
 }

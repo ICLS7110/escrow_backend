@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250429114035_webhook")]
-    partial class Webhook
+    [Migration("20250430063846_Add_GroupId_in_notification")]
+    partial class Add_GroupId_in_notification
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -296,6 +296,54 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AdminUsers");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.AnbConnectWebhook.AnbWebhookLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AnbWebhookLogs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Commissions.CommissionMaster", b =>
@@ -942,6 +990,9 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.Property<int>("FromID")
                         .HasColumnType("integer");
+
+                    b.Property<string>("GroupId")
+                        .HasColumnType("text");
 
                     b.Property<bool?>("IsRead")
                         .HasColumnType("boolean");

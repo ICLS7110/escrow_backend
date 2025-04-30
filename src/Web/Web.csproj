@@ -37,6 +37,16 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FluentValidation.AspNetCore" />
+    <PackageReference Include="OpenIddict.Abstractions" />
+    <PackageReference Include="OpenIddict.AspNetCore" />
+    <PackageReference Include="OpenIddict.Core" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" />
+    <PackageReference Include="OpenIddict.Validation" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
     <PackageReference Include="Twilio" />
   </ItemGroup>

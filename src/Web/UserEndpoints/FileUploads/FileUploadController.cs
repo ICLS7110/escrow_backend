@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Escrow.Api.Web.UserEndpoints.FileUploads;
-[Route("api/files")]
+[Route("api/fileupload")]
 [ApiController]
 public class FileUploadController : ControllerBase
 {
@@ -34,6 +34,16 @@ public class FileUploadController : ControllerBase
             return TypedResults.Ok(Result<List<string>>.Success(StatusCodes.Status200OK, "Success", fileUrls));
         }
         return TypedResults.BadRequest(Result<string>.Failure(StatusCodes.Status400BadRequest, "Something went wrong in saving the files."));
+    }
+
+
+
+    [HttpGet]
+    [Authorize]
+    [Route("checktoken")]
+    public IActionResult checktoken()
+    {
+        return Ok(new { message = "Authenticated successfully!" });
     }
 
 

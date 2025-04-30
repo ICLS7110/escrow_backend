@@ -1,0 +1,40 @@
+﻿<!-- wwwroot/swagger/oauth2-redirect.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth2 Redirect</title>
+</head>
+<body>
+    <script>
+        (function () {
+            debugger;
+            const hash = window.location.hash.substring(1); // removes leading #
+            const params = new URLSearchParams(hash);
+
+            const access_token = params.get('access_token');
+            const id_token = params.get('id_token');
+            const token_type = params.get('token_type');
+
+            if (access_token && id_token) {
+                const tokenData = {
+                    Google: {
+                        token: {
+                            access_token,
+                            id_token,
+                            token_type
+                        }
+                    }
+                };
+                localStorage.setItem('swagger_oauth2_access_token', JSON.stringify(tokenData));
+                console.log("✅ Token saved to localStorage");
+            } else {
+                console.warn("❌ Token not found in URL hash");
+            }
+
+            // Redirect back to Swagger UI
+            window.location.href = "/swagger";
+        })();
+    </script>
+</body>
+</html>

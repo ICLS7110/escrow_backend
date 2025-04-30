@@ -48,30 +48,65 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
         var notifications = new List<NotificationDTO>();
         try
         {
-            // Join with Contracts to determine user role
+
             notifications = await query
-                .OrderByDescending(n => n.Id)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Join(_context.ContractDetails,
-                    notification => notification.ContractId,
-                    contract => contract.Id,
-                    (notification, contract) => new { notification, contract })
-                .Select(x => new NotificationDTO
-                {
-                    Id = x.notification.Id,
-                    FromID = x.notification.FromID,
-                    ToID = x.notification.ToID,
-                    ContractId = x.notification.ContractId,
-                    Type = x.notification.Type,
-                    Title = x.notification.Title,
-                    Description = x.notification.Description,
-                    IsRead = x.notification.IsRead,
-                    CreatedAt = x.notification.Created.DateTime,
-                    Role = x.contract.Role,
-                    unreadCount=unreadCount.ToString()
-                })
-                .ToListAsync(cancellationToken);
+    .OrderByDescending(n => n.Id)
+    .Skip((request.PageNumber - 1) * request.PageSize)
+    .Take(request.PageSize)
+    .Join(_context.ContractDetails,
+        notification => notification.ContractId,
+        contract => contract.Id,
+        (notification, contract) => new { notification, contract })
+    .Join(_context.UserDetails,
+        combined => combined.notification.ToID,
+        user => user.Id,
+        (combined, receiver) => new { combined.notification, combined.contract, receiver })
+    .Select(x => new NotificationDTO
+    {
+        Id = x.notification.Id,
+        FromID = x.notification.FromID,
+        ToID = x.notification.ToID,
+        ContractId = x.notification.ContractId,
+        Type = x.notification.Type,
+        Title = x.notification.Title,
+        Description = x.notification.Description,
+        IsRead = x.notification.IsRead,
+        GroupId = x.notification.GroupId,
+        CreatedAt = x.notification.Created.DateTime,
+        Role = x.contract.Role,
+        ContractTitle = x.contract.ContractTitle,
+        unreadCount = unreadCount.ToString(),
+        ReceiverName = x.receiver.FullName ?? string.Empty,
+        ReceiverImage = x.receiver.ProfilePicture ?? string.Empty
+    })
+    .ToListAsync(cancellationToken);
+
+            // Join with Contracts to determine user role
+            //notifications = await query
+            //    .OrderByDescending(n => n.Id)
+            //    .Skip((request.PageNumber - 1) * request.PageSize)
+            //    .Take(request.PageSize)
+            //    .Join(_context.ContractDetails,
+            //        notification => notification.ContractId,
+            //        contract => contract.Id,
+            //        (notification, contract) => new { notification, contract })
+            //    .Select(x => new NotificationDTO
+            //    {
+            //        Id = x.notification.Id,
+            //        FromID = x.notification.FromID,
+            //        ToID = x.notification.ToID,
+            //        ContractId = x.notification.ContractId,
+            //        Type = x.notification.Type,
+            //        Title = x.notification.Title,
+            //        Description = x.notification.Description,
+            //        IsRead = x.notification.IsRead,
+            //        GroupId = x.notification.GroupId,
+            //        CreatedAt = x.notification.Created.DateTime,
+            //        Role = x.contract.Role,
+            //        ContractTitle = x.contract.ContractTitle,
+            //        unreadCount = unreadCount.ToString()
+            //    })
+            //    .ToListAsync(cancellationToken);
         }
         catch (Exception ex)
         {

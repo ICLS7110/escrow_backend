@@ -36,6 +36,7 @@ public class GetNotificationByIdQueryHandler : IRequestHandler<GetNotificationBy
                 Title = n.Title,
                 IsRead = n.IsRead,
                 Description = n.Description,
+                GroupId = n.GroupId,
             })
             .FirstOrDefaultAsync(cancellationToken);
 

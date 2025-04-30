@@ -8,6 +8,7 @@ using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.AMLPanel;
 using Escrow.Api.Domain.Entities.Commissions;
 using Escrow.Api.Domain.Entities.ContactUsPanel;
+using Escrow.Api.Domain.Entities.AnbConnectWebhook;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.ContractReviews;
 using Escrow.Api.Domain.Entities.Disputes;
@@ -19,12 +20,10 @@ using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.Transactions;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
-using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Data;
 
@@ -68,6 +67,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Menu> Menus => Set<Menu>();
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<RoleMenuPermission> RoleMenuPermissions => Set<RoleMenuPermission>();
+
+    public DbSet<AnbWebhookLog> AnbWebhookLogs => Set<AnbWebhookLog>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -78,6 +80,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Entity<BankDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
         builder.Entity<UserDetail>().HasQueryFilter(p => p.RecordState == RecordState.Active);
+        builder.Entity<AnbWebhookLog>().Property(t => t.Payload).HasColumnType("json");
     }
 
     public Task<int> SaveChangesAsync()

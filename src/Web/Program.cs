@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿
+using System.Text;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Infrastructure.Configuration;
@@ -70,10 +71,10 @@ builder.Services.AddOpenIddict()
     options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });*/
-builder.Services.AddAuthentication(options =>{
+builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options=> 
+}).AddJwtBearer(options =>
 {
     options.Events = new JwtBearerEvents
     {
@@ -88,7 +89,8 @@ builder.Services.AddAuthentication(options =>{
     var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
         ?? throw new InvalidOperationException("Jwt:IssuerSigningKey is missing in the configuration.");
 
-    options.TokenValidationParameters = new TokenValidationParameters {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
