@@ -15,11 +15,8 @@
 
   <ItemGroup>
     <Compile Remove="Exceptions\**" />
-    <Compile Remove="PermissionManagers\**" />
     <EmbeddedResource Remove="Exceptions\**" />
-    <EmbeddedResource Remove="PermissionManagers\**" />
     <None Remove="Exceptions\**" />
-    <None Remove="PermissionManagers\**" />
   </ItemGroup>
 
   <ItemGroup>
