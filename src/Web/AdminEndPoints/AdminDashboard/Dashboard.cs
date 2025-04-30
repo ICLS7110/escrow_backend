@@ -23,6 +23,11 @@ public class Dashboard : EndpointGroupBase
         dashboardGroup.MapGet("/admin-commission-last-12-months", GetAdminCommissionLast12Months);
         //dashboardGroup.MapGet("/projected-commission-next-6-months", GetProjectedCommissionNext6Months);
         dashboardGroup.MapGet("/escrow-amount", GetAmountInEscrow);
+
+
+        //new Api's For DAshBoard Counts
+        dashboardGroup.MapGet("/dashboard-counts", GetDashboardCounts);
+        dashboardGroup.MapGet("/dashboard-listings", GetDashboardListings);
     }
 
     [Authorize]
@@ -61,4 +66,28 @@ public class Dashboard : EndpointGroupBase
         var result = await sender.Send(new GetEscrowAmountQuery());
         return TypedResults.Ok(result);
     }
+
+
+
+
+
+
+
+
+    [Authorize]
+    public async Task<IResult> GetDashboardCounts(ISender sender)
+    {
+        var result = await sender.Send(new GetDashboardCountsQuery());
+        return TypedResults.Ok(result);
+    }
+
+    [Authorize]
+    public async Task<IResult> GetDashboardListings(ISender sender)
+    {
+        var result = await sender.Send(new GetDashboardListingsQuery());
+        return TypedResults.Ok(result);
+    }
+
+
+
 }
