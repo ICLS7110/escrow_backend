@@ -3,6 +3,7 @@ using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.AMLPanel;
 using Escrow.Api.Domain.Entities.Commissions;
+using Escrow.Api.Domain.Entities.ContactUsPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.ContractReviews;
 using Escrow.Api.Domain.Entities.Disputes;
@@ -39,6 +40,7 @@ public interface IApplicationDbContext
     DbSet<Notification> Notifications { get; }
     DbSet<ContractReview> ContractReviews { get; }
     DbSet<ContractDetailsLog> ContractDetailsLogs { get; }
+    DbSet<ContactUs> ContactUs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

@@ -54,7 +54,6 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 Gender = request.Gender,
                 DateOfBirth = request.DateOfBirth,
                 BusinessManagerName = request.BusinessManagerName,
-                BusinessEmail = request.BusinessEmail,
                 VatId = request.VatId,               
                 LoginMethod = request.LoginMethod,
                 BusinessProof= request.BusinessProof,

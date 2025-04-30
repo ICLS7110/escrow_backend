@@ -7,6 +7,7 @@ using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.AMLPanel;
 using Escrow.Api.Domain.Entities.Commissions;
+using Escrow.Api.Domain.Entities.ContactUsPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.ContractReviews;
 using Escrow.Api.Domain.Entities.Disputes;
@@ -61,6 +62,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<ContractReview> ContractReviews => Set<ContractReview>();
     public DbSet<ContractDetailsLog> ContractDetailsLogs => Set<ContractDetailsLog>();
+    public DbSet<ContactUs> ContactUs => Set<ContactUs>();
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
