@@ -117,7 +117,7 @@ builder.AddInfrastructureServices();
 builder.AddWebServices();
 builder.Services.AddControllers();
 
-//builder.Services.AddScoped<IEmailService, EmailConfiguration>();
+builder.Services.AddScoped<IEmailService, EmailConfiguration>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 builder.Services.Configure<FormOptions>(options =>

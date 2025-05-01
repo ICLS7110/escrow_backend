@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Escrow.Api.Domain.Entities;
+﻿using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.AMLPanel;
 using Escrow.Api.Domain.Entities.Commissions;
@@ -10,11 +9,11 @@ using Escrow.Api.Domain.Entities.Disputes;
 using Escrow.Api.Domain.Entities.EmailTemplates;
 using Escrow.Api.Domain.Entities.Notifications;
 using Escrow.Api.Domain.Entities.Pages;
+using Escrow.Api.Domain.Entities.RoleMenuPermissions;
 using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.Transactions;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
-using MediatR;
 
 namespace Escrow.Api.Application.Common.Interfaces;
 
@@ -35,12 +34,15 @@ public interface IApplicationDbContext
     DbSet<AMLSettings> AMLSettings { get; }
     DbSet<AMLNotification> AMLNotifications { get; }
     DbSet<AMLTransactionVerification> AMLTransactionVerifications { get; }
+    DbSet<ContactUs> ContactUs { get; }
     DbSet<EmailTemplate> EmailTemplates { get; }
     DbSet<TeamMember> TeamMembers { get; }
     DbSet<Notification> Notifications { get; }
     DbSet<ContractReview> ContractReviews { get; }
     DbSet<ContractDetailsLog> ContractDetailsLogs { get; }
-    DbSet<ContactUs> ContactUs { get; }
+    DbSet<Menu> Menus { get; }
+    DbSet<RoleMenuPermission> RoleMenuPermissions { get; }
+    DbSet<Permission> Permissions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();
