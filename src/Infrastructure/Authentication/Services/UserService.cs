@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Application.Common.Models;
 
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
@@ -80,6 +81,26 @@ namespace Escrow.Api.Infrastructure.Authentication.Services
             await _context.SaveChangesAsync();
 
             return Result<UserDetail>.Success(StatusCodes.Status200OK, "User created successfully", newUser);
+        }
+
+
+        public async Task<bool> UserExistsAsync(string email)
+        {
+            return await _context.UserDetails.AnyAsync(u => u.EmailAddress == email);
+        }
+
+        public async Task CreateUserAsync(CreateUserDto dto)
+        {
+            var user = new UserDetail
+            {
+                EmailAddress = dto.Email,
+                FullName = dto.FullName,
+                ProfilePicture = dto.ProfilePictureUrl,
+                Created = DateTime.UtcNow
+            };
+
+            _context.UserDetails.Add(user);
+            await _context.SaveChangesAsync();
         }
     }
 }

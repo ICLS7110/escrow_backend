@@ -11,6 +11,7 @@
             const code = params.get('code');  // The authorization code
             debugger;
             if (code) {
+                debugger;
                 // Set your client_id, client_secret, and redirect_uri
                 const clientId = '44473283156-7op213480o9p3jagklfremnp8qunugm3.apps.googleusercontent.com';
                 const clientSecret = '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';
@@ -31,6 +32,7 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        debugger;
                         if (data.id_token && data.access_token) {
                             // Store the id_token and access_token in localStorage
                             localStorage.setItem('id_token', data.id_token);
@@ -40,7 +42,7 @@
                             console.error("❌ Failed to retrieve tokens");
                         }
                         // Redirect to Swagger UI after saving the tokens
-                        window.location.href = "/swagger";
+                        window.location.href = "/api";
                     })
                     .catch(error => {
                         console.error("Error exchanging code:", error);

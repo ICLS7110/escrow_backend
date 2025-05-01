@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\swagger\**" />
+    <Content Remove="wwwroot\swagger\**" />
+    <EmbeddedResource Remove="wwwroot\swagger\**" />
+    <None Remove="wwwroot\swagger\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="UserEndpoints\UserDetails.cs" />
   </ItemGroup>
 

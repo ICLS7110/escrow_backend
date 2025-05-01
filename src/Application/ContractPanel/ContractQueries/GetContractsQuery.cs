@@ -37,8 +37,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
 
         public async Task<PaginatedList<ContractDetailsDTO>> Handle(GetContractsQuery request, CancellationToken cancellationToken)
         {
-            var activeStatuses = new List<string> { nameof(ContractStatus.Accepted), nameof(ContractStatus.Completed), nameof(ContractStatus.Escrow) };
-            var inactiveStatuses = new List<string> { nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired) };
+            var activeStatuses = new List<string> { nameof(ContractStatus.Accepted),  nameof(ContractStatus.Escrow),  nameof(ContractStatus.Pending) };
+            var inactiveStatuses = new List<string> { nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired) , nameof(ContractStatus.Draft),nameof(ContractStatus.Completed),nameof(ContractStatus.Cancelled)};
             var query = _context.ContractDetails.AsQueryable();
 
             // User-specific filtering

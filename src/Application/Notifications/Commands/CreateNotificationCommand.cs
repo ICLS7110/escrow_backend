@@ -78,13 +78,13 @@ namespace Escrow.Api.Application.Notifications.Commands
                         UserId = Guid.NewGuid().ToString(),
                         PhoneNumber = request.SellerPhoneNumber,
                         Created = DateTime.UtcNow,
-                        Role = nameof(Roles.User)
+                        Role = nameof(Roles.User),
                     };
                     _context.UserDetails.Add(seller);
                     await _context.SaveChangesAsync(cancellationToken);
                 }
 
-                // Determine FromID and ToID based on who is the logged-in user
+                // Determine FromID and ToID
                 int fromId, toId;
                 string? targetDeviceToken = null;
 
@@ -105,7 +105,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                     return Result<object>.Failure(StatusCodes.Status403Forbidden, "Unauthorized user context.");
                 }
 
-                // Create notification record
+                // Create notification for user
                 var notification = new Notification
                 {
                     FromID = fromId,
@@ -122,7 +122,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                // Fetch extra info for push payload
+                // Fetch contract title
                 var contract = await _context.ContractDetails
                     .Where(c => c.Id == request.ContractId)
                     .Select(c => new { c.Id, c.ContractTitle })
@@ -134,7 +134,7 @@ namespace Escrow.Api.Application.Notifications.Commands
                 var receiverName = receiver.FullName ?? "User";
                 var receiverImage = receiver.ProfilePicture ?? "";
 
-                // Send Push Notification
+                // Send push to other user
                 if (!string.IsNullOrWhiteSpace(targetDeviceToken))
                 {
                     try
@@ -160,9 +160,58 @@ namespace Escrow.Api.Application.Notifications.Commands
                     }
                 }
 
+                // Create and send notifications to all admins
+                var adminUsers = await _context.UserDetails
+                    .Where(u => u.Role == nameof(Roles.Admin))
+                    .ToListAsync(cancellationToken);
+
+                foreach (var admin in adminUsers)
+                {
+                    var adminNotification = new Notification
+                    {
+                        FromID = fromId,
+                        ToID = admin.Id,
+                        ContractId = request.ContractId,
+                        Type = request.Type,
+                        Title = request.Title,
+                        Description = request.Description,
+                        Created = DateTime.UtcNow,
+                        IsRead = false,
+                        GroupId = string.IsNullOrWhiteSpace(request.GroupId) ? null : request.GroupId,
+                    };
+
+                    _context.Notifications.Add(adminNotification);
+
+                    if (!string.IsNullOrWhiteSpace(admin.DeviceToken))
+                    {
+                        try
+                        {
+                            await _notificationService.SendPushNotificationAsync(
+                                admin.DeviceToken,
+                                $"[ADMIN] {request.Title}",
+                                request.Description,
+                                new
+                                {
+                                    GroupId = request.GroupId,
+                                    ContractId = request.ContractId,
+                                    ContractTitle = contractTitle,
+                                    FromUser = currentUserId,
+                                    Type = request.Type
+                                }
+                            );
+                        }
+                        catch (Exception adminPushEx)
+                        {
+                            Console.WriteLine($"[Warning] Admin push failed for {admin.Id}: {adminPushEx.Message}");
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync(cancellationToken);
+
                 return Result<object>.Success(
                     StatusCodes.Status200OK,
-                    "Notification created successfully.",
+                    "Notification created successfully (including admin).",
                     new { NotificationId = notification.Id }
                 );
             }
@@ -172,6 +221,139 @@ namespace Escrow.Api.Application.Notifications.Commands
                 return Result<object>.Failure(StatusCodes.Status500InternalServerError, "Unexpected Server Error.");
             }
         }
+
+
+
+        //public async Task<Result<object>> Handle(CreateNotificationCommand request, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        if (string.IsNullOrWhiteSpace(request.BuyerPhoneNumber) || string.IsNullOrWhiteSpace(request.SellerPhoneNumber))
+        //            return Result<object>.Failure(StatusCodes.Status400BadRequest, "Phone numbers are required.");
+
+        //        if (request.ContractId <= 0)
+        //            return Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid ContractId.");
+
+        //        var currentUserId = _jwtService.GetUserId();
+
+        //        // Get or create Buyer
+        //        var buyer = await _context.UserDetails.FirstOrDefaultAsync(u => u.PhoneNumber == request.BuyerPhoneNumber, cancellationToken);
+        //        if (buyer == null)
+        //        {
+        //            buyer = new UserDetail
+        //            {
+        //                UserId = Guid.NewGuid().ToString(),
+        //                PhoneNumber = request.BuyerPhoneNumber,
+        //                Created = DateTime.UtcNow,
+        //                Role = nameof(Roles.User),
+        //            };
+        //            _context.UserDetails.Add(buyer);
+        //            await _context.SaveChangesAsync(cancellationToken);
+        //        }
+
+        //        // Get or create Seller
+        //        var seller = await _context.UserDetails.FirstOrDefaultAsync(u => u.PhoneNumber == request.SellerPhoneNumber, cancellationToken);
+        //        if (seller == null)
+        //        {
+        //            seller = new UserDetail
+        //            {
+        //                UserId = Guid.NewGuid().ToString(),
+        //                PhoneNumber = request.SellerPhoneNumber,
+        //                Created = DateTime.UtcNow,
+        //                Role = nameof(Roles.User)
+        //            };
+        //            _context.UserDetails.Add(seller);
+        //            await _context.SaveChangesAsync(cancellationToken);
+        //        }
+
+        //        // Determine FromID and ToID based on who is the logged-in user
+        //        int fromId, toId;
+        //        string? targetDeviceToken = null;
+
+        //        if (buyer.Id.ToString() == currentUserId)
+        //        {
+        //            fromId = buyer.Id;
+        //            toId = seller.Id;
+        //            targetDeviceToken = seller.DeviceToken;
+        //        }
+        //        else if (seller.Id.ToString() == currentUserId)
+        //        {
+        //            fromId = seller.Id;
+        //            toId = buyer.Id;
+        //            targetDeviceToken = buyer.DeviceToken;
+        //        }
+        //        else
+        //        {
+        //            return Result<object>.Failure(StatusCodes.Status403Forbidden, "Unauthorized user context.");
+        //        }
+
+        //        // Create notification record
+        //        var notification = new Notification
+        //        {
+        //            FromID = fromId,
+        //            ToID = toId,
+        //            ContractId = request.ContractId,
+        //            Type = request.Type,
+        //            Title = request.Title,
+        //            Description = request.Description,
+        //            Created = DateTime.UtcNow,
+        //            IsRead = false,
+        //            GroupId = string.IsNullOrWhiteSpace(request.GroupId) ? null : request.GroupId,
+        //        };
+
+        //        _context.Notifications.Add(notification);
+        //        await _context.SaveChangesAsync(cancellationToken);
+
+        //        // Fetch extra info for push payload
+        //        var contract = await _context.ContractDetails
+        //            .Where(c => c.Id == request.ContractId)
+        //            .Select(c => new { c.Id, c.ContractTitle })
+        //            .FirstOrDefaultAsync(cancellationToken);
+
+        //        var contractTitle = contract?.ContractTitle ?? "Contract";
+
+        //        var receiver = toId == buyer.Id ? buyer : seller;
+        //        var receiverName = receiver.FullName ?? "User";
+        //        var receiverImage = receiver.ProfilePicture ?? "";
+
+        //        // Send Push Notification
+        //        if (!string.IsNullOrWhiteSpace(targetDeviceToken))
+        //        {
+        //            try
+        //            {
+        //                await _notificationService.SendPushNotificationAsync(
+        //                    targetDeviceToken,
+        //                    request.Title,
+        //                    request.Description,
+        //                    new
+        //                    {
+        //                        GroupId = request.GroupId,
+        //                        ContractId = request.ContractId,
+        //                        ContractTitle = contractTitle,
+        //                        ReceiverName = receiverName,
+        //                        ReceiverImage = receiverImage,
+        //                        Type = request.Type
+        //                    }
+        //                );
+        //            }
+        //            catch (Exception pushEx)
+        //            {
+        //                Console.WriteLine($"[Warning] Push notification failed: {pushEx.Message}");
+        //            }
+        //        }
+
+        //        return Result<object>.Success(
+        //            StatusCodes.Status200OK,
+        //            "Notification created successfully.",
+        //            new { NotificationId = notification.Id }
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"[Error] CreateNotificationCommandHandler: {ex.Message}");
+        //        return Result<object>.Failure(StatusCodes.Status500InternalServerError, "Unexpected Server Error.");
+        //    }
+        //}
 
         //public async Task<Result<object>> Handle(CreateNotificationCommand request, CancellationToken cancellationToken)
         //{
