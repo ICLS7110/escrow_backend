@@ -15,10 +15,9 @@ namespace Escrow.Api.Application.AdminAuth.Queries
     // Query to fetch all details of an admin by their ID
     public class GetAdminAllDetailQuery : IRequest<Result<AllAdminDetail>>
     {
-        public int? AdminId { get; init; }
+        public int AdminId { get; init; } // Made non-nullable
     }
 
-    // Handler to handle the query and fetch all admin details
     public class GetAdminAllDetailQueryHandler : IRequestHandler<GetAdminAllDetailQuery, Result<AllAdminDetail>>
     {
         private readonly IApplicationDbContext _context;
@@ -30,27 +29,24 @@ namespace Escrow.Api.Application.AdminAuth.Queries
 
         public async Task<Result<AllAdminDetail>> Handle(GetAdminAllDetailQuery request, CancellationToken cancellationToken)
         {
-            if (request.AdminId == 0)
+            if (request.AdminId <= 0)
             {
-                return Result<AllAdminDetail>.Failure(StatusCodes.Status400BadRequest, "Admin ID is required.");
+                return Result<AllAdminDetail>.Failure(StatusCodes.Status400BadRequest, "Valid Admin ID is required.");
             }
 
             var adminUser = await _context.UserDetails
-                .Where(x => x.Id == request.AdminId)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.AdminId, cancellationToken);
 
             if (adminUser == null)
             {
                 return Result<AllAdminDetail>.Failure(StatusCodes.Status404NotFound, "Admin not found.");
             }
 
-            // Map admin data to the AdminDetailDTO
             var adminDetailDto = new AllAdminDetail
             {
                 Id = adminUser.Id,
                 Username = adminUser.FullName,
                 Email = adminUser.EmailAddress,
-                PasswordHash = adminUser.Password,
                 Role = adminUser.Role,
                 Image = adminUser.ProfilePicture,
                 Created = adminUser.Created,

@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.AdminPanel;
-using System.Numerics;
 
 namespace Escrow.Api.Application.AdminAuth.Commands
 {
@@ -67,4 +66,5 @@ namespace Escrow.Api.Application.AdminAuth.Commands
             return Result<object>.Success(StatusCodes.Status200OK, "Password changed successfully.");
         }
     }
+
 }
