@@ -34,23 +34,6 @@ public class SendContactMessageHandler : IRequestHandler<SendContactMessageComma
     {
         try
         {
-            // 🔹 Temporarily commenting out validation for debugging
-            /*
-            var validator = new SendContactMessageValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                string errorMessages = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                return Result<int>.Failure(StatusCodes.Status400BadRequest, errorMessages);
-            }
-            */
-
-
-           
-            await _emailService.SendEmailAsync(request.Email, request.Title, request.Name, request.Message);
-
-            // 🔹 Step 1: Store Message in Database
             var contactMessage = new ContactUs
             {
                 Name = request.Name,
@@ -62,7 +45,16 @@ public class SendContactMessageHandler : IRequestHandler<SendContactMessageComma
             };
 
             await _context.ContactUs.AddAsync(contactMessage, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+
+            var result = await _context.SaveChangesAsync(cancellationToken);
+
+            // If result is 0, that means nothing was saved
+            if (result == 0)
+            {
+                return Result<int>.Failure(StatusCodes.Status500InternalServerError, "Unable to save message to the database.");
+            }
+
+            await _emailService.SendEmailAsync(request.Email, request.Title, request.Name, request.Message);
 
             return Result<int>.Success(StatusCodes.Status200OK, "Message sent successfully.", contactMessage.Id);
         }
@@ -71,5 +63,6 @@ public class SendContactMessageHandler : IRequestHandler<SendContactMessageComma
             return Result<int>.Failure(StatusCodes.Status500InternalServerError, $"Error: {ex.Message}");
         }
     }
+
 }
 
