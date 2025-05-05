@@ -10,6 +10,7 @@ using Escrow.Api.Application.Common.Mappings;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Common.Models.BankDtos;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
+using Escrow.Api.Application.UserPanel.Queries.GetUsers;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -26,20 +27,14 @@ public record GetContractForUserQuery : IRequest<PaginatedList<ContractDTO>>
     public int? PageSize { get; init; } = 10;
 }
 
-
-
-
-
 public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUserQuery, PaginatedList<ContractDTO>>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IMapper _mapper;
     private readonly IJwtService _jwtService;
 
-    public GetContractForUserQueryHandler(IApplicationDbContext context, IMapper mapper, IJwtService jwtService)
+    public GetContractForUserQueryHandler(IApplicationDbContext context, IJwtService jwtService)
     {
         _context = context;
-        _mapper = mapper;
         _jwtService = jwtService;
     }
 
@@ -48,8 +43,14 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
 
-        List<int> allContractIds = new();
+        IQueryable<ContractDetails> query = _context.ContractDetails
+            .AsQueryable()
+            .Include(c => c.MileStones) // Include related MileStones
+            .Include(c => c.BuyerDetails) // Include Buyer details
+            .Include(c => c.SellerDetails) // Include Seller details
+            .Include(c => c.UserDetail); // Include UserDetails if needed
 
+        // Apply filters
         if (request.Id.HasValue)
         {
             var directContractIds = await _context.ContractDetails
@@ -62,13 +63,8 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
                 .Select(inv => inv.ContractId)
                 .ToListAsync(cancellationToken);
 
-            allContractIds = directContractIds.Concat(invitedContractIds).Distinct().ToList();
-        }
+            var allContractIds = directContractIds.Concat(invitedContractIds).Distinct().ToList();
 
-        var query = _context.ContractDetails.AsQueryable();
-
-        if (request.Id.HasValue && allContractIds.Any())
-        {
             query = query.Where(c => allContractIds.Contains(c.Id));
         }
 
@@ -82,24 +78,15 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             query = query.Where(c => c.Status == request.Status.ToString());
         }
 
-        query = query.OrderByDescending(c => c.Created);
-        var totalCount = await query.CountAsync(cancellationToken);
+        // Pagination logic
+        query = query.OrderByDescending(c => c.Created)
+                     .Skip((pageNumber - 1) * pageSize)
+                     .Take(pageSize);
 
-        var contracts = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+        // Execute the query and get the results
+        var contracts = await query.ToListAsync(cancellationToken);
 
-        var contractIds = contracts.Select(c => c.Id).ToList();
-
-        var milestones = await _context.MileStones
-            .Where(m => contractIds.Contains(Convert.ToInt32(m.ContractId)))
-            .ToListAsync(cancellationToken);
-
-        var invitations = await _context.SellerBuyerInvitations
-            .Where(inv => contractIds.Contains(inv.ContractId))
-            .ToListAsync(cancellationToken);
-
+        // Gather relevant data for contract DTOs
         var buyerSellerIds = contracts
             .SelectMany(c => new[] { c.BuyerDetailsId, c.SellerDetailsId })
             .Distinct()
@@ -110,11 +97,11 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             .Select(u => new { u.Id, u.ProfilePicture })
             .ToListAsync(cancellationToken);
 
-        Dictionary<int, string> profilePicDict = userProfiles
-     .ToDictionary(u => u.Id, u => u.ProfilePicture ?? string.Empty); // or any default string
+        var profilePicDict = userProfiles
+            .ToDictionary(u => u.Id, u => u.ProfilePicture ?? string.Empty); // Default empty string for missing profiles
 
-
-        var contractDTOs = contracts.Select(c => new ContractDTO
+        // Map contract details into ContractDetailsDTO
+        var contractDetailsDTOs = contracts.Select(c => new ContractDTO
         {
             Id = c.Id,
             Role = c.Role ?? string.Empty,
@@ -128,56 +115,30 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             BuyerMobile = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(c.BuyerMobile),
             SellerName = c.SellerName,
             SellerMobile = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(c.SellerMobile),
-            CreatedBy = c.CreatedBy,
             Status = c.Status,
-            IsActive = c.IsActive,
-            IsDeleted = c.IsDeleted,
+            BuyerPayableAmount = c.BuyerPayableAmount,
+            SellerPayableAmount = c.SellerPayableAmount,
             TaxAmount = c.TaxAmount,
             EscrowTax = c.EscrowTax,
-            CountryCode = PhoneNumberHelper.ExtractCountryCode(c.BuyerMobile),
-            Created = c.Created,
-            ContractDoc = c.ContractDoc,
-            BuyerId = c.BuyerDetailsId.ToString(),
-            SellerId = c.SellerDetailsId.ToString(),
-            LastModified = c.LastModified,
-            LastModifiedBy = c.LastModifiedBy,
-            SellerPayableAmount = c.SellerPayableAmount,
-            BuyerPayableAmount = c.BuyerPayableAmount,
-            BuyerProfilePicture = c.BuyerDetailsId.HasValue 
-    ? profilePicDict.GetValueOrDefault<int, string>(c.BuyerDetailsId.Value) 
-    : null,
-
-SellerProfilePicture = c.SellerDetailsId.HasValue 
-    ? profilePicDict.GetValueOrDefault<int, string>(c.SellerDetailsId.Value) 
-    : null,
-
-
-            MileStones = milestones
-                .Where(m => m.ContractId == c.Id)
+            IsActive = c.IsActive,
+            IsDeleted = c.IsDeleted,
+            BuyerProfilePicture = profilePicDict.GetValueOrDefault(c.BuyerDetailsId ?? 0),
+            SellerProfilePicture = profilePicDict.GetValueOrDefault(c.SellerDetailsId ?? 0),
+            MileStones = (c.MileStones ?? new List<MileStone>())
                 .Select(m => new MileStoneDTO
                 {
                     Id = m.Id,
                     Name = m.Name,
-                    DueDate = m.DueDate,
                     Amount = m.Amount,
                     Description = m.Description,
-                    Documents = m.Documents,
-                    ContractId = m.ContractId,
+                    DueDate = m.DueDate,
                     Status = m.Status
                 }).ToList(),
-            InvitationDetails = invitations
-                .Where(inv => inv.ContractId == c.Id)
-                .Select(inv => new SellerBuyerInvitation
-                {
-                    Id = inv.Id,
-                    ContractId = inv.ContractId,
-                    BuyerId = inv.BuyerId,
-                    SellerId = inv.SellerId,
-                    Status = inv.Status,
-                    Created = inv.Created
-                }).FirstOrDefault()
+            // BuyerDetails and SellerDetails mapping
         }).ToList();
 
-        return new PaginatedList<ContractDTO>(contractDTOs, totalCount, pageNumber, pageSize);
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        return new PaginatedList<ContractDTO>(contractDetailsDTOs, totalCount, pageNumber, pageSize);
     }
 }
