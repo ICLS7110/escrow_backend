@@ -26,10 +26,13 @@ namespace Escrow.Api.Application.AdminAuth.Queries
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
 
-        public GetAdminDetailQueryHandler(IApplicationDbContext context, IMapper mapper, IJwtService jwtService)
+        private readonly IPasswordHasher _passwordHasher;
+
+        public GetAdminDetailQueryHandler(IApplicationDbContext context,IMapper mapper,IJwtService jwtService,IPasswordHasher passwordHasher)
         {
             _context = context;
             _jwtService = jwtService;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result<AdminLoginDTO>> Handle(GetAdminDetailQuery request, CancellationToken cancellationToken)
@@ -38,11 +41,11 @@ namespace Escrow.Api.Application.AdminAuth.Queries
             {
                 return Result<AdminLoginDTO>.Failure(StatusCodes.Status400BadRequest, "Email and Password are required.");
             }
-            
-            var adminUser = await _context.UserDetails
-                .FirstOrDefaultAsync(x => x.EmailAddress == request.Email && x.Password == request.Password);
 
-            if (adminUser == null)
+            var adminUser = await _context.UserDetails
+                .FirstOrDefaultAsync(x => x.EmailAddress == request.Email, cancellationToken);
+
+            if (adminUser == null || !_passwordHasher.VerifyPassword(request.Password!, adminUser.Password!))
             {
                 return Result<AdminLoginDTO>.Failure(StatusCodes.Status404NotFound, "Invalid credentials.");
             }
@@ -59,5 +62,6 @@ namespace Escrow.Api.Application.AdminAuth.Queries
 
             return Result<AdminLoginDTO>.Success(StatusCodes.Status200OK, "Admin login successfully.", adminDto);
         }
+
     }
 }

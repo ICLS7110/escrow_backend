@@ -26,6 +26,7 @@
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="BCrypt.Net-Core" />
     <PackageReference Include="EPPlus" />
     <PackageReference Include="FirebaseAdmin" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
