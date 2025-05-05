@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.AdminPanel;
+using System.Numerics;
 
 namespace Escrow.Api.Application.AdminAuth.Commands
 {
@@ -21,15 +22,16 @@ namespace Escrow.Api.Application.AdminAuth.Commands
     public class AdminChangePasswordCommandHandler : IRequestHandler<AdminChangePasswordCommand, Result<object>>
     {
         private readonly IApplicationDbContext _context;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public AdminChangePasswordCommandHandler(IApplicationDbContext context)
+        public AdminChangePasswordCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result<object>> Handle(AdminChangePasswordCommand request, CancellationToken cancellationToken)
         {
-            // Validate input fields
             if (string.IsNullOrWhiteSpace(request.OldPassword) || string.IsNullOrWhiteSpace(request.NewPassword))
             {
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "Old password and new password are required.");
@@ -40,7 +42,6 @@ namespace Escrow.Api.Application.AdminAuth.Commands
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "New password and confirm password do not match.");
             }
 
-            // Fetch admin user
             var adminUser = await _context.UserDetails
                 .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
 
@@ -49,18 +50,21 @@ namespace Escrow.Api.Application.AdminAuth.Commands
                 return Result<object>.Failure(StatusCodes.Status404NotFound, "Admin user not found.");
             }
 
-            // Ensure new password is not the same as old password
-            if (adminUser.Password == request.NewPassword)
+            if (string.IsNullOrEmpty(adminUser.Password) ||
+                !_passwordHasher.VerifyPassword(request.OldPassword, adminUser.Password))
+            {
+                return Result<object>.Failure(StatusCodes.Status400BadRequest, "Old password is incorrect.");
+            }
+
+            if (_passwordHasher.VerifyPassword(request.NewPassword, adminUser.Password))
             {
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "New password cannot be the same as the old password.");
             }
 
-            // Update password
-            adminUser.Password = request.NewPassword;
+            adminUser.Password = _passwordHasher.HashPassword(request.NewPassword);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result<object>.Success(StatusCodes.Status200OK, "Password changed successfully.");
         }
-
     }
 }

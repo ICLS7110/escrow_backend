@@ -20,10 +20,12 @@ namespace Escrow.Api.Application.AdminAuth.Commands
     public class AdminResetPasswordCommandHandler : IRequestHandler<AdminResetPasswordCommand, Result<object>>
     {
         private readonly IApplicationDbContext _context;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public AdminResetPasswordCommandHandler(IApplicationDbContext context)
+        public AdminResetPasswordCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<Result<object>> Handle(AdminResetPasswordCommand request, CancellationToken cancellationToken)
@@ -36,12 +38,15 @@ namespace Escrow.Api.Application.AdminAuth.Commands
                 return Result<object>.Failure(StatusCodes.Status404NotFound, "Admin not found.");
             }
 
-            if (adminUser.OTP != request.OTP)
+            if (string.IsNullOrEmpty(adminUser.OTP) || adminUser.OTP != request.OTP)
             {
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP.");
             }
 
-            adminUser.Password = request.NewPassword;
+            adminUser.Password = _passwordHasher.HashPassword(request.NewPassword);
+
+            // Optional: Invalidate OTP after use
+            adminUser.OTP = null;
 
             await _context.SaveChangesAsync(cancellationToken);
 
