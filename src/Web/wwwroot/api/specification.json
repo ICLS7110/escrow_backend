@@ -2659,6 +2659,16 @@
         "operationId": "GetApiDisputeManagement",
         "parameters": [
           {
+            "name": "DisputeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
             "name": "Status",
             "in": "query",
             "schema": {
@@ -2669,7 +2679,7 @@
                 }
               ]
             },
-            "x-position": 1
+            "x-position": 2
           },
           {
             "name": "PageNumber",
@@ -2679,7 +2689,7 @@
               "type": "integer",
               "format": "int32"
             },
-            "x-position": 2
+            "x-position": 3
           },
           {
             "name": "PageSize",
@@ -2689,37 +2699,7 @@
               "type": "integer",
               "format": "int32"
             },
-            "x-position": 3
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      }
-    },
-    "/api/DisputeManagement/{disputeId}": {
-      "get": {
-        "tags": [
-          "DisputeManagement"
-        ],
-        "operationId": "GetApiDisputeManagement2",
-        "parameters": [
-          {
-            "name": "disputeId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
+            "x-position": 4
           }
         ],
         "responses": {

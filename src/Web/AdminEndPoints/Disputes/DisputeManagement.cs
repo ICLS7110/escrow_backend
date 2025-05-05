@@ -18,7 +18,7 @@ public class DisputeManagement : EndpointGroupBase
 
         // Admin-only endpoints
         disputeGroup.MapGet("/", GetAllDisputes).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
-        disputeGroup.MapGet("/{disputeId:int}", GetDisputeById).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
+        //disputeGroup.MapGet("/{disputeId:int}", GetDisputeById).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
         disputeGroup.MapPost("/{disputeId:int}/assign-arbitrator", AssignArbitrator).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
         disputeGroup.MapPost("/update-status", UpdateDisputeStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
         disputeGroup.MapPost("/escrow-decision", MakeEscrowDecision).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
@@ -36,14 +36,14 @@ public class DisputeManagement : EndpointGroupBase
             : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No disputes found."));
     }
 
-    [Authorize]
-    public async Task<IResult> GetDisputeById(ISender sender, int disputeId)
-    {
-        var result = await sender.Send(new GetDisputeByIdQuery(disputeId));
-        return result?.Data != null
-            ? TypedResults.Ok(result)
-            : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Dispute not found."));
-    }
+    //[Authorize]
+    //public async Task<IResult> GetDisputeById(ISender sender, int disputeId)
+    //{
+    //    var result = await sender.Send(new GetDisputeByIdQuery(disputeId));
+    //    return result?.Data != null
+    //        ? TypedResults.Ok(result)
+    //        : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Dispute not found."));
+    //}
 
     [Authorize]
     public async Task<IResult> AssignArbitrator(ISender sender, AssignArbitratorCommand command)

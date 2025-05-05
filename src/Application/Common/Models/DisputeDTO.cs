@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Domain.Entities.Disputes;
 using Escrow.Api.Domain.Enums;
 
@@ -20,5 +21,6 @@ public class DisputeDTO
     public string? AdminDecision { get; set; }  // Admin's final decision
     public decimal? ReleaseAmount { get; set; }  // Amount released
     public string? ReleaseTo { get; set; }  // Buyer/Seller receiving the release
-    public string? ContractDetails { get; set; }  // ✅ Nullable contract details
+    //public string? ContractDetails { get; set; }  // ✅ Nullable contract details
+    public ContractDTO? ContractDetails { get; set; }  // ✅ Nullable contract details
 }
