@@ -38,14 +38,6 @@ public class FileUploadController : ControllerBase
 
 
 
-    [HttpGet]
-    [Authorize]
-    [IgnoreAntiforgeryToken]
-    [Route("checktoken")]
-    public IActionResult checktoken()
-    {
-        return Ok(new { message = "Authenticated successfully!" });
-    }
 
 
     public class FileUploadRequest

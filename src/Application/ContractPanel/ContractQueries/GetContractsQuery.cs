@@ -20,8 +20,11 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
         public ContractStatus? Status { get; init; }
         public string? SearchKeyword { get; init; }
         public bool? IsActive { get; init; }
-        public int? PriceFilter { get; init; }
+        public int? StartPrice { get; init; }
+        public int? EndPrice { get; init; }
         public bool? IsMilestone { get; init; }
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
         public int PageNumber { get; init; } = 1;
         public int PageSize { get; init; } = 10;
     }
@@ -37,8 +40,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
 
         public async Task<PaginatedList<ContractDetailsDTO>> Handle(GetContractsQuery request, CancellationToken cancellationToken)
         {
-            var activeStatuses = new List<string> { nameof(ContractStatus.Accepted),  nameof(ContractStatus.Escrow),  nameof(ContractStatus.Pending) };
-            var inactiveStatuses = new List<string> { nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired) , nameof(ContractStatus.Draft),nameof(ContractStatus.Completed),nameof(ContractStatus.Cancelled)};
+            var activeStatuses = new List<string> { nameof(ContractStatus.Accepted), nameof(ContractStatus.Escrow), nameof(ContractStatus.Pending) };
+            var inactiveStatuses = new List<string> { nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired), nameof(ContractStatus.Draft), nameof(ContractStatus.Completed), nameof(ContractStatus.Cancelled) };
             var query = _context.ContractDetails.AsQueryable();
 
             // User-specific filtering
@@ -66,6 +69,9 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                     teamContractIds.Contains(c.Id.ToString()));
             }
 
+            // Fetch related dispute data
+
+
             if (request.Status.HasValue)
                 query = query.Where(c => c.Status == request.Status.ToString());
 
@@ -76,8 +82,25 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                     c.BuyerMobile == request.SearchKeyword ||
                     c.SellerMobile == request.SearchKeyword);
 
-            if (request.PriceFilter > 0)
-                query = query.Where(c => c.FeeAmount >= request.PriceFilter);
+            // ✅ Price range filter
+            if (request.StartPrice.HasValue)
+                query = query.Where(c => c.FeeAmount >= request.StartPrice.Value);
+
+            if (request.EndPrice.HasValue)
+                query = query.Where(c => c.FeeAmount <= request.EndPrice.Value);
+
+            // ✅ Date-only range filter
+            if (request.StartDate.HasValue)
+            {
+                var startDate = request.StartDate.Value.Date;
+                query = query.Where(c => c.Created.Date >= startDate);
+            }
+
+            if (request.EndDate.HasValue)
+            {
+                var endDate = request.EndDate.Value.Date;
+                query = query.Where(c => c.Created.Date <= endDate);
+            }
 
             if (request.IsActive.HasValue)
             {
@@ -121,6 +144,22 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                 .Where(tm => tm.ContractId != null && tm.IsDeleted != true)
                 .ToListAsync(cancellationToken);
 
+
+            var disputes = await _context.Disputes
+.Where(d => contractIds.Contains(d.ContractId.ToString()))
+.ToListAsync(cancellationToken);
+
+            // Now do grouping and selection in-memory
+            var disputeMap = disputes
+                .GroupBy(d => d.ContractId)
+                .Select(g => g.OrderByDescending(d => d.Created).FirstOrDefault())
+                .Where(d => d != null)
+                .ToDictionary(d => d!.ContractId, d => d!.Id);
+
+
+
+
+
             var contractDTOs = contracts.Select(c => new ContractDetailsDTO
             {
                 Id = c.Id,
@@ -150,6 +189,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                 LastModifiedBy = c.LastModifiedBy,
                 SellerPayableAmount = c.SellerPayableAmount,
                 BuyerPayableAmount = c.BuyerPayableAmount,
+                DisputeId = disputeMap.ContainsKey(c.Id) ? disputeMap[c.Id] : null,
 
                 MileStones = milestones
                     .Where(m => m.ContractId == c.Id)

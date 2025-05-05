@@ -30,12 +30,12 @@ public class UpdateDisputeStatusCommandHandler : IRequestHandler<UpdateDisputeSt
             return Result<string>.Failure(404, "Dispute not found.");
         }
 
-        if (dispute.Status == DisputeStatus.Resolved)
+        if (dispute.Status == nameof(DisputeStatus.Resolved))
         {
             return Result<string>.Failure(400, "Dispute is already resolved and cannot be updated.");
         }
 
-        dispute.Status = request.NewStatus;
+        dispute.Status = nameof(request.NewStatus);
 
         await _context.SaveChangesAsync(cancellationToken);
 

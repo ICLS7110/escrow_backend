@@ -24,6 +24,7 @@ using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Escrow.Api.Domain.Entities.SystemConfigurations;
 
 namespace Escrow.Api.Infrastructure.Data;
 
@@ -69,6 +70,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<RoleMenuPermission> RoleMenuPermissions => Set<RoleMenuPermission>();
 
     public DbSet<AnbWebhookLog> AnbWebhookLogs => Set<AnbWebhookLog>();
+    public DbSet<SystemConfiguration> SystemConfigurations => Set<SystemConfiguration>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

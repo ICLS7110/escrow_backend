@@ -11,6 +11,7 @@ using Escrow.Api.Domain.Entities.EmailTemplates;
 using Escrow.Api.Domain.Entities.Notifications;
 using Escrow.Api.Domain.Entities.Pages;
 using Escrow.Api.Domain.Entities.RoleMenuPermissions;
+using Escrow.Api.Domain.Entities.SystemConfigurations;
 using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.Transactions;
 using Escrow.Api.Domain.Entities.UserPanel;
@@ -45,6 +46,7 @@ public interface IApplicationDbContext
     DbSet<RoleMenuPermission> RoleMenuPermissions { get; }
     DbSet<Permission> Permissions { get; }
     DbSet<AnbWebhookLog> AnbWebhookLogs { get; }
+    DbSet<SystemConfiguration> SystemConfigurations { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

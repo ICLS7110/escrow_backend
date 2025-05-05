@@ -38,7 +38,8 @@ public class UpdateNotificationStatusCommandHandler : IRequestHandler<UpdateNoti
         }
 
         //userDetail.IsNotified = request.IsNotified;
-        userDetail.IsNotified = userDetail.IsNotified == null ? true : !userDetail.IsNotified;
+        //userDetail.IsNotified = userDetail.IsNotified == null ? true : !userDetail.IsNotified;
+        userDetail.IsNotified = !(userDetail.IsNotified ?? false);
         userDetail.LastModifiedBy = userId.ToString();
         userDetail.LastModified = DateTime.UtcNow;
 

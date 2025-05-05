@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Escrow.Api.Application.Customers.Commands;
 using Escrow.Api.Application.Customers.Queries;
 using Escrow.Api.Application.Customer.Command;
+using Escrow.Api.Application.Customer.Queries;
 
 namespace Escrow.Api.Web.AdminEndPoints.Customers;
 
@@ -29,6 +30,10 @@ public class Customers : EndpointGroupBase
         customerGroup.MapPut("/update-status/{id:int}", ChangeCustomerStatus); // New endpoint for toggling status
         customerGroup.MapGet("/list", GetCustomers);
         customerGroup.MapGet("/detail/{id:int}", GetCustomers);
+
+        customerGroup.MapGet("/contract-details/{id:int}", CustomerContractDetails);
+
+
     }
 
     [Authorize]
@@ -85,4 +90,45 @@ public class Customers : EndpointGroupBase
 
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Customer status updated successfully."));
     }
+
+
+    [Authorize]
+    public async Task<IResult> CustomerContractDetails(ISender sender,int activePageNumber = 1,int historicalPageNumber = 1,int activePageSize = 10,int historicalPageSize = 10,string? id = null)
+    {
+        // Create the query with all parameters
+        var query = new GetCustomerContractsQuery
+        {
+            ActivePageNumber = activePageNumber,
+            HistoricalPageNumber = historicalPageNumber,
+            ActivePageSize = activePageSize,
+            HistoricalPageSize = historicalPageSize,
+            CustomerId = id
+        };
+
+        // Send the query to the handler
+        var result = await sender.Send(query);
+
+        // Check the result status and handle accordingly
+        if (result.Status == StatusCodes.Status404NotFound)
+        {
+            return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "No contracts found for the given customer."));
+        }
+
+        return TypedResults.Ok(result);
+    }
+
+    //[Authorize]
+    //public async Task<IResult> CustomerContractDetails(ISender sender, string? id)
+    //{
+    //    var query = new GetCustomerContractsQuery { CustomerId = id };
+    //    var result = await sender.Send(query);
+
+    //    if (result.Status == StatusCodes.Status404NotFound)
+    //    {
+    //        return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Customer not found."));
+    //    }
+
+    //    return TypedResults.Ok(result);
+    //}
+
 }

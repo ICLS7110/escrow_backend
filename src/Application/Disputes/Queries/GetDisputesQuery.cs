@@ -26,43 +26,41 @@ public class GetDisputesQueryHandler : IRequestHandler<GetDisputesQuery, Paginat
         _context = context;
     }
 
-    public async Task<PaginatedList<DisputeDTO>> Handle(GetDisputesQuery request, CancellationToken cancellationToken)
-    {
-        var query = _context.Disputes
-            .Include(d => d.Messages)  // Ensure messages are loaded
-            .Include(d => d.ContractDetails) // Ensure contract details are loaded
-            .AsQueryable();
-
-        if (request.Status.HasValue)
+        public async Task<PaginatedList<DisputeDTO>> Handle(GetDisputesQuery request, CancellationToken cancellationToken)
         {
-            query = query.Where(d => d.Status == request.Status);
+            var query = _context.Disputes.AsQueryable();
+
+            if (!string.IsNullOrEmpty(nameof(request.Status)))
+            {
+                query = query.Where(d => d.Status == nameof(request.Status));
+            }
+
+            var totalRecords = await query.CountAsync(cancellationToken);
+
+            var disputes = await query
+                .OrderByDescending(d => d.DisputeDateTime)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync(cancellationToken);
+
+            var contractIds = disputes.Select(d => d.ContractId).Distinct().ToList();
+            var contracts = await _context.ContractDetails
+                .Where(c => contractIds.Contains(c.Id))
+                .ToDictionaryAsync(c => c.Id, c => c.ContractTitle, cancellationToken);
+
+            var disputeDTOs = disputes.Select(d => new DisputeDTO
+            {
+                Id = d.Id,
+                DisputeDateTime = d.DisputeDateTime,
+                RaisedBy = d.DisputeRaisedBy ?? "Unknown",
+                DisputeDoc = d.DisputeDoc ?? "Unknown",
+                Status = d.Status ?? "N/A",
+                ContractDetails = contracts.TryGetValue(d.ContractId, out var title) ? title : "N/A"
+            }).ToList();
+
+            return new PaginatedList<DisputeDTO>(disputeDTOs, totalRecords, request.PageNumber, request.PageSize);
         }
 
-        var totalRecords = await query.CountAsync(cancellationToken);
-
-        // Fetch data from DB first, then process null values in memory
-        var disputes = await query
-            .OrderByDescending(d => d.DisputeDateTime)
-            .Skip((request.PageNumber - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToListAsync(cancellationToken);
-
-        // ✅ Process null values after fetching data from DB
-        var disputeDTOs = disputes.Select(d => new DisputeDTO
-        {
-            Id = d.Id,
-            DisputeDateTime = d.DisputeDateTime,
-            RaisedBy = d.DisputeRaisedBy ?? "Unknown", // ✅ Default if null
-            Status = d.Status.ToString(),
-            EscrowAmount = d.EscrowAmount,
-            ContractAmount = d.ContractAmount,
-            FeesTaxes = d.FeesTaxes,
-            Messages = d.Messages?.Select(m => m.Message ?? "No message").ToList() ?? new List<string>(), // ✅ Handled safely
-            ContractDetails = d.ContractDetails != null ? d.ContractDetails.ContractTitle : "N/A" // ✅ Avoid null reference
-        }).ToList();
-
-        return new PaginatedList<DisputeDTO>(disputeDTOs, totalRecords, request.PageNumber, request.PageSize);
-    }
 
 
 }

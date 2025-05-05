@@ -49,7 +49,7 @@ namespace Escrow.Api.Application.AdminAuth.Queries
 
             if (!string.IsNullOrEmpty(request.Name))
             {
-                query = query.Where(x => x.FullName != null && x.FullName.Contains(request.Name));
+                query = query.Where(x => x.FullName != null && x.FullName.Contains(request.Name) && x.EmailAddress != null && x.EmailAddress.Contains(request.Name));
             }
 
             var totalRecords = await query.CountAsync(cancellationToken);

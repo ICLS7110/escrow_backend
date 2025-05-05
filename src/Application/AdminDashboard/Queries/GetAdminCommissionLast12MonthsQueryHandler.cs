@@ -4,109 +4,109 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Escrow.Api.Applcation.Common.Models;
 
-namespace Escrow.Api.Application.AdminDashboard.Queries;
-
-public class GetAdminCommissionLast12MonthsQuery : IRequest<Result<List<MonthlyValueDto>>>
+namespace Escrow.Api.Application.AdminDashboard.Queries
 {
-    public int? Year { get; set; }  // Optional
-    public int? Month { get; set; } // Optional
-}
-public class GetAdminCommissionLast12MonthsQueryHandler : IRequestHandler<GetAdminCommissionLast12MonthsQuery, Result<List<MonthlyValueDto>>>
-{
-    private readonly IApplicationDbContext _context;
-
-    public GetAdminCommissionLast12MonthsQueryHandler(IApplicationDbContext context)
+    public class GetAdminCommissionLast12MonthsQuery : IRequest<Result<MonthlyValueDto>>
     {
-        _context = context;
+        public TimeRangeType RangeType { get; set; } = TimeRangeType.Weekly;
     }
 
-    public async Task<Result<List<MonthlyValueDto>>> Handle(GetAdminCommissionLast12MonthsQuery request, CancellationToken cancellationToken)
+    public class GetAdminCommissionLast12MonthsQueryHandler : IRequestHandler<GetAdminCommissionLast12MonthsQuery, Result<MonthlyValueDto>>
     {
-        var result = new List<MonthlyValueDto>();
+        private readonly IApplicationDbContext _context;
 
-        try
+        public GetAdminCommissionLast12MonthsQueryHandler(IApplicationDbContext context)
         {
-            var query = _context.ContractDetails
-                .AsNoTracking()
-                .Where(c => c.EscrowTax > 0); // optional sanity filter
+            _context = context;
+        }
 
-            // Optional: filter by specific year/month
-            if (request.Year.HasValue)
+        public async Task<Result<MonthlyValueDto>> Handle(GetAdminCommissionLast12MonthsQuery request, CancellationToken cancellationToken)
+        {
+            var result = new MonthlyValueDto();
+
+            try
             {
-                query = query.Where(c => c.Created.Year == request.Year.Value);
-            }
+                var now = DateTime.UtcNow.Date;
+                var currentYear = now.Year;
 
-            if (request.Month.HasValue)
-            {
-                query = query.Where(c => c.Created.Month == request.Month.Value);
-            }
+                var contractList = await _context.ContractDetails
+                    .AsNoTracking()
+                    .Where(c => c.EscrowTax > 0 && c.Created.Year == currentYear)
+                    .ToListAsync(cancellationToken);
 
-            // Group by Year + Month
-            var grouped = await query
-                .GroupBy(c => new
+                switch (request.RangeType)
                 {
-                    c.Created.Year,
-                    c.Created.Month
-                })
-                .Select(g => new
-                {
-                    Month = new DateTime(g.Key.Year, g.Key.Month, 1, 0, 0, 0, DateTimeKind.Utc),
-                    Value = g.Sum(c => (decimal?)c.EscrowTax ?? 0)
-                })
-                .ToListAsync(cancellationToken);
+                    case TimeRangeType.Weekly:
+                        for (int i = 6; i >= 0; i--)
+                        {
+                            var day = now.AddDays(-i);
+                            var total = contractList
+                                .Where(c => c.Created.Date == day)
+                                .Sum(c => c.EscrowTax ?? 0);
 
-            if (request.Year.HasValue && request.Month.HasValue)
-            {
-                // Only one month
-                var month = new DateTime(request.Year.Value, request.Month.Value, 1, 0, 0, 0, DateTimeKind.Utc);
-                result.Add(new MonthlyValueDto
-                {
-                    Month = month.ToString("MMM yyyy", CultureInfo.InvariantCulture),
-                    Value = grouped.FirstOrDefault()?.Value ?? 0
-                });
-            }
-            else
-            {
-                // Default: Fill up to 12 months range from current date or specified year
-                var now = DateTime.UtcNow;
-                var startMonth = request.Year.HasValue
-                    ? new DateTime(request.Year.Value, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-                    : new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-11);
+                            result.Labels.Add(day.ToString("dd MMM", CultureInfo.InvariantCulture));
+                            result.Values.Add(total);
+                        }
+                        break;
 
-                for (int i = 0; i < 12; i++)
-                {
-                    var month = startMonth.AddMonths(i);
-                    var formatted = month.ToString("MMM yyyy", CultureInfo.InvariantCulture);
-                    var existing = grouped.FirstOrDefault(g => g.Month.Month == month.Month && g.Month.Year == month.Year);
+                    case TimeRangeType.Quarterly:
+                        for (int i = 0; i < 4; i++)
+                        {
+                            var referenceDate = now.AddMonths(-i * 3);
+                            var start = new DateTime(referenceDate.Year, ((referenceDate.Month - 1) / 3) * 3 + 1, 1);
+                            var end = start.AddMonths(3);
 
-                    result.Add(new MonthlyValueDto
-                    {
-                        Month = formatted,
-                        Value = existing?.Value ?? 0
-                    });
+                            var total = contractList
+                                .Where(c => c.Created >= start && c.Created < end)
+                                .Sum(c => c.EscrowTax ?? 0);
+
+                            var label = $"Q{((start.Month - 1) / 3 + 1)} {start:yyyy}";
+                            result.Labels.Add(label);
+                            result.Values.Add(total);
+                        }
+                        break;
+
+                    case TimeRangeType.Monthly:
+                    default:
+                        for (int i = 0; i < 12; i++)
+                        {
+                            var month = new DateTime(currentYear, 1, 1).AddMonths(i);
+                            var nextMonth = month.AddMonths(1);
+
+                            var total = contractList
+                                .Where(c => c.Created >= month && c.Created < nextMonth)
+                                .Sum(c => c.EscrowTax ?? 0);
+
+                            if (month > now)
+                                total = 0;
+
+                            result.Labels.Add(month.ToString("MMM yyyy", CultureInfo.InvariantCulture));
+                            result.Values.Add(total);
+                        }
+                        break;
                 }
+
+                return Result<MonthlyValueDto>.Success(
+                    StatusCodes.Status200OK,
+                    "Admin commission data retrieved.",
+                    result
+                );
+            }
+            catch (Exception ex)
+            {
+                return Result<MonthlyValueDto>.Failure(
+                    StatusCodes.Status417ExpectationFailed,
+                    $"Failed to retrieve admin commission data: {ex.Message}"
+                );
             }
         }
-        catch (Exception ex)
-        {
-            return Result<List<MonthlyValueDto>>.Failure(
-                StatusCodes.Status417ExpectationFailed,
-                $"Failed to retrieve admin commission data: {ex.Message}"
-            );
-        }
-
-        return Result<List<MonthlyValueDto>>.Success(
-            StatusCodes.Status200OK,
-            "Admin commission data retrieved.",
-            result
-        );
     }
-
 }

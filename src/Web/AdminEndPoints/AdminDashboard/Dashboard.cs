@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using MediatR;
 using Escrow.Api.Application.AdminDashboard.Queries;
 using Microsoft.AspNetCore.Mvc;
+using Escrow.Api.Applcation.Common.Models;
 
 namespace Escrow.Api.Web.AdminEndPoints.AdminDashboard;
 
@@ -44,35 +45,24 @@ public class Dashboard : EndpointGroupBase
         return TypedResults.Ok(result); 
     }
 
-
     [Authorize]
-    public async Task<IResult> GetAdminCommissionLast12Months(ISender sender, [FromQuery] int? year, [FromQuery] int? month)
+    public async Task<IResult> GetAdminCommissionLast12Months(ISender sender, [FromQuery] TimeRangeType rangeType = TimeRangeType.Weekly)
     {
         var query = new GetAdminCommissionLast12MonthsQuery
         {
-            Year = year,
-            Month = month
+            RangeType=rangeType
         };
 
         var result = await sender.Send(query);
         return TypedResults.Ok(result); // Already formatted by handler
     }
-
     
-
     [Authorize]
     public async Task<IResult> GetAmountInEscrow(ISender sender)
     {
         var result = await sender.Send(new GetEscrowAmountQuery());
         return TypedResults.Ok(result);
     }
-
-
-
-
-
-
-
 
     [Authorize]
     public async Task<IResult> GetDashboardCounts(ISender sender)
@@ -87,7 +77,4 @@ public class Dashboard : EndpointGroupBase
         var result = await sender.Send(new GetDashboardListingsQuery());
         return TypedResults.Ok(result);
     }
-
-
-
 }

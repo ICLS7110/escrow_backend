@@ -28,5 +28,7 @@ namespace Escrow.Api.Application.Common.Models
         public bool? IsProfileCompleted { get; set; }
         public string? CompanyEmail { get; set; }
         public bool? IsActive { get; set; }
+        public decimal TotalFeesAmount { get; set; }
+
     }
 }

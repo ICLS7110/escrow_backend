@@ -93,6 +93,18 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
     .ToListAsync(cancellationToken);
 
 
+
+        var disputes = await _context.Disputes
+.Where(d => contractIds.Contains(d.ContractId))
+.ToListAsync(cancellationToken);
+
+        // Now do grouping and selection in-memory
+        var disputeMap = disputes
+            .GroupBy(d => d.ContractId)
+            .Select(g => g.OrderByDescending(d => d.Created).FirstOrDefault())
+            .Where(d => d != null)
+            .ToDictionary(d => d!.ContractId, d => d!.Id);
+
         var invitations = await _context.SellerBuyerInvitations
             .Where(inv => contractIds.Contains(inv.ContractId))
             .ToListAsync(cancellationToken);
@@ -150,7 +162,7 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             SellerProfilePicture = c.SellerDetailsId.HasValue
                 ? profilePicDict.GetValueOrDefault(c.SellerDetailsId.Value)
                 : null,
-
+            DisputeId = disputeMap.ContainsKey(c.Id) ? disputeMap[c.Id] : 0,
             MileStones = milestones
                 .Where(m => m.ContractId == c.Id)
                 .Select(m => new MileStoneDTO

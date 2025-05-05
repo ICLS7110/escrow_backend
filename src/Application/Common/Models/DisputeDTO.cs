@@ -14,6 +14,7 @@ public class DisputeDTO
     public decimal EscrowAmount { get; set; }
     public decimal ContractAmount { get; set; }
     public decimal FeesTaxes { get; set; }
+    public string DisputeDoc { get; set; } = string.Empty;
     public List<string> Messages { get; set; } = new();  // ✅ Extract messages as strings
     public int? ArbitratorId { get; set; }  // Nullable Arbitrator ID
     public string? AdminDecision { get; set; }  // Admin's final decision

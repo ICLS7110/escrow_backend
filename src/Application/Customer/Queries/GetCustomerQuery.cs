@@ -83,6 +83,10 @@ namespace Escrow.Api.Application.Customers.Queries
                     IsProfileCompleted = s.IsProfileCompleted,
                     CompanyEmail = s.CompanyEmail,
                     IsActive = s.IsActive,
+
+                    TotalFeesAmount = _context.ContractDetails
+                .Where(c => (c.Id == s.Id || c.BuyerDetailsId==s.Id || c.SellerDetailsId==s.Id || c.CreatedBy == s.Id.ToString()) && c.IsDeleted == false)
+                .Sum(c => (decimal?)c.FeeAmount) ?? 0
                 })
                 .OrderByDescending(x => x.Created)
                 .PaginatedListAsync(pageNumber, pageSize);

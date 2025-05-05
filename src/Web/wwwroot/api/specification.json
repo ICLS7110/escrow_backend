@@ -2280,6 +2280,18 @@
           "CommissionMaster"
         ],
         "operationId": "GetApiCommissionMaster",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -2292,18 +2304,18 @@
         ]
       }
     },
-    "/api/CommissionMaster/update": {
-      "put": {
+    "/api/CommissionMaster/upsert": {
+      "post": {
         "tags": [
           "CommissionMaster"
         ],
-        "operationId": "PutApiCommissionMasterUpdate",
+        "operationId": "PostApiCommissionMasterUpsert",
         "requestBody": {
           "x-name": "command",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateCommissionRateCommand"
+                "$ref": "#/components/schemas/UpsertCommissionRateCommand"
               }
             }
           },
@@ -2336,6 +2348,65 @@
             "description": ""
           }
         }
+      }
+    },
+    "/api/SystemConfiguration": {
+      "get": {
+        "tags": [
+          "SystemConfiguration"
+        ],
+        "operationId": "GetApiSystemConfiguration",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/SystemConfiguration/update": {
+      "post": {
+        "tags": [
+          "SystemConfiguration"
+        ],
+        "operationId": "PostApiSystemConfigurationUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSystemConfigurationCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/PermissionManager/roles": {
@@ -2723,6 +2794,36 @@
         ]
       }
     },
+    "/api/DisputeManagement/create": {
+      "post": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "PostApiDisputeManagementCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDisputeCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Customers/add": {
       "post": {
         "tags": [
@@ -3022,6 +3123,76 @@
         ]
       }
     },
+    "/api/Customers/contract-details/{id}": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "GetApiCustomersContractDetails",
+        "parameters": [
+          {
+            "name": "activePageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 1
+          },
+          {
+            "name": "historicalPageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "activePageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 3
+          },
+          {
+            "name": "historicalPageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 4
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/AML/transactions/flagged": {
       "get": {
         "tags": [
@@ -3251,24 +3422,17 @@
         "operationId": "GetApiDashboardAdminCommissionLast12Months",
         "parameters": [
           {
-            "name": "year",
+            "name": "rangeType",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
+              "default": "Weekly",
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TimeRangeType"
+                }
+              ]
             },
             "x-position": 1
-          },
-          {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
           }
         ],
         "responses": {
@@ -3717,32 +3881,6 @@
         ]
       }
     },
-    "/api/fileupload/checktoken": {
-      "get": {
-        "tags": [
-          "FileUpload"
-        ],
-        "operationId": "FileUpload_checktoken",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ]
-      }
-    },
     "/api/fileupload/UploadMultipleImages": {
       "post": {
         "tags": [
@@ -4118,7 +4256,8 @@
           "Completed",
           "Cancelled",
           "Draft",
-          "Escrow"
+          "Escrow",
+          "Dispute"
         ],
         "enum": [
           "Pending",
@@ -4128,7 +4267,8 @@
           "Completed",
           "Cancelled",
           "Draft",
-          "Escrow"
+          "Escrow",
+          "Dispute"
         ]
       },
       "CreateContractDetailCommand": {
@@ -4841,7 +4981,7 @@
           }
         }
       },
-      "UpdateCommissionRateCommand": {
+      "UpsertCommissionRateCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -4859,9 +4999,26 @@
           "transactionType": {
             "type": "string"
           },
+          "minAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
           "taxRate": {
             "type": "number",
             "format": "decimal"
+          }
+        }
+      },
+      "UpsertSystemConfigurationCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
           }
         }
       },
@@ -4984,6 +5141,32 @@
           }
         }
       },
+      "CreateDisputeCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "contractId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "disputeRaisedBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "disputeReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "disputeDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "disputeDoc": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "CreateCustomerCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -5053,6 +5236,20 @@
             "type": "string"
           }
         }
+      },
+      "TimeRangeType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Weekly",
+          "Monthly",
+          "Quarterly"
+        ],
+        "enum": [
+          "Weekly",
+          "Monthly",
+          "Quarterly"
+        ]
       },
       "CreateSubAdminCommand": {
         "type": "object",
