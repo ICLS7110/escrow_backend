@@ -12,15 +12,9 @@ public class DisputeDTO
     public DateTime DisputeDateTime { get; set; }
     public string RaisedBy { get; set; } = string.Empty;  // Buyer/Seller
     public string Status { get; set; } = string.Empty;  // Enum as String
-    public decimal EscrowAmount { get; set; }
-    public decimal ContractAmount { get; set; }
-    public decimal FeesTaxes { get; set; }
     public string DisputeDoc { get; set; } = string.Empty;
-    public List<string> Messages { get; set; } = new();  // ✅ Extract messages as strings
+    public string DisputeReason { get; set; } = string.Empty;
+    public string DisputeDescription { get; set; } = string.Empty;
     public int? ArbitratorId { get; set; }  // Nullable Arbitrator ID
-    public string? AdminDecision { get; set; }  // Admin's final decision
-    public decimal? ReleaseAmount { get; set; }  // Amount released
-    public string? ReleaseTo { get; set; }  // Buyer/Seller receiving the release
-    //public string? ContractDetails { get; set; }  // ✅ Nullable contract details
     public ContractDTO? ContractDetails { get; set; }  // ✅ Nullable contract details
 }

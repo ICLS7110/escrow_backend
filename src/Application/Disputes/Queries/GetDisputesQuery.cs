@@ -82,6 +82,8 @@ public class GetDisputesQueryHandler : IRequestHandler<GetDisputesQuery, Paginat
                 RaisedBy = d.DisputeRaisedBy ?? "Unknown",
                 DisputeDoc = d.DisputeDoc ?? "Unknown",
                 Status = d.Status?.ToString() ?? "N/A",
+                DisputeDescription = d.DisputeDescription?.ToString() ?? "N/A",
+                DisputeReason = d.DisputeReason?.ToString() ?? "N/A",
 
                 ContractDetails = contract != null ? new ContractDTO
                 {
