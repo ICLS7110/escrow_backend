@@ -31,15 +31,15 @@ public class EscrowDecisionCommandHandler : IRequestHandler<EscrowDecisionComman
             return Result<string>.Failure(404, "Dispute not found.");
         }
 
-        if (dispute.Status != DisputeStatus.InReview)
-        {
-            return Result<string>.Failure(400, "Escrow decision can only be made for disputes in 'InReview' status.");
-        }
+        //if (dispute.Status != DisputeStatus.InReview)
+        //{
+        //    return Result<string>.Failure(400, "Escrow decision can only be made for disputes in 'InReview' status.");
+        //}
 
-        if (request.ReleaseAmount > dispute.EscrowAmount)
-        {
-            return Result<string>.Failure(400, "Release amount cannot be greater than the escrow amount.");
-        }
+        //if (request.ReleaseAmount > dispute.EscrowAmount)
+        //{
+        //    return Result<string>.Failure(400, "Release amount cannot be greater than the escrow amount.");
+        //}
 
         if (request.ReleaseTo.ToLower() != "buyer" && request.ReleaseTo.ToLower() != "seller")
         {
@@ -47,10 +47,10 @@ public class EscrowDecisionCommandHandler : IRequestHandler<EscrowDecisionComman
         }
 
         // Update dispute record with escrow decision
-        dispute.ReleaseAmount = request.ReleaseAmount;
-        dispute.ReleaseTo = request.ReleaseTo;
-        dispute.AdminDecision = request.AdminDecision;
-        dispute.Status = DisputeStatus.Resolved;  // Mark dispute as resolved
+        //dispute.ReleaseAmount = request.ReleaseAmount;
+        //dispute.ReleaseTo = request.ReleaseTo;
+        //dispute.AdminDecision = request.AdminDecision;
+        dispute.Status = nameof(DisputeStatus.Resolved);  // Mark dispute as resolved
 
         await _context.SaveChangesAsync(cancellationToken);
 
