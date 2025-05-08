@@ -58,8 +58,8 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             //    return Result<int>.Failure(StatusCodes.Status400BadRequest,"Buyer and Seller mobile numbers cannot be the same.");
             //}
             // Get or create buyer/seller
-            int buyerId = await GetOrCreateUserId(request.BuyerName, request.BuyerMobile, cancellationToken);
-            int sellerId = await GetOrCreateUserId(request.SellerName, request.SellerMobile, cancellationToken);
+            int buyerId = await _firebaseNotification.GetOrCreateUserId(request.BuyerName, request.BuyerMobile, cancellationToken);
+            int sellerId = await _firebaseNotification.GetOrCreateUserId(request.SellerName, request.SellerMobile, cancellationToken);
 
             // Get commission rule
             var commission = await _context.CommissionMasters
@@ -141,7 +141,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             await _context.SaveChangesAsync(cancellationToken);
 
             // Send Push Notification and Save Notification Record
-            await SendNotificationAsync(userId, buyerId, sellerId, entity.Id, entity.Role, cancellationToken);
+            await _firebaseNotification.SendNotificationAsync(userId, buyerId, sellerId, entity.Id, entity.Role, cancellationToken);
 
             return entity.Id;
         }
@@ -149,90 +149,90 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
 
 
 
-        private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
-        {
-            // Fetch creator's name for use in notification message only (not stored)
-            var creatorName = await _context.UserDetails
-                .Where(u => u.Id == creatorId)
-                .Select(u => u.FullName)
-                .FirstOrDefaultAsync(cancellationToken);
+        //private async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
+        //{
+        //    // Fetch creator's name for use in notification message only (not stored)
+        //    var creatorName = await _context.UserDetails
+        //        .Where(u => u.Id == creatorId)
+        //        .Select(u => u.FullName)
+        //        .FirstOrDefaultAsync(cancellationToken);
 
-            // Fetch buyer and seller user data
-            var users = await _context.UserDetails
-                .Where(u => u.Id == buyerId || u.Id == sellerId) // Get buyer and seller records
-                .ToListAsync(cancellationToken);
+        //    // Fetch buyer and seller user data
+        //    var users = await _context.UserDetails
+        //        .Where(u => u.Id == buyerId || u.Id == sellerId) // Get buyer and seller records
+        //        .ToListAsync(cancellationToken);
 
-            // Filter out the record that does not match creatorId
-            var userToNotify = users.FirstOrDefault(u => u.Id != creatorId); // This will give you the user who is not the creator
+        //    // Filter out the record that does not match creatorId
+        //    var userToNotify = users.FirstOrDefault(u => u.Id != creatorId); // This will give you the user who is not the creator
 
-            // If we have a user to notify, proceed with the notification logic
-            if (userToNotify != null)
-            {
-                var userInfo = new { userToNotify.FullName, userToNotify.DeviceToken, userToNotify.IsNotified };
+        //    // If we have a user to notify, proceed with the notification logic
+        //    if (userToNotify != null)
+        //    {
+        //        var userInfo = new { userToNotify.FullName, userToNotify.DeviceToken, userToNotify.IsNotified };
 
-                // Create and send the notification
-                var title = "New Contract Created";
-                var description = $"{creatorName} has created a new contract for you, {userInfo.FullName}. Please review the details.";
+        //        // Create and send the notification
+        //        var title = "New Contract Created";
+        //        var description = $"{creatorName} has created a new contract for you, {userInfo.FullName}. Please review the details.";
 
-                // Save notification to DB (note: FromID is NOT added here)
-                var notification = new Notification
-                {
-                    ToID = userToNotify.Id,
-                    ContractId = contractId,
-                    Title = title,
-                    Description = description,
-                    Type = "Contract",
-                    IsRead = false,
-                    Created = DateTime.UtcNow,
-                };
+        //        // Save notification to DB (note: FromID is NOT added here)
+        //        var notification = new Notification
+        //        {
+        //            ToID = userToNotify.Id,
+        //            ContractId = contractId,
+        //            Title = title,
+        //            Description = description,
+        //            Type = "Contract",
+        //            IsRead = false,
+        //            Created = DateTime.UtcNow,
+        //        };
 
-                // Save the notification in the database
-                await _context.Notifications.AddAsync(notification, cancellationToken);
+        //        // Save the notification in the database
+        //        await _context.Notifications.AddAsync(notification, cancellationToken);
 
-                // Send push notification if applicable
-                if (!string.IsNullOrEmpty(userInfo.DeviceToken) && userInfo.IsNotified == true)
-                {
-                    await _firebaseNotification.SendPushNotificationAsync(
-                        userInfo.DeviceToken,
-                        title,
-                        description,
-                        new { ContractId = contractId, Type = "Contract", Role = role }
-                    );
-                }
+        //        // Send push notification if applicable
+        //        if (!string.IsNullOrEmpty(userInfo.DeviceToken) && userInfo.IsNotified == true)
+        //        {
+        //            await _firebaseNotification.SendPushNotificationAsync(
+        //                userInfo.DeviceToken,
+        //                title,
+        //                description,
+        //                new { ContractId = contractId, Type = "Contract", Role = role }
+        //            );
+        //        }
 
-                // Save changes to the database
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-        }
+        //        // Save changes to the database
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+        //}
 
 
-        private async Task<int> GetOrCreateUserId(string? name, string? mobile, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrEmpty(mobile)) return 0;
+        //private async Task<int> GetOrCreateUserId(string? name, string? mobile, CancellationToken cancellationToken)
+        //{
+        //    if (string.IsNullOrEmpty(mobile)) return 0;
 
-            var user = await _context.UserDetails.FirstOrDefaultAsync(u => u.PhoneNumber == mobile, cancellationToken);
+        //    var user = await _context.UserDetails.FirstOrDefaultAsync(u => u.PhoneNumber == mobile, cancellationToken);
 
-            if (user != null)
-            {
-                return user.Id;
-            }
+        //    if (user != null)
+        //    {
+        //        return user.Id;
+        //    }
 
-            var newUser = new UserDetail
-            {
-                UserId = Guid.NewGuid().ToString(),
-                FullName = name ?? "Unknown",
-                PhoneNumber = mobile,
-                Created = DateTime.UtcNow,
-                IsActive = true,
-                IsDeleted = false,
-                IsProfileCompleted = false,
-                Role = nameof(Roles.User),
-            };
+        //    var newUser = new UserDetail
+        //    {
+        //        UserId = Guid.NewGuid().ToString(),
+        //        FullName = name ?? "Unknown",
+        //        PhoneNumber = mobile,
+        //        Created = DateTime.UtcNow,
+        //        IsActive = true,
+        //        IsDeleted = false,
+        //        IsProfileCompleted = false,
+        //        Role = nameof(Roles.User),
+        //    };
 
-            _context.UserDetails.Add(newUser);
-            await _context.SaveChangesAsync(cancellationToken);
+        //    _context.UserDetails.Add(newUser);
+        //    await _context.SaveChangesAsync(cancellationToken);
 
-            return newUser.Id;
-        }
+        //    return newUser.Id;
+        //}
     }
 }

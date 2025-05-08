@@ -2843,6 +2843,36 @@
         ]
       }
     },
+    "/api/DisputeManagement/update-status-v2": {
+      "post": {
+        "tags": [
+          "DisputeManagement"
+        ],
+        "operationId": "UpdateDisputeStatusV2",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Customers/add": {
       "post": {
         "tags": [
@@ -4160,8 +4190,9 @@
           "provider": {
             "type": "string"
           },
-          "token": {
-            "type": "string"
+          "sId": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

@@ -46,6 +46,7 @@ public class Transactions : EndpointGroupBase
         var result = await sender.Send(new SearchTransactionsQuery
         {
             Keyword = request.Keyword,
+            TransactionStatus = request.TransactionStatus,
             TransactionType = request.TransactionType,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
@@ -53,7 +54,7 @@ public class Transactions : EndpointGroupBase
             PageSize = request.PageSize
         });
 
-        if (result == null || !result.Items.Any())
+        if (result == null)
         {
             return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No transactions found."));
         }

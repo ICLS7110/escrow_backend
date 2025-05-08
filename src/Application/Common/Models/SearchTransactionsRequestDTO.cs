@@ -16,6 +16,7 @@ public class SearchTransactionsRequestDTO
     //[FromQuery(Name = "seller_ids")]
     //public string? SellerIdsRaw { get; set; }
 
+    [FromQuery] public string? TransactionStatus { get; set; }
     [FromQuery] public string? TransactionType { get; set; }
     [FromQuery] public DateTime? StartDate { get; set; }
     [FromQuery] public DateTime? EndDate { get; set; }

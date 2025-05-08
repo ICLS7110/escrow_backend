@@ -21,10 +21,20 @@ public class DisputeManagement : EndpointGroupBase
         //disputeGroup.MapGet("/{disputeId:int}", GetDisputeById).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
         disputeGroup.MapPost("/{disputeId:int}/assign-arbitrator", AssignArbitrator).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
         disputeGroup.MapPost("/update-status", UpdateDisputeStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
+
+
         disputeGroup.MapPost("/escrow-decision", MakeEscrowDecision).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
 
         // 🆕 User-facing endpoint
         disputeGroup.MapPost("/create", CreateDispute).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin),nameof(Roles.User))); ; // ⬅️ New user-facing route
+
+
+
+    //    disputeGroup.MapPost("/update-status-v2", UpdateDisputeStatusV2)
+    //.WithName("UpdateDisputeStatusV2")
+    //.WithOpenApi()
+    //.RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
+
     }
 
     [Authorize]
@@ -53,11 +63,14 @@ public class DisputeManagement : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> UpdateDisputeStatus(ISender sender, [FromBody] UpdateDisputeStatusCommand command)
+    public async Task<IResult> UpdateDisputeStatus(
+    ISender sender,
+    [FromBody] UpdateStatusCommand command)
     {
         var result = await sender.Send(command);
         return TypedResults.Ok(result);
     }
+
 
     [Authorize]
     public async Task<IResult> MakeEscrowDecision(ISender sender, [FromBody] EscrowDecisionCommand command)
@@ -78,6 +91,17 @@ public class DisputeManagement : EndpointGroupBase
 
         return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message ?? "Failed to create dispute."));
     }
+
+
+    [Authorize]
+    public async Task<IResult> UpdateDisputeStatusV2(
+    ISender sender,
+    [FromBody] UpdateStatusCommand command)
+    {
+        var result = await sender.Send(command);
+        return TypedResults.Ok(result);
+    }
+
 
 }
 

@@ -3,6 +3,7 @@ using System;
 using Escrow.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250507063317_AlterStatus_in_transcation")]
+    partial class AlterStatus_in_transcation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -797,9 +800,6 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BuyerNote")
-                        .HasColumnType("text");
-
                     b.Property<int>("ContractId")
                         .HasColumnType("integer");
 
@@ -838,15 +838,6 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.Property<int>("RecordState")
                         .HasColumnType("integer");
-
-                    b.Property<string>("ReleaseAmount")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ReleaseTo")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SellerNote")
-                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .HasColumnType("text");

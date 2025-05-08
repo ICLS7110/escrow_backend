@@ -1,17 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Mappings;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.Common.Models.ContractDTOs;
+using Escrow.Api.Application.DTOs;
+using Escrow.Api.Domain.Enums;
+using FluentValidation;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Application.Transactions.Queries;
-public record SearchTransactionsQuery : IRequest<PaginatedList<TransactionDTO>>
+
+public record SearchTransactionsQuery : IRequest<Result<PaginatedList<TransactionDTO>>>
 {
     public string? Keyword { get; init; }
     public string? TransactionType { get; init; }
+    public string? TransactionStatus { get; init; }
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public int? PageNumber { get; init; } = 1;
@@ -27,22 +35,25 @@ public class SearchTransactionsQueryValidator : AbstractValidator<SearchTransact
     }
 }
 
-public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactionsQuery, PaginatedList<TransactionDTO>>
+public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactionsQuery, Result<PaginatedList<TransactionDTO>>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IJwtService _jwtService;
 
-    public SearchTransactionsQueryHandler(IApplicationDbContext context)
+    public SearchTransactionsQueryHandler(IApplicationDbContext context, IJwtService jwtService)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
     }
 
-    public async Task<PaginatedList<TransactionDTO>> Handle(SearchTransactionsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PaginatedList<TransactionDTO>>> Handle(SearchTransactionsQuery request, CancellationToken cancellationToken)
     {
         var validator = new SearchTransactionsQueryValidator();
         var validationResult = validator.Validate(request);
+
         if (!validationResult.IsValid)
         {
-            throw new ArgumentException(validationResult.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid input.");
+            return Result<PaginatedList<TransactionDTO>>.Failure(400, validationResult.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid request.");
         }
 
         int pageNumber = request.PageNumber ?? 1;
@@ -50,15 +61,36 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
 
         var query = _context.Transactions.AsQueryable();
 
-        // 🔍 Filtering logic
+        var currentUserId = _jwtService.GetUserId().ToInt();
+
+        var userRole = await _context.UserDetails
+            .Where(u => u.Id == currentUserId)
+            .Select(u => u.Role)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (userRole == nameof(Roles.User))
+        {
+            query = query.Where(t => t.CreatedBy == currentUserId.ToString());
+        }
+
+
+        var totalAmount = await query.SumAsync(t => (decimal?)t.TransactionAmount) ?? 0m;
+
         if (!string.IsNullOrEmpty(request.Keyword))
         {
-            query = query.Where(t => t.TransactionType != null && t.TransactionType.Contains(request.Keyword) || t.Id.ToString() == request.Keyword);
+            query = query.Where(t =>
+                (t.TransactionType != null && t.TransactionType.Contains(request.Keyword)) ||
+                t.Id.ToString() == request.Keyword);
         }
 
         if (!string.IsNullOrEmpty(request.TransactionType))
         {
             query = query.Where(t => t.TransactionType == request.TransactionType);
+        }
+
+        if (!string.IsNullOrEmpty(request.TransactionStatus))
+        {
+            query = query.Where(t => t.Status == request.TransactionStatus);
         }
 
         if (request.StartDate.HasValue)
@@ -74,19 +106,6 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
             query = query.Where(t => t.TransactionDateTime <= endDateUtc);
         }
 
-
-
-        //if (request.StartDate.HasValue)
-        //{
-        //    query = query.Where(t => t.TransactionDateTime.Date >= Convert.ToDateTime(request.StartDate.Value).Date);
-        //}
-
-        //if (request.EndDate.HasValue)
-        //{
-        //    query = query.Where(t => t.TransactionDateTime.Date <= request.EndDate.Value);
-        //}
-
-        // 📌 Apply Pagination
         var paginatedTransactions = await query
             .OrderByDescending(t => t.TransactionDateTime)
             .Select(t => new TransactionDTO
@@ -97,10 +116,337 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
                 TransactionType = t.TransactionType ?? "N/A",
                 FromPayee = t.FromPayee ?? "N/A",
                 ToRecipient = t.ToRecipient ?? "N/A",
-                ContractId = t.ContractId
+                ContractId = t.ContractId,
+                TotalAmount = totalAmount,
+                Status=t.Status,
+                ContractDetails = t.ContractId != null ? (
+                    from c in _context.ContractDetails
+                    where c.Id == t.ContractId
+                    select new ContractDetailsDTO
+                    {
+                        Id = c.Id,
+                        Role = c.Role,
+                        ContractTitle = c.ContractTitle,
+                        ServiceType = c.ServiceType,
+                        ServiceDescription = c.ServiceDescription,
+                        AdditionalNote = c.AdditionalNote,
+                        FeesPaidBy = c.FeesPaidBy,
+                        FeeAmount = c.FeeAmount,
+                        BuyerName = c.BuyerName,
+                        BuyerMobile = c.BuyerMobile,
+                        BuyerId = c.BuyerDetailsId.ToString(),
+                        SellerId = c.SellerDetailsId.ToString(),
+                        SellerName = c.SellerName,
+                        SellerMobile = c.SellerMobile,
+                        CreatedBy = c.CreatedBy,
+                        ContractDoc = c.ContractDoc,
+                        Status = c.Status,
+                        IsActive = c.IsActive,
+                        IsDeleted = c.IsDeleted,
+                        TaxAmount = c.TaxAmount,
+                        EscrowTax = c.EscrowTax,
+                        LastModifiedBy = c.LastModifiedBy,
+                        BuyerPayableAmount = c.BuyerPayableAmount,
+                        SellerPayableAmount = c.SellerPayableAmount,
+                        Created = c.Created,
+                        LastModified = c.LastModified,
+                        MileStones = _context.MileStones
+                            .Where(m => m.ContractId == c.Id)
+                            .Select(m => new MileStoneDTO
+                            {
+                                Id = m.Id,
+                                Name = m.Name,
+                                Amount = m.Amount,
+                                DueDate = m.DueDate,
+                                Status = m.Status
+                            }).ToList(),
+                        TeamMembers = new List<TeamDTO>(),
+                        InvitationDetails = null
+                    }).FirstOrDefault() : null
             })
             .PaginatedListAsync(pageNumber, pageSize);
 
-        return paginatedTransactions;
+        if (!paginatedTransactions.Items.Any())
+        {
+            return Result<PaginatedList<TransactionDTO>>.Failure(404, "No transactions found.");
+        }
+
+        return Result<PaginatedList<TransactionDTO>>.Success(200, "Transactions retrieved successfully.", paginatedTransactions);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactionsQuery, PaginatedList<TransactionDTO>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IJwtService _jwtService;
+
+//    public SearchTransactionsQueryHandler(IApplicationDbContext context, IJwtService jwtService)
+//    {
+//        _context = context ?? throw new ArgumentNullException(nameof(context));
+//        _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
+//    }
+
+//    public async Task<PaginatedList<TransactionDTO>> Handle(SearchTransactionsQuery request, CancellationToken cancellationToken)
+//    {
+//        var validator = new SearchTransactionsQueryValidator();
+//        var validationResult = validator.Validate(request);
+//        if (!validationResult.IsValid)
+//        {
+//            throw new ArgumentException(validationResult.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid input.");
+//        }
+
+//        int pageNumber = request.PageNumber ?? 1;
+//        int pageSize = request.PageSize ?? 10;
+
+//        var query = _context.Transactions.AsQueryable();
+
+//        // 🔐 Get User ID and Role from JWT
+//        var currentUserId = _jwtService.GetUserId().ToInt();
+
+
+//        var userRole = await _context.UserDetails
+//          .Where(u => u.Id == currentUserId)
+//          .Select(u => u.Role)
+//          .FirstOrDefaultAsync(cancellationToken);
+
+
+//        // 👤 If user is 'User', restrict to their transactions
+//        if (userRole == nameof(Roles.User))
+//        {
+//            query = query.Where(t => t.CreatedBy == currentUserId.ToString());
+//        }
+
+//        // 🔍 Apply filters
+//        if (!string.IsNullOrEmpty(request.Keyword))
+//        {
+//            query = query.Where(t =>
+//                (t.TransactionType != null && t.TransactionType.Contains(request.Keyword)) ||
+//                t.Id.ToString() == request.Keyword);
+//        }
+
+//        if (!string.IsNullOrEmpty(request.TransactionType))
+//        {
+//            query = query.Where(t => t.TransactionType == request.TransactionType);
+//        }
+
+//        if (request.StartDate.HasValue)
+//        {
+//            var startDateUtc = DateTime.SpecifyKind(request.StartDate.Value.Date, DateTimeKind.Utc);
+//            query = query.Where(t => t.TransactionDateTime >= startDateUtc);
+//        }
+
+//        if (request.EndDate.HasValue)
+//        {
+//            var endDate = request.EndDate.Value.Date.AddDays(1).AddTicks(-1);
+//            var endDateUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+//            query = query.Where(t => t.TransactionDateTime <= endDateUtc);
+//        }
+
+//        // 📦 Projection + Pagination
+//        var paginatedTransactions = await query
+//            .OrderByDescending(t => t.TransactionDateTime)
+//            .Select(t => new TransactionDTO
+//            {
+//                Id = t.Id,
+//                TransactionDateTime = t.TransactionDateTime,
+//                TransactionAmount = t.TransactionAmount,
+//                TransactionType = t.TransactionType ?? "N/A",
+//                FromPayee = t.FromPayee ?? "N/A",
+//                ToRecipient = t.ToRecipient ?? "N/A",
+//                ContractId = t.ContractId,
+//                ContractDetails = t.ContractId != null ? (
+//                    from c in _context.ContractDetails
+//                    where c.Id == t.ContractId
+//                    select new ContractDetailsDTO
+//                    {
+//                        Id = c.Id,
+//                        Role = c.Role,
+//                        ContractTitle = c.ContractTitle,
+//                        ServiceType = c.ServiceType,
+//                        ServiceDescription = c.ServiceDescription,
+//                        AdditionalNote = c.AdditionalNote,
+//                        FeesPaidBy = c.FeesPaidBy,
+//                        FeeAmount = c.FeeAmount,
+//                        BuyerName = c.BuyerName,
+//                        BuyerMobile = c.BuyerMobile,
+//                        BuyerId = c.BuyerDetailsId.ToString(),
+//                        SellerId = c.SellerDetailsId.ToString(),
+//                        SellerName = c.SellerName,
+//                        SellerMobile = c.SellerMobile,
+//                        CreatedBy = c.CreatedBy,
+//                        ContractDoc = c.ContractDoc,
+//                        Status = c.Status,
+//                        IsActive = c.IsActive,
+//                        IsDeleted = c.IsDeleted,
+//                        TaxAmount = c.TaxAmount,
+//                        EscrowTax = c.EscrowTax,
+//                        LastModifiedBy = c.LastModifiedBy,
+//                        BuyerPayableAmount = c.BuyerPayableAmount,
+//                        SellerPayableAmount = c.SellerPayableAmount,
+//                        Created = c.Created,
+//                        LastModified = c.LastModified,
+
+//                        MileStones = _context.MileStones
+//                            .Where(m => m.ContractId == c.Id)
+//                            .Select(m => new MileStoneDTO
+//                            {
+//                                Id = m.Id,
+//                                Name = m.Name,
+//                                Amount = m.Amount,
+//                                DueDate = m.DueDate,
+//                                Status = m.Status
+//                            }).ToList(),
+
+//                        TeamMembers = new List<TeamDTO>(),
+//                        InvitationDetails = null
+//                    }).FirstOrDefault() : null
+//            })
+//            .PaginatedListAsync(pageNumber, pageSize);
+
+//        return paginatedTransactions;
+//    }
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//public async Task<PaginatedList<TransactionDTO>> Handle(SearchTransactionsQuery request, CancellationToken cancellationToken)
+//{
+//    var validator = new SearchTransactionsQueryValidator();
+//    var validationResult = validator.Validate(request);
+//    if (!validationResult.IsValid)
+//    {
+//        throw new ArgumentException(validationResult.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid input.");
+//    }
+
+//    int pageNumber = request.PageNumber ?? 1;
+//    int pageSize = request.PageSize ?? 10;
+
+//    var query = _context.Transactions.AsQueryable();
+
+//    // 🔍 Filtering logic
+//    if (!string.IsNullOrEmpty(request.Keyword))
+//    {
+//        query = query.Where(t => t.TransactionType != null && t.TransactionType.Contains(request.Keyword) || t.Id.ToString() == request.Keyword);
+//    }
+
+//    if (!string.IsNullOrEmpty(request.TransactionType))
+//    {
+//        query = query.Where(t => t.TransactionType == request.TransactionType);
+//    }
+
+//    if (request.StartDate.HasValue)
+//    {
+//        var startDateUtc = DateTime.SpecifyKind(request.StartDate.Value.Date, DateTimeKind.Utc);
+//        query = query.Where(t => t.TransactionDateTime >= startDateUtc);
+//    }
+
+//    if (request.EndDate.HasValue)
+//    {
+//        var endDate = request.EndDate.Value.Date.AddDays(1).AddTicks(-1);
+//        var endDateUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+//        query = query.Where(t => t.TransactionDateTime <= endDateUtc);
+//    }
+
+
+
+//    //if (request.StartDate.HasValue)
+//    //{
+//    //    query = query.Where(t => t.TransactionDateTime.Date >= Convert.ToDateTime(request.StartDate.Value).Date);
+//    //}
+
+//    //if (request.EndDate.HasValue)
+//    //{
+//    //    query = query.Where(t => t.TransactionDateTime.Date <= request.EndDate.Value);
+//    //}
+
+//    // 📌 Apply Pagination
+//    var paginatedTransactions = await query
+//.OrderByDescending(t => t.TransactionDateTime)
+//.Select(t => new TransactionDTO
+//{
+//    Id = t.Id,
+//    TransactionDateTime = t.TransactionDateTime,
+//    TransactionAmount = t.TransactionAmount,
+//    TransactionType = t.TransactionType ?? "N/A",
+//    FromPayee = t.FromPayee ?? "N/A",
+//    ToRecipient = t.ToRecipient ?? "N/A",
+//    ContractId = t.ContractId,
+//    ContractDetails = t.ContractId != null ? (
+//        from c in _context.ContractDetails
+//        where c.Id == t.ContractId
+//        select new ContractDetailsDTO
+//        {
+//            Id = c.Id,
+//            Role = c.Role,
+//            ContractTitle = c.ContractTitle,
+//            ServiceType = c.ServiceType,
+//            ServiceDescription = c.ServiceDescription,
+//            AdditionalNote = c.AdditionalNote,
+//            FeesPaidBy = c.FeesPaidBy,
+//            FeeAmount = c.FeeAmount,
+//            BuyerName = c.BuyerName,
+//            BuyerMobile = c.BuyerMobile,
+//            BuyerId = c.BuyerDetailsId.ToString(),
+//            SellerId = c.SellerDetailsId.ToString(),
+//            SellerName = c.SellerName,
+//            SellerMobile = c.SellerMobile,
+//            CreatedBy = c.CreatedBy,
+//            ContractDoc = c.ContractDoc,
+//            Status = c.Status,
+//            IsActive = c.IsActive,
+//            IsDeleted = c.IsDeleted,
+//            TaxAmount = c.TaxAmount,
+//            EscrowTax = c.EscrowTax,
+//            LastModifiedBy = c.LastModifiedBy,
+//            BuyerPayableAmount = c.BuyerPayableAmount,
+//            SellerPayableAmount = c.SellerPayableAmount,
+//            Created = c.Created,
+//            LastModified = c.LastModified,
+
+//            MileStones = _context.MileStones
+//                .Where(m => m.ContractId == c.Id)
+//                .Select(m => new MileStoneDTO
+//                {
+//                    Id = m.Id,
+//                    Name = m.Name,
+//                    Amount = m.Amount,
+//                    DueDate = m.DueDate,
+//                    Status = m.Status
+//                }).ToList(),
+
+//            // You can optionally fetch these similarly
+//            TeamMembers = new List<TeamDTO>(),
+//            InvitationDetails = null
+//        }).FirstOrDefault() : null
+//})
+//.PaginatedListAsync(pageNumber, pageSize);
+
+
+//    return paginatedTransactions;
+//}
+

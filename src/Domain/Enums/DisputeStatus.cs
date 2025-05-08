@@ -11,9 +11,11 @@ namespace Escrow.Api.Domain.Enums;
 public enum DisputeStatus
 {
     Pending,
+    Resolved,
+    DisputeWin,
     InReview,
     WaitingForResponse,
-    Resolved,
+    DisputeLoss,
     WaitingForBuyer,
     WaitingForSeller
 }

@@ -14,7 +14,11 @@ public class Dispute : BaseAuditableEntity
     public string? DisputeReason { get; set; }
     public string? DisputeDescription { get; set; }
     public string? DisputeDoc { get; set; } 
-    public string? Status { get; set; } 
+    public string? Status { get; set; }
+    public string? ReleaseTo { get; set; }
+    public string? ReleaseAmount { get; set; }
+    public string? BuyerNote { get; set; }
+    public string? SellerNote { get; set; }
     public DateTime DisputeDateTime { get; set; } = DateTime.UtcNow;
 }
 //public class Dispute : BaseAuditableEntity

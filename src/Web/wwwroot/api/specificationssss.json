@@ -2764,7 +2764,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateStatusCommand"
+                "$ref": "#/components/schemas/UpdateDisputeStatusCommand"
               }
             }
           },
@@ -4160,8 +4160,9 @@
           "provider": {
             "type": "string"
           },
-          "token": {
-            "type": "string"
+          "sId": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -5050,7 +5051,7 @@
           }
         }
       },
-      "UpdateStatusCommand": {
+      "UpdateDisputeStatusCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -5060,22 +5061,6 @@
           },
           "newStatus": {
             "$ref": "#/components/schemas/DisputeStatus"
-          },
-          "releaseTo": {
-            "type": "string",
-            "nullable": true
-          },
-          "releaseAmount": {
-            "type": "string",
-            "nullable": true
-          },
-          "buyerNote": {
-            "type": "string",
-            "nullable": true
-          },
-          "sellerNote": {
-            "type": "string",
-            "nullable": true
           }
         }
       },

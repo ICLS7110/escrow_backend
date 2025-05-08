@@ -77,7 +77,7 @@ public class ModifyContractCommandHandler : IRequestHandler<ModifyContractComman
             contract.SellerName = request.SellerName ?? string.Empty;
             contract.SellerMobile = request.SellerMobile ?? string.Empty;
             contract.ContractDoc = request.ContractDoc ?? string.Empty;
-            contract.Status = request.Status ?? nameof(ContractStatus.Pending);
+            contract.Status = nameof(ContractStatus.Pending);
             contract.LastModified = DateTime.UtcNow;
             contract.LastModifiedBy = userId.ToString();
 

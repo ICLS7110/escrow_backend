@@ -95,7 +95,8 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IAESService, AESService>();
         builder.Services.AddScoped<IFileService, FileService>();
 
-        builder.Services.AddSingleton<INotificationService, FirebaseNotificationService>();
+        builder.Services.AddScoped<INotificationService, FirebaseNotificationService>(); // ✅
+
     }
 
 

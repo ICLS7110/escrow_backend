@@ -20,19 +20,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Disputes\Commands\UpdateDisputeStatusCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AWSSDK.Core" />
     <PackageReference Include="BCrypt.Net-Core" />
+    <PackageReference Include="Dapper" />
     <PackageReference Include="EPPlus" />
     <PackageReference Include="FirebaseAdmin" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Google.Apis.Auth" />
+    <PackageReference Include="jose-jwt" />
+    <PackageReference Include="JWT" />
     <PackageReference Include="libphonenumber-csharp" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
   <ItemGroup>

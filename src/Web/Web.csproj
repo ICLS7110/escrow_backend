@@ -45,10 +45,6 @@
     <Folder Include="AdminEndPoints\UserPanel\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\welink-logo.png" />
-  </ItemGroup>
-
 
   <!-- Auto-generated Open API specification and Angular TypeScript clients -->
   <PropertyGroup>
