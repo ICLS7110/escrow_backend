@@ -1,5 +1,6 @@
 ﻿using Escrow.Api.Application;
 using Escrow.Api.Application.BankDetails.Queries;
+using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
@@ -13,6 +14,7 @@ using Escrow.Api.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Escrow.Api.Web.Endpoints.UserPanel;
@@ -42,6 +44,8 @@ public class UserDetails : EndpointGroupBase
         userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin).AllowAnonymous();
 
         userGroup.MapPost("/update-mobile-number", UpdateMobileNumber).AllowAnonymous();
+        userGroup.MapPost("/send-sms", SendSMS).AllowAnonymous();
+
 
     }
 
@@ -166,4 +170,25 @@ public class UserDetails : EndpointGroupBase
         var result = await sender.Send(query);
         return TypedResults.Ok(result);
     }
+
+
+
+    [AllowAnonymous]
+    public async Task<IResult> SendSMS(HttpContext httpContext, [FromBody] SMSRequest request)
+    {
+        try
+        {
+            var smsService = httpContext.RequestServices.GetRequiredService<UnifonicSmsService>();
+            var response = await smsService.SendSmsAsync(request.To, request.To.ToString());
+            return TypedResults.Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
+    }
+
+
+
+
 }

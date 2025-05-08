@@ -564,6 +564,31 @@
         }
       }
     },
+    "/api/UserDetails/send-sms": {
+      "post": {
+        "tags": [
+          "UserDetails"
+        ],
+        "operationId": "PostApiUserDetailsSendSms",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SMSRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/Contract": {
       "get": {
         "tags": [
@@ -4180,6 +4205,18 @@
           "mobileNumber": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "SMSRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
           }
         }
       },

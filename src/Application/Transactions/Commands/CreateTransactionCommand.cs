@@ -102,8 +102,6 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
-
         return Result<object>.Success(StatusCodes.Status200OK, "Transaction created successfully.", new { TransactionId = entity.Id });
     }
 }

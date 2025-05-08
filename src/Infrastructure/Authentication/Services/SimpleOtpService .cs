@@ -1,14 +1,17 @@
 ﻿using Escrow.Api.Application.Authentication.Interfaces;
+using Escrow.Api.Application.Common.Helpers;
 using System;
 
 namespace Escrow.Api.Infrastructure.Authentication.Services
 {
+    
     public class SimpleOtpService : IOtpService
     {
         public Task<string> GenerateOtpAsync()
         {
-           /* var random = new Random();
-            return Task.FromResult(random.Next(100000, 999999).ToString());*/
+            
+            /* var random = new Random();
+             return Task.FromResult(random.Next(100000, 999999).ToString());*/
             // Return a static OTP for consistent testing
             return Task.FromResult("1234");
         }

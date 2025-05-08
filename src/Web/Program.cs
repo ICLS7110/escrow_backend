@@ -122,6 +122,9 @@ builder.Services.AddScoped<IEmailService, EmailConfiguration>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 
+builder.Services.AddHttpClient<UnifonicSmsService>();
+builder.Services.AddHttpClient();
+
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 100_000_000; // 100 MB

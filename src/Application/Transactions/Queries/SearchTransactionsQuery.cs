@@ -96,14 +96,14 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
         if (request.StartDate.HasValue)
         {
             var startDateUtc = DateTime.SpecifyKind(request.StartDate.Value.Date, DateTimeKind.Utc);
-            query = query.Where(t => t.TransactionDateTime >= startDateUtc);
+            query = query.Where(t => t.TransactionDateTime >= startDateUtc||t.Created >= startDateUtc);
         }
 
         if (request.EndDate.HasValue)
         {
             var endDate = request.EndDate.Value.Date.AddDays(1).AddTicks(-1);
             var endDateUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
-            query = query.Where(t => t.TransactionDateTime <= endDateUtc);
+            query = query.Where(t => t.TransactionDateTime <= endDateUtc || t.Created <= endDateUtc);
         }
 
         var paginatedTransactions = await query
