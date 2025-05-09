@@ -17,7 +17,8 @@ namespace Escrow.Api.Domain.Enums
         Completed,
         Cancelled,
         Draft,
-        Escrow
+        Escrow,
+        Dispute
     }
 
 }
