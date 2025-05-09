@@ -7,22 +7,22 @@ using Escrow.Api.Domain.Entities;
 using Escrow.Api.Domain.Entities.AdminPanel;
 using Escrow.Api.Domain.Entities.AMLPanel;
 using Escrow.Api.Domain.Entities.Commissions;
+using Escrow.Api.Domain.Entities.ContactUsPanel;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.ContractReviews;
 using Escrow.Api.Domain.Entities.Disputes;
 using Escrow.Api.Domain.Entities.EmailTemplates;
 using Escrow.Api.Domain.Entities.Notifications;
 using Escrow.Api.Domain.Entities.Pages;
+using Escrow.Api.Domain.Entities.RoleMenuPermissions;
 using Escrow.Api.Domain.Entities.TeamMembers;
 using Escrow.Api.Domain.Entities.Transactions;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Domain.Enums;
-using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Options;
 
 namespace Escrow.Api.Infrastructure.Data;
 
@@ -41,6 +41,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 
+
     public DbSet<UserDetail> UserDetails { get; set; }
     public DbSet<Page> Pages => Set<Page>();
     public DbSet<BankDetail> BankDetails => Set<BankDetail>();
@@ -56,11 +57,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<AMLTransactionVerification> AMLTransactionVerifications => Set<AMLTransactionVerification>();
     public DbSet<Dispute> Disputes => Set<Dispute>();
     public DbSet<DisputeMessage> DisputeMessages => Set<DisputeMessage>();
+    public DbSet<ContactUs> ContactUs => Set<ContactUs>();
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<ContractReview> ContractReviews => Set<ContractReview>();
     public DbSet<ContractDetailsLog> ContractDetailsLogs => Set<ContractDetailsLog>();
+    public DbSet<Menu> Menus => Set<Menu>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<RoleMenuPermission> RoleMenuPermissions => Set<RoleMenuPermission>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

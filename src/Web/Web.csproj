@@ -6,13 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AdminEndPoints\PermissionManagers\**" />
-    <Content Remove="AdminEndPoints\PermissionManagers\**" />
-    <EmbeddedResource Remove="AdminEndPoints\PermissionManagers\**" />
-    <None Remove="AdminEndPoints\PermissionManagers\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="UserEndpoints\UserDetails.cs" />
   </ItemGroup>
 
@@ -53,6 +46,7 @@
 
   <ItemGroup>
     <Folder Include="AdminEndPoints\UserPanel\" />
+    <Folder Include="UserEndpoints\Commissions\" />
     <Folder Include="wwwroot\UserUploads\" />
   </ItemGroup>
 
