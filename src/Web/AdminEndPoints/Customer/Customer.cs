@@ -28,7 +28,6 @@ public class Customers : EndpointGroupBase
         customerGroup.MapPut("/delete/{id:int}", DeleteCustomer);
         customerGroup.MapPut("/update-status/{id:int}", ChangeCustomerStatus); // New endpoint for toggling status
         customerGroup.MapGet("/list", GetCustomers);
-        customerGroup.MapGet("/detail/{id:int}", GetCustomers);
     }
 
     [Authorize]

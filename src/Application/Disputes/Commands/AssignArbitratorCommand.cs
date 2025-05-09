@@ -28,12 +28,12 @@ public class AssignArbitratorCommandHandler : IRequestHandler<AssignArbitratorCo
             return Result<string>.Failure(404, "Dispute not found.");
         }
 
-        if (dispute.ArbitratorId.HasValue)
-        {
-            return Result<string>.Failure(400, "An arbitrator has already been assigned to this dispute.");
-        }
+        //if (dispute.ArbitratorId.HasValue)
+        //{
+        //    return Result<string>.Failure(400, "An arbitrator has already been assigned to this dispute.");
+        //}
 
-        dispute.ArbitratorId = request.ArbitratorId;
+        //dispute.ArbitratorId = request.ArbitratorId;
 
         await _context.SaveChangesAsync(cancellationToken);
 

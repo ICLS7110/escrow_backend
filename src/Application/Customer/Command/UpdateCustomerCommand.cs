@@ -31,22 +31,30 @@ namespace Escrow.Api.Application.Customer.Commands
 
         public async Task<Result<object>> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
-            var customer = await _context.UserDetails
-                .FirstOrDefaultAsync(c => c.Id == request.CustomerId, cancellationToken);
+            var result = await _context.UserDetails
+                .Where(c => c.Id == request.CustomerId || c.EmailAddress == request.EmailAddress)
+                .Select(c => new
+                {
+                    IsTargetCustomer = c.Id == request.CustomerId,
+                    IsEmailConflict = c.EmailAddress == request.EmailAddress && c.Id != request.CustomerId,
+                    Customer = c
+                })
+                .ToListAsync(cancellationToken);
 
-            if (customer == null)
+            var customerEntry = result.FirstOrDefault(r => r.IsTargetCustomer);
+            var hasEmailConflict = result.Any(r => r.IsEmailConflict);
+
+            if (customerEntry == null)
             {
                 return Result<object>.Failure(StatusCodes.Status404NotFound, "Customer not found.");
             }
 
-            // Check if email already exists for another customer
-            var existingCustomer = await _context.UserDetails
-                .FirstOrDefaultAsync(c => c.EmailAddress == request.EmailAddress && c.Id != request.CustomerId, cancellationToken);
-
-            if (existingCustomer != null)
+            if (hasEmailConflict)
             {
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, "Email already exists.");
             }
+
+            var customer = customerEntry.Customer;
 
             customer.FullName = request.FullName;
             customer.PhoneNumber = request.MobileNumber;
@@ -58,5 +66,6 @@ namespace Escrow.Api.Application.Customer.Commands
 
             return Result<object>.Success(StatusCodes.Status200OK, "Customer updated successfully.");
         }
+
     }
 }
