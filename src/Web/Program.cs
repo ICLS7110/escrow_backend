@@ -1,4 +1,5 @@
 using System.Text;
+using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Infrastructure.Configuration;
@@ -117,8 +118,9 @@ builder.AddInfrastructureServices();
 builder.AddWebServices();
 builder.Services.AddControllers();
 
-//builder.Services.AddScoped<IEmailService, EmailConfiguration>();
+builder.Services.AddScoped<IEmailService, EmailConfiguration>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
