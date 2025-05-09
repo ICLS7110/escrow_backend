@@ -16,7 +16,6 @@
   <ItemGroup>
     <Compile Remove="Helpers\IUserService.cs" />
     <Compile Remove="Helpers\UserService.cs" />
-    <Compile Remove="Services\NoOpEmailSender.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,6 +38,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

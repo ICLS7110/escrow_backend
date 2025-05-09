@@ -3884,6 +3884,38 @@
           }
         }
       }
+    },
+    "/api/Anb/balance/{accountNumber}": {
+      "get": {
+        "tags": [
+          "Anb"
+        ],
+        "operationId": "Anb_GetBalance",
+        "parameters": [
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
