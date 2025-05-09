@@ -3088,24 +3088,17 @@
         "operationId": "GetApiDashboardAdminCommissionLast12Months",
         "parameters": [
           {
-            "name": "year",
+            "name": "rangeType",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
+              "default": "Weekly",
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/TimeRangeType"
+                }
+              ]
             },
             "x-position": 1
-          },
-          {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "x-position": 2
           }
         ],
         "responses": {
@@ -3126,6 +3119,42 @@
           "Dashboard"
         ],
         "operationId": "GetApiDashboardEscrowAmount",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Dashboard/dashboard-counts": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "GetApiDashboardDashboardCounts",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/Dashboard/dashboard-listings": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "GetApiDashboardDashboardListings",
         "responses": {
           "200": {
             "description": ""
@@ -4769,6 +4798,20 @@
             "type": "string"
           }
         }
+      },
+      "TimeRangeType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Weekly",
+          "Monthly",
+          "Quarterly"
+        ],
+        "enum": [
+          "Weekly",
+          "Monthly",
+          "Quarterly"
+        ]
       },
       "CreateSubAdminCommand": {
         "type": "object",
