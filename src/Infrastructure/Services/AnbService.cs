@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
@@ -42,10 +43,10 @@ public class AnbService : IAnbService
             {
                 Content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                    new KeyValuePair<string, string>("client_id", clientId),
-                    new KeyValuePair<string, string>("client_secret", clientSecret)
-                })
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret)
+            })
             };
 
             var response = await _httpClient.SendAsync(request);
@@ -80,6 +81,7 @@ public class AnbService : IAnbService
         }
     }
 
+
     public async Task<string> GetAccountBalanceAsync(string accountNumber)
     {
         try
@@ -100,14 +102,17 @@ public class AnbService : IAnbService
         }
         catch (HttpRequestException ex)
         {
+            // Network or protocol errors
             throw new ApplicationException($"HTTP error while fetching balance for account {accountNumber}: {ex.Message}", ex);
         }
         catch (TaskCanceledException ex)
         {
+            // Timeout
             throw new ApplicationException($"Request timed out while fetching balance for account {accountNumber}.", ex);
         }
         catch (Exception ex)
         {
+            // General errors
             throw new ApplicationException($"Unexpected error while fetching balance for account {accountNumber}: {ex.Message}", ex);
         }
     }
