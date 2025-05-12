@@ -27,7 +27,7 @@ public class UnifonicSmsService
         {
             { "AppSid", _appSid },
             //{ "SenderID", "DevWePayBE" },
-            { "Body", messageBody },
+            { "Body", "This is a trial SMS message in English. Change template to try other language." },
             { "Recipient", recipient },
             { "responseType", "JSON" },
             { "CorrelationID", "test-correlation-id" },
