@@ -14,6 +14,7 @@ using Escrow.Api.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using Org.BouncyCastle.Asn1.Ocsp;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -179,7 +180,7 @@ public class UserDetails : EndpointGroupBase
         try
         {
             var smsService = httpContext.RequestServices.GetRequiredService<UnifonicSmsService>();
-            var response = await smsService.SendSmsAsync(request.To, request.To.ToString());
+            var response = await smsService.SendSmsAsync(request.To, request.To.ToString(), request.SenderId.ToString());
             return TypedResults.Ok(response);
         }
         catch (Exception ex)

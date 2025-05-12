@@ -1,16 +1,21 @@
 ﻿using System.Text;
 using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
+using Escrow.Api.Application.Features.Bank.Queries;
 using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
 using Escrow.Api.Infrastructure.Data.Configurations;
 using Escrow.Api.Infrastructure.Helpers;
 using Escrow.Api.Infrastructure.Identity;
+using Escrow.Api.Infrastructure.Security;
+using Escrow.Api.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -124,6 +129,17 @@ builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 
 builder.Services.AddHttpClient<UnifonicSmsService>();
 builder.Services.AddHttpClient();
+
+builder.Services.Configure<ANBSettings>(builder.Configuration.GetSection("ANBSettings"));
+
+builder.Services.AddHttpClient<IAnbService, AnbService>();
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(GetAccountBalanceHandler).Assembly);
+});
+
+
+
 
 builder.Services.Configure<FormOptions>(options =>
 {

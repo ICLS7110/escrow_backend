@@ -3884,6 +3884,71 @@
           }
         }
       }
+    },
+    "/api/Anb/balance/{accountNumber}": {
+      "get": {
+        "tags": [
+          "Anb"
+        ],
+        "operationId": "Anb_GetBalance",
+        "parameters": [
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Anb/verify-account": {
+      "post": {
+        "tags": [
+          "Anb"
+        ],
+        "operationId": "Anb_VerifyAccount",
+        "requestBody": {
+          "x-name": "accountNumber",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4216,6 +4281,9 @@
             "type": "string"
           },
           "message": {
+            "type": "string"
+          },
+          "senderId": {
             "type": "string"
           }
         }

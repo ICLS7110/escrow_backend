@@ -85,8 +85,7 @@ namespace Escrow.Api.Infrastructure.Helpers.Notifications
                 return false;
             }
         }
-
-        public async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, CancellationToken cancellationToken)
+        public async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, string type, CancellationToken cancellationToken)
         {
             var creatorName = await _context.UserDetails
                 .Where(u => u.Id == creatorId)
@@ -97,14 +96,36 @@ namespace Escrow.Api.Infrastructure.Helpers.Notifications
                 .Where(u => u.Id == buyerId || u.Id == sellerId)
                 .ToListAsync(cancellationToken);
 
-            var userToNotify = users.FirstOrDefault(u => u.Id != creatorId);
+            var title = string.Empty;
+            var descriptionTemplate = string.Empty;
 
-            if (userToNotify != null)
+            List<UserDetail> usersToNotify;
+
+            if (type == "Contract")
             {
-                var userInfo = new { userToNotify.FullName, userToNotify.DeviceToken, userToNotify.IsNotified };
+                title = "New Contract Created";
+                descriptionTemplate = $"{creatorName} has created a new contract for you, {{0}}. Please review the details.";
 
-                var title = "New Contract Created";
-                var description = $"{creatorName} has created a new contract for you, {userInfo.FullName}. Please review the details.";
+                usersToNotify = users.Where(u => u.Id != creatorId).ToList(); // Notify only the other party
+            }
+            else
+            {
+                if (type == "Transaction")
+                {
+                    title = "New Transaction Created";
+                    descriptionTemplate = $"{creatorName} has Created a Transaction related to the contract. Please review the details, {{0}}.";
+                }
+                else if (type == "Dispute")
+                {
+                    title = "New Dispute Created";
+                    descriptionTemplate = $"{creatorName} has raised a dispute related to the contract. Please review the details, {{0}}.";
+                }
+                usersToNotify = users; // Notify both buyer and seller
+            }
+
+            foreach (var userToNotify in usersToNotify)
+            {
+                var description = string.Format(descriptionTemplate, userToNotify.FullName);
 
                 var notification = new Domain.Entities.Notifications.Notification
                 {
@@ -112,26 +133,73 @@ namespace Escrow.Api.Infrastructure.Helpers.Notifications
                     ContractId = contractId,
                     Title = title,
                     Description = description,
-                    Type = "Contract",
+                    Type = type,
                     IsRead = false,
                     Created = DateTime.UtcNow,
                 };
 
                 await _context.Notifications.AddAsync(notification, cancellationToken);
 
-                if (!string.IsNullOrEmpty(userInfo.DeviceToken) && userInfo.IsNotified == true)
+                if (!string.IsNullOrEmpty(userToNotify.DeviceToken) && userToNotify.IsNotified == true)
                 {
                     await SendPushNotificationAsync(
-                        userInfo.DeviceToken,
+                        userToNotify.DeviceToken,
                         title,
                         description,
-                        new { ContractId = contractId, Type = "Contract", Role = role }
+                        new { ContractId = contractId, Type = type, Role = role }
                     );
                 }
-
-                await _context.SaveChangesAsync(cancellationToken);
             }
+
+            await _context.SaveChangesAsync(cancellationToken);
         }
+
+        //public async Task SendNotificationAsync(int creatorId, int buyerId, int sellerId, int contractId, string role, string type,CancellationToken cancellationToken)
+        //{
+        //    var creatorName = await _context.UserDetails
+        //        .Where(u => u.Id == creatorId)
+        //        .Select(u => u.FullName)
+        //        .FirstOrDefaultAsync(cancellationToken);
+
+        //    var users = await _context.UserDetails
+        //        .Where(u => u.Id == buyerId || u.Id == sellerId)
+        //        .ToListAsync(cancellationToken);
+
+        //    var userToNotify = users.FirstOrDefault(u => u.Id != creatorId);
+
+        //    if (userToNotify != null)
+        //    {
+        //        var userInfo = new { userToNotify.FullName, userToNotify.DeviceToken, userToNotify.IsNotified };
+
+        //        var title = "New Contract Created";
+        //        var description = $"{creatorName} has created a new contract for you, {userInfo.FullName}. Please review the details.";
+
+        //        var notification = new Domain.Entities.Notifications.Notification
+        //        {
+        //            ToID = userToNotify.Id,
+        //            ContractId = contractId,
+        //            Title = title,
+        //            Description = description,
+        //            Type = "Contract",
+        //            IsRead = false,
+        //            Created = DateTime.UtcNow,
+        //        };
+
+        //        await _context.Notifications.AddAsync(notification, cancellationToken);
+
+        //        if (!string.IsNullOrEmpty(userInfo.DeviceToken) && userInfo.IsNotified == true)
+        //        {
+        //            await SendPushNotificationAsync(
+        //                userInfo.DeviceToken,
+        //                title,
+        //                description,
+        //                new { ContractId = contractId, Type = "Contract", Role = role }
+        //            );
+        //        }
+
+        //        await _context.SaveChangesAsync(cancellationToken);
+        //    }
+        //}
 
         public async Task<int> GetOrCreateUserId(string? name, string? mobile, CancellationToken cancellationToken)
         {

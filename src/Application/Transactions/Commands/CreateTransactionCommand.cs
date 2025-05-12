@@ -23,15 +23,26 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtService _jwtService;
+    private readonly IEmailService _emailService;
+    private readonly INotificationService _notificationService;
 
-    public CreateTransactionCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+    public CreateTransactionCommandHandler(IApplicationDbContext context, IJwtService jwtService, IEmailService emailService, INotificationService notificationService)
     {
         _context = context;
         _jwtService = jwtService;
+        _emailService = emailService;
+        _notificationService = notificationService;
     }
-
     public async Task<Result<object>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
     {
+        List<string> errorMessages = new();
+
+        var userId = _jwtService.GetUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Result<object>.Failure(StatusCodes.Status401Unauthorized, "User is not authenticated.");
+        }
+
         var contract = await _context.ContractDetails.FindAsync(request.ContractId);
         if (contract == null)
         {
@@ -46,17 +57,14 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             return Result<object>.Failure(StatusCodes.Status404NotFound, "Buyer or Seller not found.");
         }
 
-        if (!int.TryParse(_jwtService.GetUserId(), out int userId))
-        {
-            return Result<object>.Failure(StatusCodes.Status401Unauthorized, "Invalid user ID.");
-        }
-
+        int currentUserId = Convert.ToInt32(userId);
         int recipientId;
-        if (userId == buyer.Id)
+
+        if (currentUserId == buyer.Id)
         {
             recipientId = seller.Id;
         }
-        else if (userId == seller.Id)
+        else if (currentUserId == seller.Id)
         {
             recipientId = buyer.Id;
         }
@@ -65,43 +73,104 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             return Result<object>.Failure(StatusCodes.Status401Unauthorized, "Unauthorized transaction.");
         }
 
-        var entity = new Domain.Entities.Transactions.Transaction
+        var transaction = new Domain.Entities.Transactions.Transaction
         {
             TransactionAmount = request.Amount,
             TransactionType = request.Type,
             ContractId = request.ContractId,
             Created = DateTime.UtcNow,
-            FromPayee = userId.ToString(),
+            FromPayee = userId,
             ToRecipient = recipientId.ToString(),
-            CreatedBy = userId.ToString()
+            CreatedBy = userId
         };
 
-        _context.Transactions.Add(entity);
+        _context.Transactions.Add(transaction);
 
-        // Update ContractDetails status to 'Accepted'
-        contract.Status = nameof(ContractStatus.Escrow); // Assuming Status is a string, change as needed
+        // Update contract and milestones status
+        contract.Status = nameof(ContractStatus.Escrow);
         _context.ContractDetails.Update(contract);
 
-        // Get all milestones for the contract
         var milestones = await _context.MileStones
             .Where(m => m.ContractId == request.ContractId)
             .ToListAsync(cancellationToken);
 
-        // If milestones exist, update their statuses to 'Escrow'
+        foreach (var milestone in milestones)
+        {
+            milestone.Status = nameof(MilestoneStatus.Escrow);
+            milestone.LastModified = DateTime.UtcNow;
+            milestone.LastModifiedBy = userId;
+        }
+
         if (milestones.Any())
         {
-            foreach (var milestone in milestones)
-            {
-                milestone.Status = nameof(MilestoneStatus.Escrow);
-                milestone.LastModified = DateTime.UtcNow;
-                milestone.LastModifiedBy = userId.ToString();
-            }
-
             _context.MileStones.UpdateRange(milestones);
+        }
+
+        // Notify Buyer and Seller
+        var userIds = new[] { contract.BuyerDetailsId, contract.SellerDetailsId }
+            .Where(id => id.HasValue)
+            .Select(id => id)
+            .ToList();
+
+        var users = await _context.UserDetails
+            .Where(u => userIds.Contains(u.Id))
+            .ToListAsync(cancellationToken);
+
+        foreach (var user in users)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(user.EmailAddress) && !string.IsNullOrWhiteSpace(user.FullName))
+                {
+                    var subject = "Transaction Created";
+                    var body = $"Dear {user.FullName},\n\nA new transaction has been created for your contract (ID: {contract.Id}).";
+
+                    await _emailService.SendEmailAsync(user.EmailAddress, subject, user.FullName, body);
+                }
+
+                await _notificationService.SendNotificationAsync(
+                    creatorId: currentUserId,
+                    buyerId: 0,
+                    sellerId: user.Id,
+                    contractId: contract.Id,
+                    role: nameof(Roles.User),
+                    type: "Transaction",
+                    cancellationToken: cancellationToken
+                );
+            }
+            catch (Exception ex)
+            {
+                errorMessages.Add($"Failed to notify {user.FullName}: {ex.Message}");
+            }
+        }
+
+        // Notify Admins
+        var adminUsers = await _context.UserDetails
+            .Where(u => u.Role == nameof(Roles.Admin))
+            .ToListAsync(cancellationToken);
+
+        foreach (var admin in adminUsers)
+        {
+            await _notificationService.SendNotificationAsync(
+                creatorId: currentUserId,
+                buyerId: 0,
+                sellerId: admin.Id,
+                contractId: contract.Id,
+                role: nameof(Roles.Admin),
+                type: "Transaction",
+                cancellationToken: cancellationToken
+            );
         }
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Result<object>.Success(StatusCodes.Status200OK, "Transaction created successfully.", new { TransactionId = entity.Id });
+        var successMessage = "Transaction created successfully.";
+        if (errorMessages.Any())
+        {
+            var fullMessage = successMessage + "\nHowever, the following issues occurred:\n" + string.Join("\n", errorMessages);
+            return Result<object>.Success(StatusCodes.Status207MultiStatus, fullMessage);
+        }
+
+        return Result<object>.Success(StatusCodes.Status200OK, successMessage, new { TransactionId = transaction.Id });
     }
 }

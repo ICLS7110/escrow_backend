@@ -141,7 +141,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             await _context.SaveChangesAsync(cancellationToken);
 
             // Send Push Notification and Save Notification Record
-            await _firebaseNotification.SendNotificationAsync(userId, buyerId, sellerId, entity.Id, entity.Role, cancellationToken);
+            await _firebaseNotification.SendNotificationAsync(userId, buyerId, sellerId, entity.Id, entity.Role, "Contract", cancellationToken);
 
             return entity.Id;
         }

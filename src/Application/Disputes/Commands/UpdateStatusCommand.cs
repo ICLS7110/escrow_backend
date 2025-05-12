@@ -104,6 +104,7 @@ public class UpdateStatusCommandHandler : IRequestHandler<UpdateStatusCommand, R
                     sellerId: user.Id,
                     contractId: contract.Id,
                     role: nameof(Roles.User),
+                    type: "Dispute",
                     cancellationToken: cancellationToken
                 );
             }
@@ -127,6 +128,7 @@ public class UpdateStatusCommandHandler : IRequestHandler<UpdateStatusCommand, R
                 sellerId: admin.Id,
                 contractId: contract.Id,
                 role: nameof(Roles.Admin),
+                type: "Dispute",
                 cancellationToken: cancellationToken
             );
         }
