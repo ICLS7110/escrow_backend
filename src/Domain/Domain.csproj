@@ -24,7 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Entities\ContactUsPanel\" />
     <Folder Include="Entities\Notifications\" />
+    <Folder Include="Entities\RoleMenuPermissions\" />
   </ItemGroup>
 
 </Project>

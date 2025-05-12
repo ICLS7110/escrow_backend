@@ -866,6 +866,123 @@
         ]
       }
     },
+    "/api/ContactUs/send": {
+      "post": {
+        "tags": [
+          "ContactUs"
+        ],
+        "operationId": "PostApiContactUsSend",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendContactMessageCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/ContactUs/messages": {
+      "get": {
+        "tags": [
+          "ContactUs"
+        ],
+        "operationId": "GetApiContactUsMessages",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10,
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/CommissionMaster": {
+      "get": {
+        "tags": [
+          "CommissionMaster"
+        ],
+        "operationId": "GetApiCommissionMaster",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/CommissionMaster/update": {
+      "put": {
+        "tags": [
+          "CommissionMaster"
+        ],
+        "operationId": "PutApiCommissionMasterUpdate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommissionRateCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/Users/register": {
       "post": {
         "tags": [
@@ -2056,6 +2173,140 @@
             "description": ""
           }
         }
+      }
+    },
+    "/api/PermissionManager/roles": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerRoles",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/menus": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerMenus",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/permissions": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerPermissions",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/role-permissions": {
+      "get": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "GetApiPermissionManagerRolePermissions",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/PermissionManager/assign-permissions": {
+      "post": {
+        "tags": [
+          "PermissionManager"
+        ],
+        "operationId": "PostApiPermissionManagerAssignPermissions",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignPermissionsCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/EmailTemplate": {
@@ -3735,6 +3986,51 @@
           }
         }
       },
+      "SendContactMessageCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateCommissionRateCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commissionRate": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "appliedGlobally": {
+            "type": "boolean"
+          },
+          "transactionType": {
+            "type": "string"
+          },
+          "taxRate": {
+            "type": "number",
+            "format": "decimal"
+          }
+        }
+      },
       "HttpValidationProblemDetails": {
         "allOf": [
           {
@@ -4311,6 +4607,39 @@
           },
           "otp": {
             "type": "string"
+          }
+        }
+      },
+      "AssignPermissionsCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "menuPermissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuPermissionDto"
+            }
+          }
+        }
+      },
+      "MenuPermissionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "menuId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       },

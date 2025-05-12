@@ -59,6 +59,7 @@ namespace Escrow.Api.Application.UserPanel.Commands.CreateUser
                 LoginMethod = request.LoginMethod,
                 BusinessProof= request.BusinessProof,
                 CompanyEmail = request.CompanyEmail,
+                Role = nameof(Roles.User),
             };
 
             
