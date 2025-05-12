@@ -31,7 +31,7 @@ public class UnifonicSmsService
             { "Recipient", recipient },
             { "responseType", "JSON" },
             { "CorrelationID", "test-correlation-id" },
-            { "baseEncode", "true" },
+            //{ "baseEncode", "true" },
             { "statusCallback", "sent" },
             { "async", "false" },
             { "MessageType", "6" } // Awareness

@@ -60,7 +60,7 @@ namespace Escrow.Api.Application.AdminAuth.Queries
                 Token = _jwtService.GetJWT(adminUser.Id.ToString())
             };
 
-            return Result<AdminLoginDTO>.Success(StatusCodes.Status200OK, "Admin login successfully.", adminDto);
+            return Result<AdminLoginDTO>.Success(StatusCodes.Status200OK, "login successfully.", adminDto);
         }
 
     }

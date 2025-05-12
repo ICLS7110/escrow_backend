@@ -21,15 +21,17 @@ public class CreateSubAdminCommandHandler : IRequestHandler<CreateSubAdminComman
     private readonly IApplicationDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
+    private readonly IEmailService _emailService;
 
     public CreateSubAdminCommandHandler(
         IApplicationDbContext context,
         IPasswordHasher passwordHasher,
-        IJwtService jwtService)
+        IJwtService jwtService, IEmailService emailService)
     {
         _context = context;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
+        _emailService = emailService;
     }
 
     public async Task<int> Handle(CreateSubAdminCommand request, CancellationToken cancellationToken)
@@ -57,6 +59,21 @@ public class CreateSubAdminCommandHandler : IRequestHandler<CreateSubAdminComman
         _context.UserDetails.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
 
+        await SendAccountCreationEmailAsync(entity.EmailAddress, entity.FullName, request.Password);
+
+
         return entity.Id;
     }
+    private async Task SendAccountCreationEmailAsync(string email, string username, string password)
+    {
+        var subject = "Account Created Successfully";
+        var body = $@"
+        <p>Dear {username},</p>
+        <p>Your account has been created successfully.</p>
+        <p><strong>Username:</strong> {username}</p>
+        <p><strong>Password:</strong> {password}</p>";
+
+        await _emailService.SendEmailAsync(email, subject, username, body);
+    }
+
 }

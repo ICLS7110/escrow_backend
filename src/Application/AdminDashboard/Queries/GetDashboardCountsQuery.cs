@@ -22,7 +22,8 @@ public class GetDashboardCountsQueryHandler : IRequestHandler<GetDashboardCounts
     public async Task<DashboardCountsDTO> Handle(GetDashboardCountsQuery request, CancellationToken cancellationToken)
     {
         var totalUsers = await _context.UserDetails.CountAsync(u => u.IsDeleted == false && u.Role == nameof(Roles.User), cancellationToken);
-        var totalSubAdmins = await _context.UserDetails.CountAsync(u => u.Role != null &&u.Role.Replace("-", "").ToLower() == "subadmin", cancellationToken);
+        var totalSubAdmins = await _context.UserDetails.CountAsync(u => u.Role != null && u.Role.ToLower() == "sub-admin", cancellationToken);
+        //var totalSubAdmins = await _context.UserDetails.CountAsync(u => u.Role != null &&u.Role.Replace("-", "").ToLower() == "subadmin", cancellationToken);
 
 
         var totalContracts = await _context.ContractDetails.CountAsync(cancellationToken);

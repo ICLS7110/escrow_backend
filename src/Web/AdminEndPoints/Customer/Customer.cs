@@ -71,7 +71,8 @@ public class Customers : EndpointGroupBase
 
         if (result == null || result.Items.Count == 0)
         {
-            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No customers found."));
+            return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(StatusCodes.Status200OK, "Customers retrieved successfully.", result));
+            //return TypedResults.NotFound(Result<object>.Success(StatusCodes.Status200OK, "", result));
         }
 
         return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(StatusCodes.Status200OK, "Customers retrieved successfully.", result));
@@ -93,7 +94,7 @@ public class Customers : EndpointGroupBase
 
 
     [Authorize]
-    public async Task<IResult> CustomerContractDetails(ISender sender,int activePageNumber = 1,int historicalPageNumber = 1,int activePageSize = 10,int historicalPageSize = 10,string? id = null)
+    public async Task<IResult> CustomerContractDetails(ISender sender, int activePageNumber = 1, int historicalPageNumber = 1, int activePageSize = 10, int historicalPageSize = 10, string? id = null)
     {
         // Create the query with all parameters
         var query = new GetCustomerContractsQuery

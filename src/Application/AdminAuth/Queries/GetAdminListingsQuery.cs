@@ -48,7 +48,7 @@ namespace Escrow.Api.Application.AdminAuth.Queries
 
             if (!string.IsNullOrWhiteSpace(request.Name))
             {
-                query = query.Where(x => x.FullName != null && x.FullName.Contains(request.Name));
+                query = query.Where(x => x.FullName != null && x.FullName.Contains(request.Name) || x.EmailAddress != null && x.EmailAddress.Contains(request.Name));
             }
 
             var listings = await query

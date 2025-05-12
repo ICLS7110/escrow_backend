@@ -173,7 +173,6 @@ public class UserDetails : EndpointGroupBase
     }
 
 
-
     [AllowAnonymous]
     public async Task<IResult> SendSMS(HttpContext httpContext, [FromBody] SMSRequest request)
     {
@@ -188,8 +187,4 @@ public class UserDetails : EndpointGroupBase
             return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
         }
     }
-
-
-
-
 }
