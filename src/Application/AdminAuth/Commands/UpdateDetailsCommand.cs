@@ -34,25 +34,19 @@ public class UpdateDetailsCommandHandler : IRequestHandler<UpdateDetailsCommand,
         }
 
         // If the provided role matches the existing role, proceed with updating details
-        if (adminUser.Role == request.Role)
+        adminUser.FullName = request.UserName;
+
+
+        // If role is NOT "Sub-Admin", update both Name and Email
+        if (string.Equals(adminUser.Role, nameof(Roles.Admin), StringComparison.OrdinalIgnoreCase))
         {
-            adminUser.FullName = request.UserName;
-            
-
-            // If role is NOT "Sub-Admin", update both Name and Email
-            if (adminUser.Role.ToLower() == nameof(Roles.Admin).ToLower())
-            {
-                adminUser.EmailAddress = request.Email;
-            }
-
-            adminUser.ProfilePicture = request.Image;
-            adminUser.LastModified = DateTime.UtcNow;
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return Result<string>.Success(StatusCodes.Status200OK, "Updated successfully.");
+            adminUser.EmailAddress = request.Email;
         }
 
-        // If roles do not match, return an error
-        return Result<string>.Failure(StatusCodes.Status400BadRequest, "Role mismatch. Cannot update user.");
+        adminUser.ProfilePicture = request.Image;
+        adminUser.LastModified = DateTime.UtcNow;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result<string>.Success(StatusCodes.Status200OK, "Updated successfully.");
     }
 }

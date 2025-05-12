@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 namespace Escrow.Api.Infrastructure.Configuration;
 
+using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -17,20 +18,43 @@ public class JwtService : IJwtService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _config;
+    private readonly IApplicationDbContext _context;
 
-    public JwtService(IHttpContextAccessor httpContextAccessor,IConfiguration configuration)
+    public JwtService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IApplicationDbContext context)
     {
         _httpContextAccessor = httpContextAccessor;
         _config = configuration;
+        _context = context;
     }
 
+    //public JwtService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    //{
+    //    _httpContextAccessor = httpContextAccessor;
+    //    _config = configuration;
+    //}
     public string GetJWT(string userId)
     {
+        var user = _context.UserDetails.FirstOrDefault(x => x.Id.ToString() == userId);
+
+        if (user == null)
+            throw new Exception("User not found");
+
+        var role = user.Role ?? nameof(Roles.User); // Default fallback role if null
+
+        if (user != null && user.Role != null && user.Role.Contains("sub-admin"))
+        {
+            role = nameof(Roles.SubAdmin);
+
+            // Now fetch the data (replace this with your actual data-fetching logic)
+        }
+
+
+
         var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Role,"User")
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, userId),
+        new Claim(ClaimTypes.Role, role)
+    };
 
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationHelper.JwtIssuerSigningKey));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -42,13 +66,15 @@ public class JwtService : IJwtService
             expires: DateTime.Now.AddMinutes(ConfigurationHelper.AuthTokenExpiry),
             signingCredentials: signingCredentials
         );
+
         return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
     }
 
+
     public string GetUserId()
     {
-        var userid= _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userid = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return userid ?? string.Empty;
     }
-    
+
 }
