@@ -37,14 +37,11 @@ public class UpdateDetailsCommandHandler : IRequestHandler<UpdateDetailsCommand,
         if (adminUser.Role == request.Role)
         {
             adminUser.FullName = request.UserName;
-            
-
             // If role is NOT "Sub-Admin", update both Name and Email
             if (adminUser.Role.ToLower() == nameof(Roles.Admin).ToLower())
             {
                 adminUser.EmailAddress = request.Email;
             }
-
             adminUser.ProfilePicture = request.Image;
             adminUser.LastModified = DateTime.UtcNow;
             await _context.SaveChangesAsync(cancellationToken);

@@ -49,7 +49,7 @@ public class OtpManagerService : IOtpManagerService
       
 
         var message = "Hello from Unifonic sandbox!";
-        var response = _smsService.SendSmsAsync(phoneNumber, message,"");
+        var response = await _smsService.SendSmsAsync(phoneNumber, message,"").ConfigureAwait(true);
         Console.WriteLine($"SMS sent: {response}");
 
 
