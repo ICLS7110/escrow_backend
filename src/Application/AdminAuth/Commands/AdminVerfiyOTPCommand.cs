@@ -18,12 +18,10 @@ namespace Escrow.Api.Application.AdminAuth.Commands
 
     public class AdminVerifyOTPCommandHandler : IRequestHandler<AdminVerifyOTPCommand, Result<string>>
     {
-        private readonly IApplicationDbContext _context;
         private readonly IOtpManagerService _otpManagerService;
 
-        public AdminVerifyOTPCommandHandler(IApplicationDbContext context,IOtpManagerService otpManagerService)
+        public AdminVerifyOTPCommandHandler(IOtpManagerService otpManagerService)
         {
-            _context = context;
             _otpManagerService = otpManagerService;
         }
 
