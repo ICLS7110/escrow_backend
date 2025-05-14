@@ -88,6 +88,7 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
 
         // Update contract and milestones status
         contract.Status = nameof(ContractStatus.Escrow);
+        contract.EscrowStatusUpdatedAt = DateTime.UtcNow;
         _context.ContractDetails.Update(contract);
 
         var milestones = await _context.MileStones

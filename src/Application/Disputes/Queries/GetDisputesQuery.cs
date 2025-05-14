@@ -51,10 +51,10 @@ public class GetDisputesQueryHandler : IRequestHandler<GetDisputesQuery, Paginat
             query = query.Where(d => d.Status == nameof(request.Status));
         }
 
-        if (user?.Role == nameof(Roles.User))
-        {
-            query = query.Where(d => d.DisputeRaisedBy == userId.ToString()); // Assuming you track who raised the dispute
-        }
+        //if (user?.Role == nameof(Roles.User))
+        //{
+        //    query = query.Where(d => d.DisputeRaisedBy == userId.ToString()); // Assuming you track who raised the dispute
+        //}
 
         var totalRecords = await query.CountAsync(cancellationToken);
 
@@ -84,12 +84,17 @@ public class GetDisputesQueryHandler : IRequestHandler<GetDisputesQuery, Paginat
                 Status = d.Status?.ToString() ?? "N/A",
                 DisputeDescription = d.DisputeDescription?.ToString() ?? "N/A",
                 DisputeReason = d.DisputeReason?.ToString() ?? "N/A",
+                BuyerNote = d.BuyerNote ?? "N/A",
+                ReleaseAmount = d.ReleaseAmount ?? "0",
+                ReleaseTo = d.ReleaseTo ?? "N/A",
+                SellerNote = d.BuyerNote ?? "N/A",
 
                 ContractDetails = contract != null ? new ContractDTO
                 {
                     Id = contract.Id,
                     ContractTitle = contract.ContractTitle,
                     ServiceType = contract.ServiceType,
+                    Role = contract.Role,
                     ServiceDescription = contract.ServiceDescription,
                     AdditionalNote = contract.AdditionalNote,
                     FeesPaidBy = contract.FeesPaidBy,

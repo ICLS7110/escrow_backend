@@ -35,22 +35,20 @@ public class OtpManagerService : IOtpManagerService
         _smsService = smsService;
     }
 
-    // Implementing RequestOtpAsync from IOtpManagerService
+
+
+
+
+
+
+
+
     public async Task<bool> RequestOtpAsync(string countryCode, string mobileNumber)
-    {        
+    {
         var phoneNumber = $"{countryCode}{mobileNumber}";
         var isPhoneNumberValid = await _validationService.ValidatePhoneNumberAsync(phoneNumber);
         if (!isPhoneNumberValid)
             return false;
-       
-            
-
-            //var success = await _smsService.SendSmsAsync(request.To, request.Message);
-      
-
-        var message = "Hello from Unifonic sandbox!";
-        var response = await _smsService.SendSmsAsync(phoneNumber, message,"").ConfigureAwait(true);
-        Console.WriteLine($"SMS sent: {response}");
 
 
         var otp = await _otpService.GenerateOtpAsync();
@@ -60,9 +58,43 @@ public class OtpManagerService : IOtpManagerService
 
         // Send the OTP
         await _otpService.SendOtpAsync(phoneNumber, otp);
-        return true ;
+        return true;
 
     }
+
+
+
+
+
+
+    // Implementing RequestOtpAsync from IOtpManagerService
+    //public async Task<bool> RequestOtpAsync(string countryCode, string mobileNumber)
+    //{        
+    //    var phoneNumber = $"{countryCode}{mobileNumber}";
+    //    var isPhoneNumberValid = await _validationService.ValidatePhoneNumberAsync(phoneNumber);
+    //    if (!isPhoneNumberValid)
+    //        return false;
+
+
+
+    //        //var success = await _smsService.SendSmsAsync(request.To, request.Message);
+
+
+    //    var message = "Hello from Unifonic sandbox!";
+    //    var response = await _smsService.SendSmsAsync(phoneNumber, message,"").ConfigureAwait(true);
+    //    Console.WriteLine($"SMS sent: {response}");
+
+
+    //    var otp = await _otpService.GenerateOtpAsync();
+
+    //    // Store OTP in cache with a 5-minute expiration
+    //    _cache.Set(phoneNumber, otp, TimeSpan.FromMinutes(5));
+
+    //    // Send the OTP
+    //    await _otpService.SendOtpAsync(phoneNumber, otp);
+    //    return true ;
+
+    //}
 
     // Implementing VerifyOtpAsync from IOtpManagerService
     //public async Task<UserDetail> VerifyOtpAsync(string countryCode, string mobileNumber, string otp)

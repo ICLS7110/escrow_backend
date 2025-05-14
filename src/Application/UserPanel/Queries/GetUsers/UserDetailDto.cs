@@ -30,6 +30,8 @@ public class UserDetailDto
     public bool IsProfileCompleted { get; set; } = false;
     public bool? IsNotified { get; set; } = false;
     public string? SocialId { get; set; }
+    public int ProfileCompletionPercentage { get; set; }
+    public int ConfidenceRate { get; set; }
 
     private class Mapping : Profile
     {

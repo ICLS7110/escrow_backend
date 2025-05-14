@@ -155,6 +155,7 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             LastModifiedBy = c.LastModifiedBy,
             SellerPayableAmount = c.SellerPayableAmount,
             BuyerPayableAmount = c.BuyerPayableAmount,
+            EscrowStatusUpdatedAt = c.EscrowStatusUpdatedAt,
 
             BuyerProfilePicture = c.BuyerDetailsId.HasValue
                 ? profilePicDict.GetValueOrDefault(c.BuyerDetailsId.Value)

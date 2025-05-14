@@ -38,7 +38,7 @@ public class UserDetails : EndpointGroupBase
         userGroup.MapPut("/delete-user", DeleteUser).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
         // Device token management
-        userGroup.MapPost("/device-token", StoreDeviceToken).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/device-token", StoreDeviceToken).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User),nameof(Roles.Admin),nameof(Roles.SubAdmin)));
         userGroup.MapPost("/set-notified-status", UpdateNotificationStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
         // Social logins

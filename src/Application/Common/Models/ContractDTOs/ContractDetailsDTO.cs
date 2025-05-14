@@ -37,6 +37,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? SellerPayableAmount { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastModified { get; set; }
+        public DateTime? EscrowStatusUpdatedAt { get; set; }
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
         public SellerBuyerInvitation? InvitationDetails { get; set; }
@@ -76,6 +77,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? SellerPayableAmount { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastModified { get; set; }
+        public DateTime? EscrowStatusUpdatedAt { get; set; }
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
         public SellerBuyerInvitation? InvitationDetails { get; set; }

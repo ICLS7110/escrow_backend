@@ -1,54 +1,163 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
+using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
-using Escrow.Api.Domain.Entities.UserPanel;
 using Escrow.Api.Infrastructure.Security;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 
-namespace Escrow.Api.Application.BankDetails.Commands;
-public record UpdateBankDetailCommand: IRequest<Result<int>>
+namespace Escrow.Api.Application.BankDetails.Commands
 {
-    public int Id { get; set; }    
-    public string AccountHolderId { get; set; } = string.Empty;
-    public string AccountHolderName { get; set; } = string.Empty;
-    public string IBANNumber { get; set; } = string.Empty;
-    public string BICCode { get; set; } = string.Empty;
-    public string BankName { get; set; } = String.Empty;
-}
-
-public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, Result<int>>
-{
-    private readonly IApplicationDbContext _context;
-    private readonly IAESService _aESService;
-    private readonly IJwtService _jwtService;
-
-    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService,IJwtService jwtService)
+    public record UpdateBankDetailCommand : IRequest<Result<int>>
     {
-        _context = context;
-       _aESService = aESService;
-        _jwtService = jwtService;
+        public int Id { get; set; }
+        public string AccountHolderId { get; set; } = string.Empty;
+        public string AccountHolderName { get; set; } = string.Empty;
+        public string IBANNumber { get; set; } = string.Empty;
+        public string BICCode { get; set; } = string.Empty;
+        public string BankName { get; set; } = string.Empty;
     }
 
-    public async Task<Result<int>> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
+    public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, Result<int>>
     {
-        var userid = _jwtService.GetUserId().ToInt();
-        var entity = await _context.BankDetails.FirstOrDefaultAsync(x => x.Id==request.Id && x.UserDetailId== userid);
+        private readonly IApplicationDbContext _context;
+        private readonly IAESService _aESService;
+        private readonly IJwtService _jwtService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        if (entity == null)
-            return Result<int>.Failure(StatusCodes.Status404NotFound, "Bank Details Not Found.");
+        public UpdateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
+        {
+            _context = context;
+            _aESService = aESService;
+            _jwtService = jwtService;
+            _httpContextAccessor = httpContextAccessor;
+        }
 
-        entity.AccountHolderId = request.AccountHolderId;
-        entity.AccountHolderName = request.AccountHolderName;
-        entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
-        entity.BICCode = request.BICCode;
-        entity.BankName = _aESService.Encrypt(request.BankName);
-        
-        await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
+        public async Task<Result<int>> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
+        {
+            // Get current language from HttpContext
+            var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+            var userid = _jwtService.GetUserId().ToInt();
+            var entity = await _context.BankDetails.FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid);
+
+            if (entity == null)
+            {
+                return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("BankDetailsNotFound", language));
+            }
+
+            entity.AccountHolderId = request.AccountHolderId;
+            entity.AccountHolderName = request.AccountHolderName;
+            entity.IBANNumber = _aESService.Encrypt(request.IBANNumber);
+            entity.BICCode = request.BICCode;
+            entity.BankName = _aESService.Encrypt(request.BankName);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result<int>.Success(StatusCodes.Status200OK, AppMessages.Get("Success", language), entity.Id);
+        }
     }
 }
-// Compare this snippet from src/Application/BankDetails/Commands/DeleteBankDetail.cs:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using Escrow.Api.Application.Common.Constants;
+//using Escrow.Api.Application.Common.Interfaces;
+//using Escrow.Api.Application.DTOs;
+//using Escrow.Api.Domain.Entities.UserPanel;
+//using Escrow.Api.Infrastructure.Security;
+//using Microsoft.AspNetCore.Http;
+
+//namespace Escrow.Api.Application.BankDetails.Commands;
+//public record UpdateBankDetailCommand: IRequest<Result<int>>
+//{
+//    public int Id { get; set; }    
+//    public string AccountHolderId { get; set; } = string.Empty;
+//    public string AccountHolderName { get; set; } = string.Empty;
+//    public string IBANNumber { get; set; } = string.Empty;
+//    public string BICCode { get; set; } = string.Empty;
+//    public string BankName { get; set; } = String.Empty;
+//}
+
+//public class UpdateBankDetailCommandHandler : IRequestHandler<UpdateBankDetailCommand, Result<int>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IAESService _aESService;
+//    private readonly IJwtService _jwtService;
+
+//    public UpdateBankDetailCommandHandler(IApplicationDbContext context, IAESService aESService,IJwtService jwtService)
+//    {
+//        _context = context;
+//       _aESService = aESService;
+//        _jwtService = jwtService;
+//    }
+
+//    public async Task<Result<int>> Handle(UpdateBankDetailCommand request, CancellationToken cancellationToken)
+//    {
+//        var userid = _jwtService.GetUserId().ToInt();
+//        var entity = await _context.BankDetails.FirstOrDefaultAsync(x => x.Id==request.Id && x.UserDetailId== userid);
+
+//        if (entity == null)
+//            return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.BankDetailsNotFound);
+
+//        entity.AccountHolderId = request.AccountHolderId;
+//        entity.AccountHolderName = request.AccountHolderName;
+//        entity.IBANNumber =_aESService.Encrypt( request.IBANNumber);
+//        entity.BICCode = request.BICCode;
+//        entity.BankName = _aESService.Encrypt(request.BankName);
+
+//        await _context.SaveChangesAsync(cancellationToken);
+//        return Result<int>.Success(StatusCodes.Status200OK, AppMessages.Success, entity.Id);
+//    }
+//}
+//// Compare this snippet from src/Application/BankDetails/Commands/DeleteBankDetail.cs:

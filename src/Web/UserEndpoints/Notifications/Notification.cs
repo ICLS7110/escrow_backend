@@ -25,13 +25,18 @@ public class NotificationEndpoint : EndpointGroupBase
         notificationGroup.MapDelete("/delete", DeleteNotification);
         notificationGroup.MapPost("/mark-read", MarkNotificationReadStatus);
 
+        // manual notification
+        notificationGroup.MapPost("/manual/create", CreateManualNotification);
+        notificationGroup.MapGet("/manual", GetAllManualNotifications);
+
+
     }
 
     /// <summary>
     /// Retrieves all notifications with optional pagination.
     /// </summary>
     [Authorize]
-    public async Task<IResult> GetAllNotifications(ISender sender,string? filter, int pageNumber = 1, int pageSize = 10)
+    public async Task<IResult> GetAllNotifications(ISender sender, string? filter, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber < 1 || pageSize < 1)
         {
@@ -172,33 +177,61 @@ public class NotificationEndpoint : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
-    //[Authorize]
-    //public async Task<IResult> MarkNotificationReadStatus(ISender sender, [FromBody] MarkNotificationAsReadCommand command)
-    //{
-    //    if (command.NotificationId <= 0)
-    //    {
-    //        return TypedResults.BadRequest(new NotificationReadStatusResultDto
-    //        {
-    //            NotificationId = command.NotificationId,
-    //            IsRead = false
-    //        });
-    //    }
 
-    //    var result = await sender.Send(command);
 
-    //    if (result.IsRead == false && result.NotificationId == command.NotificationId)
-    //    {
-    //        // Assuming false means "not found" when unchanged
-    //        return TypedResults.NotFound(result);
-    //    }
 
-    //    return TypedResults.Ok(Result<NotificationReadStatusResultDto>.Success(
-    //        StatusCodes.Status200OK,
-    //        "Notification Marked successfully.",
-    //        result
-    //    ));
-    //    //return TypedResults.Ok(result);
-    //}
+    /// <summary>
+    /// Manual Notification
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="command"></param>
+    /// <returns></returns>
+
+    [Authorize(Roles = nameof(Roles.Admin))]
+    public async Task<IResult> CreateManualNotification(
+    ISender sender,
+    [FromBody] CreateManualNotificationCommand command)
+    {
+        try
+        {
+            var result = await sender.Send(command);
+
+            if (result.Status == StatusCodes.Status400BadRequest)
+                return TypedResults.BadRequest(result);
+
+            return TypedResults.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"CreateManualNotification Exception: {ex.Message}");
+            return TypedResults.Json(
+                Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected error occurred."),
+                statusCode: StatusCodes.Status500InternalServerError
+            );
+        }
+    }
+
+
+    [Authorize]
+    public async Task<IResult> GetAllManualNotifications(ISender sender, string? filter, int pageNumber = 1, int pageSize = 10)
+    {
+        var result = await sender.Send(new GetManualNotificationsQuery(filter, pageNumber, pageSize));
+
+        if (result == null || result.Data == null)
+        {
+            return TypedResults.NotFound(Result<object>.Failure(
+                StatusCodes.Status404NotFound,
+                "No manual notifications found."
+            ));
+        }
+
+        return TypedResults.Ok(Result<PaginatedList<ManualNotificationLogDTO>>.Success(
+            StatusCodes.Status200OK,
+            "Manual notifications retrieved successfully.",
+            result.Data
+        ));
+    }
+
 
 
 }

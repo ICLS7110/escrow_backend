@@ -189,6 +189,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
                 LastModifiedBy = c.LastModifiedBy,
                 SellerPayableAmount = c.SellerPayableAmount,
                 BuyerPayableAmount = c.BuyerPayableAmount,
+                EscrowStatusUpdatedAt = c.EscrowStatusUpdatedAt,
                 DisputeId = disputeMap.ContainsKey(c.Id) ? disputeMap[c.Id] : null,
 
                 MileStones = milestones

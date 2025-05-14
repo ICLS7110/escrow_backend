@@ -71,6 +71,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
 
     public DbSet<AnbWebhookLog> AnbWebhookLogs => Set<AnbWebhookLog>();
     public DbSet<SystemConfiguration> SystemConfigurations => Set<SystemConfiguration>();
+    public DbSet<ManualNotificationLog> ManualNotificationLogs => Set<ManualNotificationLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

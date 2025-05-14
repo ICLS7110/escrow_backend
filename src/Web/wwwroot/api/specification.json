@@ -2043,6 +2043,87 @@
         ]
       }
     },
+    "/api/NotificationEndpoint/manual/create": {
+      "post": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "PostApiNotificationEndpointManualCreate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateManualNotificationCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": [
+              "Admin"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/NotificationEndpoint/manual": {
+      "get": {
+        "tags": [
+          "NotificationEndpoint"
+        ],
+        "operationId": "GetApiNotificationEndpointManual",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/ContractReview": {
       "get": {
         "tags": [
@@ -3695,7 +3776,12 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/AdminAuth/GetAdminAllDetail": {
@@ -3720,7 +3806,12 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/AdminAuth/UpdateDetails": {
@@ -3745,7 +3836,12 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/AdminAuth/GetAdminListings": {
@@ -3798,7 +3894,12 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     },
     "/api/fileupload/Upload-Files": {
@@ -4869,6 +4970,31 @@
           "isRead": {
             "type": "boolean",
             "nullable": true
+          }
+        }
+      },
+      "CreateManualNotificationCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "allUser": {
+            "type": "boolean"
+          },
+          "selectUser": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       },

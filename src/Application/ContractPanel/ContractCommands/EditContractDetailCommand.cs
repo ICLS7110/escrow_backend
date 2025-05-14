@@ -1,136 +1,309 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using System;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
-using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
-namespace Escrow.Api.Application.ContractPanel.ContractCommands;
-
-public record EditContractDetailCommand : IRequest<Result<int>>
+namespace Escrow.Api.Application.ContractPanel.ContractCommands
 {
-    public int Id { get; set; }
-    public string Role { get; set; } = string.Empty;
-    public string ContractTitle { get; set; } = string.Empty;
-    public string ServiceType { get; set; } = string.Empty;
-    public string ServiceDescription { get; set; } = string.Empty;
-    public string? AdditionalNote { get; set; }
-    public string FeesPaidBy { get; set; } = string.Empty;
-    public decimal? FeeAmount { get; set; }
-    public string? BuyerName { get; set; }
-    public string? BuyerMobile { get; set; }
-    public string? SellerName { get; set; }
-    public string? SellerMobile { get; set; }
-    public string? ContractDoc { get; set; }
-    public string Status { get; set; } = string.Empty;
-}
-
-public class EditContractDetailCommandHandler : IRequestHandler<EditContractDetailCommand, Result<int>>
-{
-    private readonly IApplicationDbContext _context;
-    private readonly IJwtService _jwtService;
-
-    public EditContractDetailCommandHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService)
+    public record EditContractDetailCommand : IRequest<Result<int>>
     {
-        _context = applicationDbContext;
-        _jwtService = jwtService;
+        public int Id { get; set; }
+        public string Role { get; set; } = string.Empty;
+        public string ContractTitle { get; set; } = string.Empty;
+        public string ServiceType { get; set; } = string.Empty;
+        public string ServiceDescription { get; set; } = string.Empty;
+        public string? AdditionalNote { get; set; }
+        public string FeesPaidBy { get; set; } = string.Empty;
+        public decimal? FeeAmount { get; set; }
+        public string? BuyerName { get; set; }
+        public string? BuyerMobile { get; set; }
+        public string? SellerName { get; set; }
+        public string? SellerMobile { get; set; }
+        public string? ContractDoc { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
-    public async Task<Result<int>> Handle(EditContractDetailCommand request, CancellationToken cancellationToken)
+
+    public class EditContractDetailCommandHandler : IRequestHandler<EditContractDetailCommand, Result<int>>
     {
-        int userid = _jwtService.GetUserId().ToInt();
+        private readonly IApplicationDbContext _context;
+        private readonly IJwtService _jwtService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        var entity = await _context.ContractDetails
-            .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid, cancellationToken);
-
-        if (entity == null)
+        public EditContractDetailCommandHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
         {
-            return Result<int>.Failure(StatusCodes.Status404NotFound, "Contract Not Found.");
+            _context = applicationDbContext;
+            _jwtService = jwtService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        // Capture the old data snapshot as JSON
-        var oldData = new
+        public async Task<Result<int>> Handle(EditContractDetailCommand request, CancellationToken cancellationToken)
         {
-            entity.Id,
-            entity.Role,
-            entity.ContractTitle,
-            entity.ServiceType,
-            entity.ServiceDescription,
-            entity.AdditionalNote,
-            entity.FeesPaidBy,
-            entity.FeeAmount,
-            entity.BuyerName,
-            entity.BuyerMobile,
-            entity.SellerName,
-            entity.SellerMobile,
-            entity.ContractDoc,
-            entity.Status,
-            entity.BuyerDetailsId,
-            entity.SellerDetailsId
-        };
+            int userid = _jwtService.GetUserId().ToInt();
 
-        // Update entity
-        entity.Role = request.Role;
-        entity.ContractTitle = request.ContractTitle;
-        entity.ServiceType = request.ServiceType;
-        entity.ServiceDescription = request.ServiceDescription;
-        entity.AdditionalNote = request.AdditionalNote;
-        entity.FeesPaidBy = request.FeesPaidBy;
-        entity.FeeAmount = request.FeeAmount;
-        entity.BuyerName = request.BuyerName;
-        entity.BuyerMobile = request.BuyerMobile;
-        entity.SellerMobile = request.SellerMobile;
-        entity.SellerName = request.SellerName;
-        entity.Status = request.Status;
-        entity.ContractDoc = request.ContractDoc;
-        entity.BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null;
-        entity.SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null;
+            // Get the current language from HttpContext
+            var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
-        // Capture the new data snapshot as JSON
-        var newData = new
-        {
-            entity.Id,
-            entity.Role,
-            entity.ContractTitle,
-            entity.ServiceType,
-            entity.ServiceDescription,
-            entity.AdditionalNote,
-            entity.FeesPaidBy,
-            entity.FeeAmount,
-            entity.BuyerName,
-            entity.BuyerMobile,
-            entity.SellerName,
-            entity.SellerMobile,
-            entity.ContractDoc,
-            entity.Status,
-            entity.BuyerDetailsId,
-            entity.SellerDetailsId
-        };
+            var entity = await _context.ContractDetails
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid, cancellationToken);
 
-        // Create the log entry
-        var log = new ContractDetailsLog
-        {
-            ContractId = entity.Id,
-            Operation = "UPDATE",
-            ChangedFields = "ALL", // Optional: You can compare and list changed fields here if needed
-            PreviousData = System.Text.Json.JsonSerializer.Serialize(oldData),
-            NewData = System.Text.Json.JsonSerializer.Serialize(newData),
-            Remarks = "Full update from Edit API",
-            Created = DateTime.UtcNow,
-            ChangedBy = userid.ToString(),
-            Source = "API"
-        };
+            if (entity == null)
+            {
+                return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("ContractNotFound", language));
+            }
 
-        await _context.ContractDetailsLogs.AddAsync(log, cancellationToken);
-        _context.ContractDetails.Update(entity);
-        await _context.SaveChangesAsync(cancellationToken);
+            // Capture the old data snapshot as JSON
+            var oldData = new
+            {
+                entity.Id,
+                entity.Role,
+                entity.ContractTitle,
+                entity.ServiceType,
+                entity.ServiceDescription,
+                entity.AdditionalNote,
+                entity.FeesPaidBy,
+                entity.FeeAmount,
+                entity.BuyerName,
+                entity.BuyerMobile,
+                entity.SellerName,
+                entity.SellerMobile,
+                entity.ContractDoc,
+                entity.Status,
+                entity.BuyerDetailsId,
+                entity.SellerDetailsId
+            };
 
-        return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
+            // Update entity
+            entity.Role = request.Role;
+            entity.ContractTitle = request.ContractTitle;
+            entity.ServiceType = request.ServiceType;
+            entity.ServiceDescription = request.ServiceDescription;
+            entity.AdditionalNote = request.AdditionalNote;
+            entity.FeesPaidBy = request.FeesPaidBy;
+            entity.FeeAmount = request.FeeAmount;
+            entity.BuyerName = request.BuyerName;
+            entity.BuyerMobile = request.BuyerMobile;
+            entity.SellerMobile = request.SellerMobile;
+            entity.SellerName = request.SellerName;
+            entity.Status = request.Status;
+            entity.ContractDoc = request.ContractDoc;
+            entity.BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null;
+            entity.SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null;
+
+            // Capture the new data snapshot as JSON
+            var newData = new
+            {
+                entity.Id,
+                entity.Role,
+                entity.ContractTitle,
+                entity.ServiceType,
+                entity.ServiceDescription,
+                entity.AdditionalNote,
+                entity.FeesPaidBy,
+                entity.FeeAmount,
+                entity.BuyerName,
+                entity.BuyerMobile,
+                entity.SellerName,
+                entity.SellerMobile,
+                entity.ContractDoc,
+                entity.Status,
+                entity.BuyerDetailsId,
+                entity.SellerDetailsId
+            };
+
+            // Create the log entry
+            var log = new ContractDetailsLog
+            {
+                ContractId = entity.Id,
+                Operation = "UPDATE",
+                ChangedFields = "ALL", // Optional: You can compare and list changed fields here if needed
+                PreviousData = System.Text.Json.JsonSerializer.Serialize(oldData),
+                NewData = System.Text.Json.JsonSerializer.Serialize(newData),
+                Remarks = "Full update from Edit API",
+                Created = DateTime.UtcNow,
+                ChangedBy = userid.ToString(),
+                Source = "API"
+            };
+
+            await _context.ContractDetailsLogs.AddAsync(log, cancellationToken);
+            _context.ContractDetails.Update(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result<int>.Success(StatusCodes.Status200OK, AppMessages.Get("Success", language), entity.Id);
+        }
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using Escrow.Api.Application.Common.Constants;
+//using Escrow.Api.Application.Common.Interfaces;
+//using Escrow.Api.Application.Common.Models;
+//using Escrow.Api.Application.Common.Models.ContractDTOs;
+//using Escrow.Api.Application.DTOs;
+//using Escrow.Api.Domain.Entities.ContractPanel;
+//using Escrow.Api.Domain.Entities.UserPanel;
+//using Microsoft.AspNetCore.Http;
+
+//namespace Escrow.Api.Application.ContractPanel.ContractCommands;
+
+//public record EditContractDetailCommand : IRequest<Result<int>>
+//{
+//    public int Id { get; set; }
+//    public string Role { get; set; } = string.Empty;
+//    public string ContractTitle { get; set; } = string.Empty;
+//    public string ServiceType { get; set; } = string.Empty;
+//    public string ServiceDescription { get; set; } = string.Empty;
+//    public string? AdditionalNote { get; set; }
+//    public string FeesPaidBy { get; set; } = string.Empty;
+//    public decimal? FeeAmount { get; set; }
+//    public string? BuyerName { get; set; }
+//    public string? BuyerMobile { get; set; }
+//    public string? SellerName { get; set; }
+//    public string? SellerMobile { get; set; }
+//    public string? ContractDoc { get; set; }
+//    public string Status { get; set; } = string.Empty;
+//}
+
+//public class EditContractDetailCommandHandler : IRequestHandler<EditContractDetailCommand, Result<int>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IJwtService _jwtService;
+
+//    public EditContractDetailCommandHandler(IApplicationDbContext applicationDbContext, IJwtService jwtService)
+//    {
+//        _context = applicationDbContext;
+//        _jwtService = jwtService;
+//    }
+//    public async Task<Result<int>> Handle(EditContractDetailCommand request, CancellationToken cancellationToken)
+//    {
+//        int userid = _jwtService.GetUserId().ToInt();
+
+//        var entity = await _context.ContractDetails
+//            .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid, cancellationToken);
+
+//        if (entity == null)
+//        {
+//            return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.ContractNotFound);
+//        }
+
+//        // Capture the old data snapshot as JSON
+//        var oldData = new
+//        {
+//            entity.Id,
+//            entity.Role,
+//            entity.ContractTitle,
+//            entity.ServiceType,
+//            entity.ServiceDescription,
+//            entity.AdditionalNote,
+//            entity.FeesPaidBy,
+//            entity.FeeAmount,
+//            entity.BuyerName,
+//            entity.BuyerMobile,
+//            entity.SellerName,
+//            entity.SellerMobile,
+//            entity.ContractDoc,
+//            entity.Status,
+//            entity.BuyerDetailsId,
+//            entity.SellerDetailsId
+//        };
+
+//        // Update entity
+//        entity.Role = request.Role;
+//        entity.ContractTitle = request.ContractTitle;
+//        entity.ServiceType = request.ServiceType;
+//        entity.ServiceDescription = request.ServiceDescription;
+//        entity.AdditionalNote = request.AdditionalNote;
+//        entity.FeesPaidBy = request.FeesPaidBy;
+//        entity.FeeAmount = request.FeeAmount;
+//        entity.BuyerName = request.BuyerName;
+//        entity.BuyerMobile = request.BuyerMobile;
+//        entity.SellerMobile = request.SellerMobile;
+//        entity.SellerName = request.SellerName;
+//        entity.Status = request.Status;
+//        entity.ContractDoc = request.ContractDoc;
+//        entity.BuyerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleBuyer ? userid : null;
+//        entity.SellerDetailsId = request.Role == EscrowApIConstant.ContratConstant.ContractRoleSeller ? userid : null;
+
+//        // Capture the new data snapshot as JSON
+//        var newData = new
+//        {
+//            entity.Id,
+//            entity.Role,
+//            entity.ContractTitle,
+//            entity.ServiceType,
+//            entity.ServiceDescription,
+//            entity.AdditionalNote,
+//            entity.FeesPaidBy,
+//            entity.FeeAmount,
+//            entity.BuyerName,
+//            entity.BuyerMobile,
+//            entity.SellerName,
+//            entity.SellerMobile,
+//            entity.ContractDoc,
+//            entity.Status,
+//            entity.BuyerDetailsId,
+//            entity.SellerDetailsId
+//        };
+
+//        // Create the log entry
+//        var log = new ContractDetailsLog
+//        {
+//            ContractId = entity.Id,
+//            Operation = "UPDATE",
+//            ChangedFields = "ALL", // Optional: You can compare and list changed fields here if needed
+//            PreviousData = System.Text.Json.JsonSerializer.Serialize(oldData),
+//            NewData = System.Text.Json.JsonSerializer.Serialize(newData),
+//            Remarks = "Full update from Edit API",
+//            Created = DateTime.UtcNow,
+//            ChangedBy = userid.ToString(),
+//            Source = "API"
+//        };
+
+//        await _context.ContractDetailsLogs.AddAsync(log, cancellationToken);
+//        _context.ContractDetails.Update(entity);
+//        await _context.SaveChangesAsync(cancellationToken);
+
+//        return Result<int>.Success(StatusCodes.Status200OK, AppMessages.Success, entity.Id);
+//    }
+
+//}

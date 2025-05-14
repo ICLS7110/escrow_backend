@@ -43,7 +43,7 @@ public class JwtService : IJwtService
 
         if (user != null && user.Role != null && user.Role.Contains("sub-admin"))
         {
-            role = nameof(Roles.SubAdmin);
+            role = nameof(Roles.Admin);
 
             // Now fetch the data (replace this with your actual data-fetching logic)
         }

@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.Common.Interfaces;
+﻿using Escrow.Api.Application.Common.Constants;
+using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Common.Models.ContactDTO;
 using Escrow.Api.Application.ContactUsPanel.Commands;
@@ -27,19 +28,36 @@ public class ContactUs : EndpointGroupBase
                       .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin)));
     }
 
-    
-    public async Task<IResult> SendContactMessage(ISender sender, [FromBody] SendContactMessageCommand request)
+
+
+    public async Task<IResult> SendContactMessage(ISender sender, IHttpContextAccessor httpContextAccessor, [FromBody] SendContactMessageCommand request)
     {
         if (request == null)
             return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data."));
 
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(request);
 
-        if (result.Status != StatusCodes.Status200OK)  // ✅ Using Status instead of IsSuccess
+        if (result.Status != StatusCodes.Status200OK)
             return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message));
 
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contact message sent successfully."));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ContactMessageSent", language)));
     }
+
+
+    //public async Task<IResult> SendContactMessage(ISender sender, [FromBody] SendContactMessageCommand request)
+    //{
+    //    if (request == null)
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data."));
+
+    //    var result = await sender.Send(request);
+
+    //    if (result.Status != StatusCodes.Status200OK)  // ✅ Using Status instead of IsSuccess
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message));
+
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contact message sent successfully."));
+    //}
 
     [Authorize(Roles = nameof(Roles.Admin))]
     public async Task<IResult> GetContactMessages(ISender sender, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)

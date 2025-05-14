@@ -483,6 +483,9 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.Property<int?>("DeletedBy")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("EscrowStatusUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<decimal?>("EscrowTax")
                         .HasColumnType("numeric");
 
@@ -952,6 +955,58 @@ namespace Escrow.Api.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmailTemplates");
+                });
+
+            modelBuilder.Entity("Escrow.Api.Domain.Entities.Notifications.ManualNotificationLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("RecordState")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SentTo")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("SentToAll")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ManualNotificationLogs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Notifications.Notification", b =>

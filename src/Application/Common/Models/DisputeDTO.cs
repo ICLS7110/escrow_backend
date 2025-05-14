@@ -17,4 +17,11 @@ public class DisputeDTO
     public string DisputeDescription { get; set; } = string.Empty;
     public int? ArbitratorId { get; set; }  // Nullable Arbitrator ID
     public ContractDTO? ContractDetails { get; set; }  // ✅ Nullable contract details
+    public string? ReleaseTo { get; set; }
+    public string? ReleaseAmount { get; set; }
+    public string? BuyerNote { get; set; }
+    public string? SellerNote { get; set; }
 }
+
+
+   

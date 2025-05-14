@@ -47,6 +47,7 @@ public interface IApplicationDbContext
     DbSet<Permission> Permissions { get; }
     DbSet<AnbWebhookLog> AnbWebhookLogs { get; }
     DbSet<SystemConfiguration> SystemConfigurations { get; }
+    DbSet<ManualNotificationLog> ManualNotificationLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     Task<int> SaveChangesAsync();

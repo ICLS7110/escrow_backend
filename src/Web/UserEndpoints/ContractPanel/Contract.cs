@@ -149,9 +149,6 @@ public class Contract : EndpointGroupBase
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, result.Message, new()));
     }
 
-
-
-
     [Authorize]
     public async Task<IResult> GetContracts(
     ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, int? startPrice, int? endPrice, DateTime? startDate, DateTime? endDate, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
