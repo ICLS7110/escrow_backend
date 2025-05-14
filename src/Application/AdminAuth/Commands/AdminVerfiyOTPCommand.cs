@@ -6,6 +6,7 @@ using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Escrow.Api.Application.Authentication.Interfaces;
 
 namespace Escrow.Api.Application.AdminAuth.Commands
 {
@@ -18,33 +19,53 @@ namespace Escrow.Api.Application.AdminAuth.Commands
     public class AdminVerifyOTPCommandHandler : IRequestHandler<AdminVerifyOTPCommand, Result<string>>
     {
         private readonly IApplicationDbContext _context;
+        private readonly IOtpManagerService _otpManagerService;
 
-        public AdminVerifyOTPCommandHandler(IApplicationDbContext context)
+        public AdminVerifyOTPCommandHandler(IApplicationDbContext context,IOtpManagerService otpManagerService)
         {
             _context = context;
+            _otpManagerService = otpManagerService;
         }
 
-        public async Task<Result<string>> Handle(AdminVerifyOTPCommand request, CancellationToken cancellationToken)
+
+        public Task<Result<string>> Handle(AdminVerifyOTPCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.OTP))
             {
-                return Result<string>.Failure(StatusCodes.Status400BadRequest, "Email and OTP are required.");
+                return Task.FromResult(Result<string>.Failure(StatusCodes.Status400BadRequest, "Email and OTP are required."));
             }
 
-            var adminUser = await _context.UserDetails
-                .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
+            var isValid = _otpManagerService.VerifyOtpAsync(request.Email, request.OTP); // sync method
 
-            if (adminUser == null)
-            {
-                return Result<string>.Failure(StatusCodes.Status404NotFound, "Admin not found.");
-            }
+            if (!isValid)
+                return Task.FromResult(Result<string>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP."));
 
-            if (adminUser.OTP != request.OTP)
-            {
-                return Result<string>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP.");
-            }
-
-            return Result<string>.Success(StatusCodes.Status200OK, "OTP verified successfully.");
+            return Task.FromResult(Result<string>.Success(StatusCodes.Status200OK, "OTP verified successfully."));
         }
+
+
+        //public async Task<Result<string>> Handle(AdminVerifyOTPCommand request, CancellationToken cancellationToken)
+        //{
+        //    if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.OTP))
+        //    {
+        //        return Result<string>.Failure(StatusCodes.Status400BadRequest, "Email and OTP are required.");
+        //    }
+
+
+        //    var adminUser = await _context.UserDetails
+        //        .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
+
+        //    if (adminUser == null)
+        //    {
+        //        return Result<string>.Failure(StatusCodes.Status404NotFound, "Admin not found.");
+        //    }
+
+        //    if (adminUser.OTP != request.OTP)
+        //    {
+        //        return Result<string>.Failure(StatusCodes.Status400BadRequest, "Invalid OTP.");
+        //    }
+
+        //    return Result<string>.Success(StatusCodes.Status200OK, "OTP verified successfully.");
+        //}
     }
 }

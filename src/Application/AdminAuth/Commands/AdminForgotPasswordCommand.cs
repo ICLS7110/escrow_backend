@@ -8,6 +8,7 @@ using Escrow.Api.Domain.Entities.AdminPanel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Escrow.Api.Application.DTOs;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Escrow.Api.Application.AdminAuth.Commands
 {
@@ -20,13 +21,17 @@ namespace Escrow.Api.Application.AdminAuth.Commands
     {
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
+        private readonly IMemoryCache _cache;
+
 
         public AdminForgotPasswordCommandHandler(
             IApplicationDbContext context,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            IMemoryCache cache)
         {
             _context = context;
             _jwtService = jwtService;
+            _cache = cache;
         }
 
         public async Task<Result<object>> Handle(AdminForgotPasswordCommand request, CancellationToken cancellationToken)
@@ -41,6 +46,8 @@ namespace Escrow.Api.Application.AdminAuth.Commands
             }
 
             string otp = "1234";//new Random().Next(100000, 999999).ToString();
+            _cache.Set(request.Email, otp, TimeSpan.FromMinutes(5)); // Store OTP in cache for 5 minutes
+
 
             adminUser.OTP = otp;
             await _context.SaveChangesAsync(cancellationToken);
