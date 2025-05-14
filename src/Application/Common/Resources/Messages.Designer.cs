@@ -22,7 +22,7 @@ namespace Escrow.Api.Application.Common.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Messages {
+    internal class Messages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -66,15 +66,6 @@ namespace Escrow.Api.Application.Common.Resources {
         internal static string Success {
             get {
                 return ResourceManager.GetString("Success", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  Operation successful..
-        /// </summary>
-        internal static string Success1 {
-            get {
-                return ResourceManager.GetString("Success1", resourceCulture);
             }
         }
     }
