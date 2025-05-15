@@ -19,6 +19,7 @@ using Escrow.Api.Infrastructure.OptionConfiguration;
 using Microsoft.AspNetCore.Http.Features;
 using Amazon.S3;
 using Amazon;
+using Escrow.Api.Infrastructure.Helpers.Notifications;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -53,7 +54,7 @@ public static class DependencyInjection
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString);            
+            options.UseNpgsql(connectionString);
         });
 
         builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
@@ -87,13 +88,15 @@ public static class DependencyInjection
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, Escrow.Api.Infrastructure.Authentication.Services.IdentityEmailSender>();
-        builder.Services.AddSingleton<IRsaHelper,RsaHelper>();
+        builder.Services.AddSingleton<IRsaHelper, RsaHelper>();
         builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        //builder.Services.AddSingleton<INotificationService, FirebaseNotificationService>();
         builder.Services.AddScoped<IJwtService, JwtService>();
-        builder.Services.AddSingleton<IAESService,AESService>();
+        builder.Services.AddSingleton<IAESService, AESService>();
         builder.Services.AddScoped<IFileService, FileService>();
 
+        builder.Services.AddScoped<INotificationService, FirebaseNotificationService>(); // ✅
     }
 
-    
+
 }

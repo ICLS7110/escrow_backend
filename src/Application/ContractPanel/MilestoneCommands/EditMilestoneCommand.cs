@@ -4,22 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 
 namespace Escrow.Api.Application.ContractPanel.MilestoneCommands;
-public record EditMilestoneCommand : IRequest<Result<int>>
+public record EditMilestoneCommand : IRequest<Result<List<int>>>
 {
-    public int Id { get; set; }
-    public int ContractId { get; set; }
-    public string MilestoneTitle { get; set; } = string.Empty;
-    public string MilestoneDescription { get; set; } = string.Empty;
-    public DateTimeOffset DueDate { get; set; }
-    public decimal Amount { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public List<MilestoneUpdateDTO> Milestones { get; set; } = new();
 }
 
-public class EditMilestoneCommandHandler : IRequestHandler<EditMilestoneCommand, Result<int>>
+
+public class EditMilestoneCommandHandler : IRequestHandler<EditMilestoneCommand, Result<List<int>>>
 {
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -32,22 +28,36 @@ public class EditMilestoneCommandHandler : IRequestHandler<EditMilestoneCommand,
         _jwtService = jwtService;
     }
 
-    public async Task<Result<int>> Handle(EditMilestoneCommand request, CancellationToken cancellationToken)
+    public async Task<Result<List<int>>> Handle(EditMilestoneCommand request, CancellationToken cancellationToken)
     {
-        int userid = _jwtService.GetUserId().ToInt();
-        var entity = await _context.MileStones.FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == userid.ToString() && x.ContractId == request.ContractId);
-        if (entity == null)
+        int userId = _jwtService.GetUserId().ToInt();
+        var updatedMilestoneIds = new List<int>();
+
+        foreach (var milestone in request.Milestones)
         {
-            return Result<int>.Failure(StatusCodes.Status404NotFound, "Milestone Not Found.");
+            var entity = await _context.MileStones
+                .FirstOrDefaultAsync(x => x.Id == milestone.Id && x.CreatedBy == userId.ToString() && x.ContractId == milestone.ContractId, cancellationToken);
+
+            if (entity == null)
+            {
+                continue; // Skip if not found
+            }
+
+            entity.Name = milestone.MilestoneTitle;
+            entity.Description = milestone.MilestoneDescription;
+            entity.DueDate = milestone.DueDate;
+            entity.Amount = milestone.Amount;
+
+            _context.MileStones.Update(entity);
+            updatedMilestoneIds.Add(entity.Id);
         }
 
-        entity.Name = request.MilestoneTitle;
-        entity.Description = request.MilestoneDescription;
-        entity.DueDate = request.DueDate;
-        entity.Amount = request.Amount;
+        if (!updatedMilestoneIds.Any())
+        {
+            return Result<List<int>>.Failure(StatusCodes.Status404NotFound, "No milestones were updated.");
+        }
 
-        _context.MileStones.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(StatusCodes.Status200OK, "Success", entity.Id);
+        return Result<List<int>>.Success(StatusCodes.Status200OK, "Milestones updated successfully.", updatedMilestoneIds);
     }
 }

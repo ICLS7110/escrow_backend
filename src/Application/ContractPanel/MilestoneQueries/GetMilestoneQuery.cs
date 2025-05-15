@@ -47,7 +47,7 @@ public class GetMilestoneQueryHandler : IRequestHandler<GetMilestoneQuery, Pagin
 
         return await query
             .Select(s => new MileStoneDTO
-            {   
+            {
                 Id = s.Id,
                 Name = s.Name,
                 Amount = s.Amount,
@@ -55,6 +55,7 @@ public class GetMilestoneQueryHandler : IRequestHandler<GetMilestoneQuery, Pagin
                 DueDate = s.DueDate,
                 Documents = s.Documents,
                 ContractId = s.ContractId,
+                Status = s.Status
             })
             .OrderBy(x => x.Name)
             .PaginatedListAsync(pageNumber, pageSize);

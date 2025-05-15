@@ -1,13 +1,17 @@
-
+using System.Text;
+using Escrow.Api.Application.Common.Helpers;
+using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.DTOs;
+using Escrow.Api.Infrastructure.Configuration;
 using Escrow.Api.Infrastructure.Data;
+using Escrow.Api.Infrastructure.Data.Configurations;
+using Escrow.Api.Infrastructure.Helpers;
 using Escrow.Api.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Escrow.Api.Application.DTOs;
-using Escrow.Api.Infrastructure.Helpers;
 
 
 
@@ -67,10 +71,10 @@ builder.Services.AddOpenIddict()
     options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });*/
-builder.Services.AddAuthentication(options =>{
+builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options=> 
+}).AddJwtBearer(options =>
 {
     options.Events = new JwtBearerEvents
     {
@@ -85,7 +89,8 @@ builder.Services.AddAuthentication(options =>{
     var issuerSigningKey = builder.Configuration["Jwt:IssuerSigningKey"]
         ?? throw new InvalidOperationException("Jwt:IssuerSigningKey is missing in the configuration.");
 
-    options.TokenValidationParameters = new TokenValidationParameters {
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -113,11 +118,21 @@ builder.AddInfrastructureServices();
 builder.AddWebServices();
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IEmailService, EmailConfiguration>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 100_000_000; // 100 MB
+});
+
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 var app = builder.Build();
 app.UseCors("AllowAll");
+
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
@@ -143,19 +158,41 @@ app.UseStaticFiles();
 //app.UseAuthentication();
 //app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+//{
+//    // Enable Swagger in Development environment
+//    app.UseSwaggerUi(settings =>
+//    {
+//        settings.Path = "/api";
+//        settings.DocumentPath = "/api/specification.json";
+//    });
+//}
+//else
+//{
+//    app.UseHsts();
+//}
+
+
+
+
+
+
+
+// Enable Swagger in both Development and Production environments
+app.UseSwaggerUi(settings =>
 {
-    // Enable Swagger in Development environment
-    app.UseSwaggerUi(settings =>
-    {
-        settings.Path = "/api";
-        settings.DocumentPath = "/api/specification.json";
-    });
-}
-else
+    settings.Path = "/api";
+    settings.DocumentPath = "/api/specification.json";
+});
+
+// Enable HSTS only in Production
+if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
 }
+
+
+
 
 //app.MapStaticAssets();
 //app.UseExceptionHandler(options => { });
