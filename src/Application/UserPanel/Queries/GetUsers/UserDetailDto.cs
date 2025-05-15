@@ -8,9 +8,11 @@ using Escrow.Api.Domain.Entities.UserPanel;
 namespace Escrow.Api.Application.UserPanel.Queries.GetUsers;
 public class UserDetailDto
 {
+    public int Id { get; set; }
     public string? FullName { get; set; }
     public string? EmailAddress { get; set; }
     public string? PhoneNumber { get; set; }
+    public string? CountryCode { get; set; }
     public string? Gender { get; set; }
     public DateTime? DateOfBirth { get; set; }
 
@@ -20,10 +22,14 @@ public class UserDetailDto
     public string? VatId { get; set; }
 
     public string? BusinessProof { get; set; }
+    public string? DeviceToken { get; set; } // Store Firebase Device Token
     public string? CompanyEmail { get; set; }
     public string? LoginMethod { get; set; }
     public string? ProfilePicture { get; set; }
+    public string? AccountType { get; set; }
     public bool IsProfileCompleted { get; set; } = false;
+    public bool? IsNotified { get; set; } = false;
+    public string? SocialId { get; set; }
 
     private class Mapping : Profile
     {

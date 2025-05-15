@@ -35,6 +35,7 @@ public class ContractDetails : BaseAuditableEntity
     public bool? IsActive { get; set; }
     public bool? IsDeleted { get; set; }
     public UserDetail? UserDetail { get; set; }
+    public DateTime? EscrowStatusUpdatedAt { get; set; }
     
     public ICollection<MileStone>? MileStones { get; set; } 
 }

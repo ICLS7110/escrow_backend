@@ -23,12 +23,15 @@
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="BCrypt.Net-Core" />
+    <PackageReference Include="EPPlus" />
     <PackageReference Include="FirebaseAdmin" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="libphonenumber-csharp" />
     <PackageReference Include="Microsoft.AspNetCore.Http" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
   </ItemGroup>
 
@@ -37,6 +40,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AdminAuth\Commands\" />
+    <Folder Include="AdminAuth\Queries\" />
     <Folder Include="Notifications\Commands\" />
     <Folder Include="Notifications\Queries\" />
   </ItemGroup>

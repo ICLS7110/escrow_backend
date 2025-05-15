@@ -9,5 +9,6 @@ namespace Escrow.Api.Domain.Enums;
 public enum Roles
 {
     User = 1,
-    Admin = 2
+    Admin = 2,
+    SubAdmin = 3
 }

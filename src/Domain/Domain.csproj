@@ -14,11 +14,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\Policy\**" />
+    <EmbeddedResource Remove="Entities\Policy\**" />
+    <None Remove="Entities\Policy\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MediatR" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Entities\ContactUsPanel\" />
     <Folder Include="Entities\Notifications\" />
+    <Folder Include="Entities\RoleMenuPermissions\" />
   </ItemGroup>
 
 </Project>
