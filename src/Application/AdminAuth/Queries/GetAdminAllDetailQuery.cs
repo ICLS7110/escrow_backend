@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Common.Constants;
-using Escrow.Api.Application.Common.Resources;
 using Microsoft.Extensions.Localization;
 using Escrow.Api.Application.Common.Helpers;
 

@@ -9,4 +9,5 @@ public interface IAnbService
 {
     Task<string> GetAccountBalanceAsync(string accountNumber);
     Task<bool> VerifyAccountAsync(string accountNumber);
+    Task<string?> GetAccessTokenAsync();
 }

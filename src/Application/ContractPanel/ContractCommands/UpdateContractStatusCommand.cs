@@ -13,6 +13,8 @@ using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 using Amazon.Runtime.Internal.Util;
 using Microsoft.Extensions.Logging;
+using Escrow.Api.Domain.Entities.Transactions;
+using System.Transactions;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands;
 
@@ -66,7 +68,7 @@ public class UpdateContractStatusCommandHandler : IRequestHandler<UpdateContract
             if (contract == null) return false;
 
             // Mark milestones as completed if contract is completed
-            if (request.Status.Equals(nameof(ContractStatus.Completed), StringComparison.OrdinalIgnoreCase))
+            if (request.Status.Equals(nameof(ContractStatus.Completed), StringComparison.OrdinalIgnoreCase) || request.Status.Equals(nameof(ContractStatus.Released), StringComparison.OrdinalIgnoreCase))
             {
                 var milestones = await _context.MileStones
                     .Where(m => m.ContractId == request.ContractId && m.RecordState == 0)
@@ -80,7 +82,27 @@ public class UpdateContractStatusCommandHandler : IRequestHandler<UpdateContract
                 }
 
                 _context.MileStones.UpdateRange(milestones);
+
+                var totalAmount = milestones.Sum(m => m.Amount); // assuming milestone has an Amount property
+
+                var transaction = new Domain.Entities.Transactions.Transaction
+                {
+                    TransactionDateTime = DateTime.UtcNow,
+                    TransactionAmount = Convert.ToDecimal(contract.FeeAmount),
+                    TransactionType = request.Status, // or "Completed" depending on your logic
+                    FromPayee = contract.BuyerDetailsId.ToString(), // or appropriate logic
+                    ToRecipient = contract.SellerDetailsId.ToString(), // or appropriate logic
+                    ContractId = request.ContractId,
+                    Status = nameof(ContractStatus.Released),
+                    Created = DateTime.UtcNow,
+                    CreatedBy = userId.ToString()
+                };
+
+                await _context.Transactions.AddAsync(transaction, cancellationToken);
                 await _context.SaveChangesAsync(cancellationToken);
+
+
+
             }
 
             // Update contract status

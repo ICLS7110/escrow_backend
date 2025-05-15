@@ -1,5 +1,6 @@
 ﻿using Escrow.Api.Application.BankDetails.Commands;
 using Escrow.Api.Application.BankDetails.Queries;
+using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
@@ -31,36 +32,84 @@ public class BankDetails: EndpointGroupBase
     }
     [Authorize]
     public async Task<IResult> GetBankDetails(
-        ISender sender, IJwtService jwtService, int? id, [AsParameters] GetBankDetailsAdminQuery request)
+    ISender sender,
+    IJwtService jwtService,
+    int? id,
+    [AsParameters] GetBankDetailsAdminQuery request,
+    IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
         var query = new GetBankDetailsAdminQuery { Id = id, PageNumber = request.PageNumber, PageSize = request.PageSize };
         var result = await sender.Send(query);
-        return TypedResults.Ok(Result<PaginatedList<BankDetail>>.Success(StatusCodes.Status200OK,"Success", result));
+
+        var message = AppMessages.Get("BankDetailsRetrieved", language);
+        return TypedResults.Ok(Result<PaginatedList<BankDetail>>.Success(StatusCodes.Status200OK, message, result));
     }
 
-
     [Authorize]
-    public async Task<IResult> CreateBankDetail(ISender sender, IJwtService jwtService, CreateBankDetailCommand command)
+    public async Task<IResult> CreateBankDetail(ISender sender,IJwtService jwtService,CreateBankDetailCommand command,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var id = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Bank details created successfully.", new { BankId = id }));
-        //return TypedResults.Created($"/BankDetails/{id}", Result<int>.Success(StatusCodes.Status201Created, "Success.", id));
+        var message = AppMessages.Get("BankDetailCreated", language);
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, message, new { BankId = id }));
     }
 
-   
-
     [Authorize]
-    public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService, UpdateBankDetailCommand command)
+    public async Task<IResult> UpdateBankDetail(ISender sender,IJwtService jwtService,UpdateBankDetailCommand command,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Bank details updated successfully.", new()));
+        var message = AppMessages.Get("BankDetailUpdated", language);
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, message, new()));
     }
 
     [Authorize]
-    public async Task<IResult> DeleteBankDetail(ISender sender, int id)
+    public async Task<IResult> DeleteBankDetail(ISender sender,int id,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         await sender.Send(new DeleteBankDetailCommand(id));
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"Bank details Deleted successfully.", new()));
+        var message = AppMessages.Get("BankDetailDeleted", language);
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, message, new()));
     }
+
+
+    //[Authorize]
+    //public async Task<IResult> GetBankDetails(
+    //    ISender sender, IJwtService jwtService, int? id, [AsParameters] GetBankDetailsAdminQuery request)
+    //{
+
+    //    var query = new GetBankDetailsAdminQuery { Id = id, PageNumber = request.PageNumber, PageSize = request.PageSize };
+    //    var result = await sender.Send(query);
+    //    return TypedResults.Ok(Result<PaginatedList<BankDetail>>.Success(StatusCodes.Status200OK,"Success", result));
+    //}
+
+
+    //[Authorize]
+    //public async Task<IResult> CreateBankDetail(ISender sender, IJwtService jwtService, CreateBankDetailCommand command)
+    //{
+    //    var id = await sender.Send(command);
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Bank details created successfully.", new { BankId = id }));
+    //    //return TypedResults.Created($"/BankDetails/{id}", Result<int>.Success(StatusCodes.Status201Created, "Success.", id));
+    //}
+
+
+
+    //[Authorize]
+    //public async Task<IResult> UpdateBankDetail(ISender sender, IJwtService jwtService, UpdateBankDetailCommand command)
+    //{
+    //    var result = await sender.Send(command);
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "Bank details updated successfully.", new()));
+    //}
+
+    //[Authorize]
+    //public async Task<IResult> DeleteBankDetail(ISender sender, int id)
+    //{
+    //    await sender.Send(new DeleteBankDetailCommand(id));
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent,"Bank details Deleted successfully.", new()));
+    //}
 }

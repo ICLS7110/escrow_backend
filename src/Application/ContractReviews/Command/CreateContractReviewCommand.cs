@@ -25,12 +25,14 @@ namespace Escrow.Api.Application.ContractReviews.Command
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEmailService _emailService;
 
-        public CreateContractReviewCommandHandler(IApplicationDbContext context, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
+        public CreateContractReviewCommandHandler(IApplicationDbContext context, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
             _httpContextAccessor = httpContextAccessor;
+            _emailService = emailService;
         }
 
         public async Task<Result<object>> Handle(CreateContractReviewCommand request, CancellationToken cancellationToken)
@@ -102,6 +104,25 @@ namespace Escrow.Api.Application.ContractReviews.Command
             _context.ContractDetails.Update(contract);
 
             await _context.SaveChangesAsync(cancellationToken);
+
+
+            // Direct email content
+            var emailSubject = "New Contract Review Submitted";
+            var emailBody = $"A new review has been submitted for your contract.\n\n" +
+                            $"Rating: {request.Rating}\n" +
+                            $"Review: {request.ReviewText}\n\n" +
+                            "Thank you for your feedback!";
+
+            // Send email to both buyer and seller
+            if (!string.IsNullOrEmpty(buyer?.EmailAddress) && !string.IsNullOrEmpty(buyer?.FullName))
+            {
+                await _emailService.SendEmailAsync(buyer.EmailAddress, emailSubject, buyer.FullName, emailBody);
+            }
+
+            if (!string.IsNullOrEmpty(seller?.EmailAddress) && !string.IsNullOrEmpty(seller?.FullName))
+            {
+                await _emailService.SendEmailAsync(seller.EmailAddress, emailSubject, seller.FullName, emailBody);
+            }
 
             return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ReviewCreated", language), new { ReviewId = review.Id });
         }

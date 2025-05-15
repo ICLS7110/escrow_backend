@@ -14,6 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Application.Common.Constants;
 
 namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
 {
@@ -40,29 +41,33 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
     {
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
-        public UpdateUserCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public UpdateUserCommandHandler(IApplicationDbContext context, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _jwtService = jwtService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Result<int>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
+            var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
             try
             {
                 var entity = await _context.UserDetails
                     .FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
 
                 if (entity == null)
-                    return Result<int>.Failure(StatusCodes.Status404NotFound, "User Details Not Found.");
+                    return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("UserDetailsNotFound", language));
 
                 entity.FullName = request.FullName;
                 entity.EmailAddress = request.EmailAddress;
                 entity.Gender = request.Gender;
-                //entity.DateOfBirth = DateTime.SpecifyKind(request.DateOfBirth ?? DateTime.UtcNow, DateTimeKind.Unspecified);
                 entity.DateOfBirth = request.DateOfBirth.HasValue
-    ? DateTime.SpecifyKind(request.DateOfBirth.Value, DateTimeKind.Unspecified)
-    : (DateTime?)null;
+                    ? DateTime.SpecifyKind(request.DateOfBirth.Value, DateTimeKind.Unspecified)
+                    : (DateTime?)null;
 
                 entity.BusinessManagerName = request.BusinessManagerName;
                 entity.BusinessEmail = request.BusinessEmail;
@@ -74,15 +79,65 @@ namespace Escrow.Api.Application.UserPanel.Commands.UpdateUser
                 entity.IsProfileCompleted = true;
                 entity.Role = nameof(Roles.User);
 
-                //await _context.UserDetails.AddAsync(entity);
                 await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {
                 var error = ex;
+                // Optionally handle/log the error here
             }
-            return Result<int>.Success(StatusCodes.Status200OK, "Success");
 
+            return Result<int>.Success(StatusCodes.Status200OK, AppMessages.Get("Success", language));
         }
     }
+
 }
+//public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result<int>>
+//   {
+//       private readonly IApplicationDbContext _context;
+//       private readonly IJwtService _jwtService;
+//       public UpdateUserCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+//       {
+//           _context = context;
+//           _jwtService = jwtService;
+//       }
+
+//       public async Task<Result<int>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+//       {
+//           try
+//           {
+//               var entity = await _context.UserDetails
+//                   .FindAsync(new object[] { _jwtService.GetUserId().ToInt() }, cancellationToken);
+
+//               if (entity == null)
+//                   return Result<int>.Failure(StatusCodes.Status404NotFound, "User Details Not Found.");
+
+//               entity.FullName = request.FullName;
+//               entity.EmailAddress = request.EmailAddress;
+//               entity.Gender = request.Gender;
+//               //entity.DateOfBirth = DateTime.SpecifyKind(request.DateOfBirth ?? DateTime.UtcNow, DateTimeKind.Unspecified);
+//               entity.DateOfBirth = request.DateOfBirth.HasValue
+//   ? DateTime.SpecifyKind(request.DateOfBirth.Value, DateTimeKind.Unspecified)
+//   : (DateTime?)null;
+
+//               entity.BusinessManagerName = request.BusinessManagerName;
+//               entity.BusinessEmail = request.BusinessEmail;
+//               entity.VatId = request.VatId;
+//               entity.BusinessProof = request.BusinessProof;
+//               entity.CompanyEmail = request.CompanyEmail;
+//               entity.ProfilePicture = request.ProfilePicture;
+//               entity.AccountType = request.AccountType == null ? entity.AccountType : request.AccountType;
+//               entity.IsProfileCompleted = true;
+//               entity.Role = nameof(Roles.User);
+
+//               //await _context.UserDetails.AddAsync(entity);
+//               await _context.SaveChangesAsync(cancellationToken);
+//           }
+//           catch (Exception ex)
+//           {
+//               var error = ex;
+//           }
+//           return Result<int>.Success(StatusCodes.Status200OK, "Success");
+
+//       }
+//   }

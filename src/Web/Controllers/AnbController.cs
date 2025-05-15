@@ -31,5 +31,28 @@ public class AnbController : ControllerBase
         var isValid = await _anbService.VerifyAccountAsync(accountNumber);
         return Ok(new { isValid });
     }
+
+    [HttpGet("token")]
+    public async Task<IActionResult> GetToken()
+    {
+        try
+        {
+            var token = await _anbService.GetAccessTokenAsync();
+            if (string.IsNullOrEmpty(token))
+                return BadRequest(new { message = "Access token is null or empty." });
+
+            return Ok(new { accessToken = token });
+        }
+        catch (HttpRequestException ex)
+        {
+            return StatusCode(502, new { message = "Error while calling ANB token API", detail = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", detail = ex.Message });
+        }
+    }
+
+
 }
 

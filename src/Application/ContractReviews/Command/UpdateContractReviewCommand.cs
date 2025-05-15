@@ -23,12 +23,14 @@ namespace Escrow.Api.Application.ContractReviews.Command
         private readonly IApplicationDbContext _context;
         private readonly IJwtService _jwtService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEmailService _emailService;  // Injected Email Service
 
-        public UpdateContractReviewCommandHandler(IApplicationDbContext context, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
+        public UpdateContractReviewCommandHandler(IApplicationDbContext context, IJwtService jwtService, IHttpContextAccessor httpContextAccessor,IEmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
             _httpContextAccessor = httpContextAccessor;
+            _emailService = emailService;  // Initialize Email Service
         }
 
         public async Task<Result<object>> Handle(UpdateContractReviewCommand request, CancellationToken cancellationToken)
@@ -59,6 +61,40 @@ namespace Escrow.Api.Application.ContractReviews.Command
 
             _context.ContractReviews.Update(review);
             await _context.SaveChangesAsync(cancellationToken);
+
+            var buyer = await _context.UserDetails.FirstOrDefaultAsync(u => u.Id == review.ReviewerId, cancellationToken);
+            var seller = await _context.UserDetails.FirstOrDefaultAsync(u => u.Id == review.RevieweeId, cancellationToken);
+
+            // Ensure buyer and seller details are available
+            if (buyer != null && seller != null &&
+                !string.IsNullOrEmpty(buyer.EmailAddress) && !string.IsNullOrEmpty(seller.EmailAddress))
+            {
+                var emailSubject = "Your Contract Review has been Updated";
+                var emailBody = $"The review for your contract has been updated.\n\n" +
+                                $"Rating: {request.Rating}\n" +
+                                $"Review: {request.ReviewText}\n\n" +
+                                "Thank you for your feedback!";
+
+                // Send email to both buyer and seller
+                if (!string.IsNullOrEmpty(buyer.EmailAddress) && !string.IsNullOrEmpty(buyer.FullName))
+                {
+                    await _emailService.SendEmailAsync(buyer.EmailAddress, emailSubject, buyer.FullName, emailBody);
+                }
+
+                if (!string.IsNullOrEmpty(seller.EmailAddress) && !string.IsNullOrEmpty(seller.FullName))
+                {
+                    await _emailService.SendEmailAsync(seller.EmailAddress, emailSubject, seller.FullName, emailBody);
+                }
+            }
+
+
+
+
+
+
+
+
+
 
             return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ReviewUpdated", language), new { ReviewId = review.Id });
         }

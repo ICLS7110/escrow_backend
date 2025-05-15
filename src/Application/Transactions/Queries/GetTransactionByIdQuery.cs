@@ -1,16 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Application.DTOs;
-using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Enums;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using Escrow.Api.Application.Common.Constants;
 
 namespace Escrow.Api.Application.Transactions.Queries;
+
 public record GetTransactionByIdQuery : IRequest<Result<TransactionDTO>>
 {
     public int TransactionId { get; init; }
@@ -29,40 +33,60 @@ public class GetTransactionByIdQueryHandler : IRequestHandler<GetTransactionById
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtService _jwtService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public GetTransactionByIdQueryHandler(IApplicationDbContext context, IJwtService jwtService)
+    public GetTransactionByIdQueryHandler(
+        IApplicationDbContext context,
+        IJwtService jwtService,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _jwtService = jwtService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Result<TransactionDTO>> Handle(GetTransactionByIdQuery request, CancellationToken cancellationToken)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         // Validate request
         var validator = new GetTransactionByIdQueryValidator();
         var validationResult = validator.Validate(request);
         if (!validationResult.IsValid)
         {
-            return Result<TransactionDTO>.Failure(400, validationResult.Errors.First().ErrorMessage);
+            return Result<TransactionDTO>.Failure(StatusCodes.Status400BadRequest, validationResult.Errors.First().ErrorMessage);
         }
-        var userId = _jwtService.GetUserId().ToInt();
+
+        var userIdStr = _jwtService.GetUserId();
+        if (string.IsNullOrEmpty(userIdStr))
+        {
+            return Result<TransactionDTO>.Failure(StatusCodes.Status401Unauthorized, AppMessages.Get("UserNotAuthenticated", language));
+        }
+
+        if (!int.TryParse(userIdStr, out int userId))
+        {
+            return Result<TransactionDTO>.Failure(StatusCodes.Status401Unauthorized, AppMessages.Get("InvalidUserId", language));
+        }
 
         var userRole = await _context.UserDetails
-          .Where(u => u.Id == userId)
-          .Select(u => u.Role)
-          .FirstOrDefaultAsync(cancellationToken);
+            .Where(u => u.Id == userId)
+            .Select(u => u.Role)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        // Step 1: Filter Transactions first
+        if (string.IsNullOrEmpty(userRole))
+        {
+            return Result<TransactionDTO>.Failure(StatusCodes.Status401Unauthorized, AppMessages.Get("UserRoleNotFound", language));
+        }
+
+        // Query Transactions with role-based restriction
         var transactionQuery = _context.Transactions
             .Where(t => t.Id == request.TransactionId);
 
-        // Apply role-based restriction before projecting
         if (userRole == nameof(Roles.User))
         {
-            transactionQuery = transactionQuery.Where(t => t.CreatedBy == userId.ToString());
+            transactionQuery = transactionQuery.Where(t => t.CreatedBy == userIdStr);
         }
 
-        // Step 2: Perform projection with join
         var transaction = await (
             from t in transactionQuery
             join c in _context.ContractDetails on t.ContractId equals c.Id into tc
@@ -89,8 +113,8 @@ public class GetTransactionByIdQueryHandler : IRequestHandler<GetTransactionById
                     FeeAmount = contract.FeeAmount,
                     BuyerName = contract.BuyerName,
                     BuyerMobile = contract.BuyerMobile,
-                    BuyerId = contract.BuyerDetailsId.ToString(),
-                    SellerId = contract.SellerDetailsId.ToString(),
+                    BuyerId = contract.BuyerDetailsId.ToString() ??string.Empty,
+                    SellerId = contract.SellerDetailsId.ToString() ?? string.Empty,
                     SellerName = contract.SellerName,
                     SellerMobile = contract.SellerMobile,
                     CreatedBy = contract.CreatedBy,
@@ -120,13 +144,184 @@ public class GetTransactionByIdQueryHandler : IRequestHandler<GetTransactionById
             })
             .FirstOrDefaultAsync(cancellationToken);
 
-
         if (transaction == null)
         {
-            return Result<TransactionDTO>.Failure(404, "Transaction not found.");
+            return Result<TransactionDTO>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("TransactionNotFound", language));
         }
 
-        return Result<TransactionDTO>.Success(200, "Transaction retrieved successfully.", transaction);
+        return Result<TransactionDTO>.Success(StatusCodes.Status200OK, AppMessages.Get("TransactionRetrievedSuccessfully", language), transaction);
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using Escrow.Api.Application.Common.Interfaces;
+//using Escrow.Api.Application.Common.Models;
+//using Escrow.Api.Application.Common.Models.ContractDTOs;
+//using Escrow.Api.Application.DTOs;
+//using Escrow.Api.Domain.Entities.ContractPanel;
+//using Escrow.Api.Domain.Enums;
+
+//namespace Escrow.Api.Application.Transactions.Queries;
+//public record GetTransactionByIdQuery : IRequest<Result<TransactionDTO>>
+//{
+//    public int TransactionId { get; init; }
+//}
+
+//public class GetTransactionByIdQueryValidator : AbstractValidator<GetTransactionByIdQuery>
+//{
+//    public GetTransactionByIdQueryValidator()
+//    {
+//        RuleFor(x => x.TransactionId)
+//            .GreaterThan(0).WithMessage("Transaction ID must be a positive integer.");
+//    }
+//}
+
+//public class GetTransactionByIdQueryHandler : IRequestHandler<GetTransactionByIdQuery, Result<TransactionDTO>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IJwtService _jwtService;
+
+//    public GetTransactionByIdQueryHandler(IApplicationDbContext context, IJwtService jwtService)
+//    {
+//        _context = context;
+//        _jwtService = jwtService;
+//    }
+
+//    public async Task<Result<TransactionDTO>> Handle(GetTransactionByIdQuery request, CancellationToken cancellationToken)
+//    {
+//        // Validate request
+//        var validator = new GetTransactionByIdQueryValidator();
+//        var validationResult = validator.Validate(request);
+//        if (!validationResult.IsValid)
+//        {
+//            return Result<TransactionDTO>.Failure(400, validationResult.Errors.First().ErrorMessage);
+//        }
+//        var userId = _jwtService.GetUserId().ToInt();
+
+//        var userRole = await _context.UserDetails
+//          .Where(u => u.Id == userId)
+//          .Select(u => u.Role)
+//          .FirstOrDefaultAsync(cancellationToken);
+
+//        // Step 1: Filter Transactions first
+//        var transactionQuery = _context.Transactions
+//            .Where(t => t.Id == request.TransactionId);
+
+//        // Apply role-based restriction before projecting
+//        if (userRole == nameof(Roles.User))
+//        {
+//            transactionQuery = transactionQuery.Where(t => t.CreatedBy == userId.ToString());
+//        }
+
+//        // Step 2: Perform projection with join
+//        var transaction = await (
+//            from t in transactionQuery
+//            join c in _context.ContractDetails on t.ContractId equals c.Id into tc
+//            from contract in tc.DefaultIfEmpty()
+//            select new TransactionDTO
+//            {
+//                Id = t.Id,
+//                TransactionDateTime = t.TransactionDateTime,
+//                TransactionAmount = t.TransactionAmount,
+//                TransactionType = t.TransactionType ?? string.Empty,
+//                FromPayee = t.FromPayee ?? string.Empty,
+//                ToRecipient = t.ToRecipient ?? string.Empty,
+//                ContractId = t.ContractId,
+//                Status = t.Status,
+//                ContractDetails = contract == null ? null : new ContractDetailsDTO
+//                {
+//                    Id = contract.Id,
+//                    Role = contract.Role,
+//                    ContractTitle = contract.ContractTitle,
+//                    ServiceType = contract.ServiceType,
+//                    ServiceDescription = contract.ServiceDescription,
+//                    AdditionalNote = contract.AdditionalNote,
+//                    FeesPaidBy = contract.FeesPaidBy,
+//                    FeeAmount = contract.FeeAmount,
+//                    BuyerName = contract.BuyerName,
+//                    BuyerMobile = contract.BuyerMobile,
+//                    BuyerId = contract.BuyerDetailsId.ToString(),
+//                    SellerId = contract.SellerDetailsId.ToString(),
+//                    SellerName = contract.SellerName,
+//                    SellerMobile = contract.SellerMobile,
+//                    CreatedBy = contract.CreatedBy,
+//                    ContractDoc = contract.ContractDoc,
+//                    Status = contract.Status,
+//                    IsActive = contract.IsActive,
+//                    IsDeleted = contract.IsDeleted,
+//                    TaxAmount = contract.TaxAmount,
+//                    EscrowTax = contract.EscrowTax,
+//                    LastModifiedBy = contract.LastModifiedBy,
+//                    BuyerPayableAmount = contract.BuyerPayableAmount,
+//                    SellerPayableAmount = contract.SellerPayableAmount,
+//                    Created = contract.Created,
+//                    LastModified = contract.LastModified,
+
+//                    MileStones = _context.MileStones
+//                        .Where(m => m.ContractId == contract.Id)
+//                        .Select(m => new MileStoneDTO
+//                        {
+//                            Id = m.Id,
+//                            Name = m.Name,
+//                            Amount = m.Amount,
+//                            DueDate = m.DueDate,
+//                            Status = m.Status
+//                        }).ToList()
+//                }
+//            })
+//            .FirstOrDefaultAsync(cancellationToken);
+
+
+//        if (transaction == null)
+//        {
+//            return Result<TransactionDTO>.Failure(404, "Transaction not found.");
+//        }
+
+//        return Result<TransactionDTO>.Success(200, "Transaction retrieved successfully.", transaction);
+//    }
+
+//}

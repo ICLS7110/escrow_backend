@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.Common.Models.EmailTemplate;
+﻿using Escrow.Api.Application.Common.Constants;
+using Escrow.Api.Application.Common.Models.EmailTemplate;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Application.EmailTemplates.Commands;
 using Escrow.Api.Application.EmailTemplates.Queries;
@@ -23,23 +24,72 @@ public class EmailTemplate : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> GetAllEmailTemplates(ISender sender, [AsParameters] GetEmailTemplatesQuery request)
+    public async Task<IResult> GetAllEmailTemplates(ISender sender,[AsParameters] GetEmailTemplatesQuery request,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
         var result = await sender.Send(request);
-        return result.Data != null && result.Data.Any()
-            ? TypedResults.Ok(result)
-            : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No email templates found."));
-    }
 
+        if (result.Data != null && result.Data.Any())
+        {
+            var message = AppMessages.Get("EmailTemplatesRetrieved", language);
+            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, message, result.Data));
+        }
+        else
+        {
+            var message = AppMessages.Get("NoEmailTemplatesFound", language);
+            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, message));
+        }
+    }
 
     [Authorize]
-    public async Task<IResult> GetEmailTemplateById(ISender sender, int templateId)
+    public async Task<IResult> GetEmailTemplateById(ISender sender,int templateId,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
         var result = await sender.Send(new GetEmailTemplateByIdQuery(templateId));
-        return result?.Data != null
-            ? TypedResults.Ok(result)
-            : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Email template not found."));
+
+        if (result?.Data != null)
+        {
+            var message = AppMessages.Get("EmailTemplateRetrieved", language);
+            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, message, result.Data));
+        }
+        else
+        {
+            var message = AppMessages.Get("EmailTemplateNotFound", language);
+            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, message));
+        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //[Authorize]
+    //public async Task<IResult> GetAllEmailTemplates(ISender sender, [AsParameters] GetEmailTemplatesQuery request)
+    //{
+    //    var result = await sender.Send(request);
+    //    return result.Data != null && result.Data.Any()
+    //        ? TypedResults.Ok(result)
+    //        : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No email templates found."));
+    //}
+
+
+    //[Authorize]
+    //public async Task<IResult> GetEmailTemplateById(ISender sender, int templateId)
+    //{
+    //    var result = await sender.Send(new GetEmailTemplateByIdQuery(templateId));
+    //    return result?.Data != null
+    //        ? TypedResults.Ok(result)
+    //        : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Email template not found."));
+    //}
 
     [Authorize]
     public async Task<IResult> UpdateEmailTemplate(ISender sender, [FromBody] UpdateEmailTemplateCommand command)

@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Application.Common.Constants;
 using Microsoft.Extensions.Localization;
-using Escrow.Api.Application.Common.Resources;
 using Escrow.Api.Application.Common.Helpers;
 using Amazon.Runtime.Internal.Util;
 using PhoneNumbers;

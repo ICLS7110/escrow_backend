@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Escrow.Api.Domain.Enums;
+using Escrow.Api.Application.Common.Constants;
 
 namespace Escrow.Api.Web.AdminEndPoints.SubAdmin;
 
@@ -39,44 +40,95 @@ public class SubAdmin : EndpointGroupBase
         }
     }
 
-    public async Task<IResult> DeleteSubAdmin(ISender sender, int id, int deletedBy)
+    public async Task<IResult> DeleteSubAdmin(ISender sender, int id, int deletedBy, IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         try
         {
             var command = new DeleteCommand { Id = id, DeletedBy = deletedBy };
             var result = await sender.Send(command);
 
-            if (result.Status == 1)
+            if (result.Status == StatusCodes.Status404NotFound)
             {
-                return TypedResults.BadRequest(new { Success = false, Message = result.Message ?? "Failed to delete." });
+                var message = AppMessages.Get(result.Message ?? "DeleteFailed", language);
+                return TypedResults.BadRequest(new { Success = false, Message = message });
             }
 
-            return TypedResults.Ok(new { Success = true, Message = "Deleted successfully." });
+            var successMessage = AppMessages.Get("DeleteSuccess", language);
+            return TypedResults.Ok(new { Success = true, Message = successMessage });
         }
         catch (Exception ex)
         {
             return TypedResults.BadRequest(new { Success = false, Message = ex.Message });
         }
     }
-    public async Task<IResult> ChangeStatus(ISender sender, int id)
+
+    //public async Task<IResult> DeleteSubAdmin(ISender sender, int id, int deletedBy)
+    //{
+    //    try
+    //    {
+    //        var command = new DeleteCommand { Id = id, DeletedBy = deletedBy };
+    //        var result = await sender.Send(command);
+
+    //        if (result.Status == 1)
+    //        {
+    //            return TypedResults.BadRequest(new { Success = false, Message = result.Message ?? "Failed to delete." });
+    //        }
+
+    //        return TypedResults.Ok(new { Success = true, Message = "Deleted successfully." });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return TypedResults.BadRequest(new { Success = false, Message = ex.Message });
+    //    }
+    //}
+    //public async Task<IResult> ChangeStatus(ISender sender, int id ,IHttpContextAccessor _httpContextAccessor)
+    //{
+    //    try
+    //    {
+    //        var command = new ChangeStatusCommand { Id = id };
+    //        var result = await sender.Send(command);
+
+    //        if (result.Status == 1)
+    //        {
+
+    //            return TypedResults.BadRequest(new { Success = false, Message = result.Message ?? "Failed to update status." });
+    //        }
+
+    //        return TypedResults.Ok(new { Success = true, Message = "Status updated successfully." });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return TypedResults.BadRequest(new { Success = false, Message = ex.Message });
+    //    }
+    //}
+
+    public async Task<IResult> ChangeStatus(ISender sender, int id, IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         try
         {
             var command = new ChangeStatusCommand { Id = id };
             var result = await sender.Send(command);
 
-            if (result.Status == 1)
+            if (result.Status == StatusCodes.Status400BadRequest)
             {
-
-                return TypedResults.BadRequest(new { Success = false, Message = result.Message ?? "Failed to update status." });
+                var failureMessage = AppMessages.Get(result.Message ?? "StatusUpdateFailed", language);
+                return TypedResults.BadRequest(new { Success = false, Message = failureMessage });
             }
 
-            return TypedResults.Ok(new { Success = true, Message = "Status updated successfully." });
+            var successMessage = AppMessages.Get("StatusUpdateSuccess", language);
+            return TypedResults.Ok(new { Success = true, Message = successMessage });
         }
         catch (Exception ex)
         {
-            return TypedResults.BadRequest(new { Success = false, Message = ex.Message });
+            var errorMessage = AppMessages.Get("UnexpectedError", language);
+            return TypedResults.BadRequest(new { Success = false, Message = errorMessage, Details = ex.Message });
         }
     }
+
+
 
 }

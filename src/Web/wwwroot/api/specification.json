@@ -4050,6 +4050,27 @@
           }
         }
       }
+    },
+    "/api/Anb/token": {
+      "get": {
+        "tags": [
+          "Anb"
+        ],
+        "operationId": "Anb_GetToken",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4401,7 +4422,8 @@
           "Cancelled",
           "Draft",
           "Escrow",
-          "Dispute"
+          "Dispute",
+          "Released"
         ],
         "enum": [
           "Pending",
@@ -4412,7 +4434,8 @@
           "Cancelled",
           "Draft",
           "Escrow",
-          "Dispute"
+          "Dispute",
+          "Released"
         ]
       },
       "CreateContractDetailCommand": {

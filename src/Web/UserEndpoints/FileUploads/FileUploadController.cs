@@ -110,7 +110,7 @@ public class FileUploadController : ControllerBase
 
             return Ok(new
             {
-                Message = "Files uploaded successfully.",
+                Message = "Uploaded successfully.",
                 Files = uploadedFiles
             });
         }

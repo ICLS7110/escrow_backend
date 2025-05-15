@@ -8,6 +8,9 @@ using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.Disputes;
 using Escrow.Api.Domain.Enums;
 using Microsoft.AspNetCore.Http;
+using MediatR;
+using Escrow.Api.Application.Common.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace Escrow.Api.Application.Disputes.Commands;
 public class CreateDisputeCommand : IRequest<Result<int>>
@@ -24,43 +27,40 @@ public class CreateDisputeCommandHandler : IRequestHandler<CreateDisputeCommand,
 {
     private readonly IApplicationDbContext _context;
     private readonly IJwtService _jwtService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CreateDisputeCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+    public CreateDisputeCommandHandler(IApplicationDbContext context, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _jwtService = jwtService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Result<int>> Handle(CreateDisputeCommand request, CancellationToken cancellationToken)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var userId = _jwtService.GetUserId();
 
         if (string.IsNullOrEmpty(userId))
-            return Result<int>.Failure(StatusCodes.Status401Unauthorized, "User is not authenticated.");
+            return Result<int>.Failure(StatusCodes.Status401Unauthorized, AppMessages.Get("UserNotAuthenticated", language));
 
         var contract = await _context.ContractDetails.FindAsync(new object[] { request.ContractId }, cancellationToken);
         if (contract == null)
-            return Result<int>.Failure(StatusCodes.Status404NotFound, "Contract not found.");
+            return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("ContractNotFound", language));
 
-        // ✅ Dispute validation logic
         if (contract.Status != nameof(ContractStatus.Escrow))
-            return Result<int>.Failure(StatusCodes.Status400BadRequest, "Dispute can only be raised when contract is in 'Escrow' status.");
+            return Result<int>.Failure(StatusCodes.Status400BadRequest, AppMessages.Get("DisputeInvalidStatus", language));
 
         if (contract.EscrowStatusUpdatedAt == null)
-            return Result<int>.Failure(StatusCodes.Status400BadRequest, "Escrow timestamp not available to verify dispute window.");
-
-        //if (contract.EscrowStatusUpdatedAt == null)
-        //{
-        //    return Result<int>.Failure(StatusCodes.Status400BadRequest, "Escrow timestamp is not available.");
-        //}
+            return Result<int>.Failure(StatusCodes.Status400BadRequest, AppMessages.Get("EscrowTimestampUnavailable", language));
 
         var hoursSinceEscrow = DateTime.UtcNow - contract.EscrowStatusUpdatedAt.Value;
         if (hoursSinceEscrow.TotalHours > 48)
         {
-            return Result<int>.Failure(StatusCodes.Status400BadRequest, "Dispute can only be raised within 48 hours of contract entering 'Escrow'.");
+            return Result<int>.Failure(StatusCodes.Status400BadRequest, AppMessages.Get("DisputeWindowExpired", language));
         }
 
-        // ✅ Create dispute
         var dispute = new Dispute
         {
             DisputeDateTime = DateTime.UtcNow,
@@ -74,15 +74,142 @@ public class CreateDisputeCommandHandler : IRequestHandler<CreateDisputeCommand,
 
         _context.Disputes.Add(dispute);
 
-        // ✅ Update contract status
         contract.Status = nameof(ContractStatus.Dispute);
         _context.ContractDetails.Update(contract);
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Result<int>.Success(StatusCodes.Status200OK, "Dispute created and contract status updated successfully.", dispute.Id);
+        return Result<int>.Success(StatusCodes.Status200OK, AppMessages.Get("DisputeCreated", language), dispute.Id);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using Escrow.Api.Application.Common.Interfaces;
+//using Escrow.Api.Application.DTOs;
+//using Escrow.Api.Domain.Entities.Disputes;
+//using Escrow.Api.Domain.Enums;
+//using Microsoft.AspNetCore.Http;
+
+//namespace Escrow.Api.Application.Disputes.Commands;
+//public class CreateDisputeCommand : IRequest<Result<int>>
+//{
+//    public int ContractId { get; set; }
+//    public string? DisputeRaisedBy { get; set; } // Buyer/Seller
+//    public string? DisputeReason { get; set; }
+//    public string? DisputeDescription { get; set; }
+//    public string? DisputeDoc { get; set; } // Comma-separated
+//}
+
+
+//public class CreateDisputeCommandHandler : IRequestHandler<CreateDisputeCommand, Result<int>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IJwtService _jwtService;
+
+//    public CreateDisputeCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+//    {
+//        _context = context;
+//        _jwtService = jwtService;
+//    }
+
+//    public async Task<Result<int>> Handle(CreateDisputeCommand request, CancellationToken cancellationToken)
+//    {
+//        var userId = _jwtService.GetUserId();
+
+//        if (string.IsNullOrEmpty(userId))
+//            return Result<int>.Failure(StatusCodes.Status401Unauthorized, "User is not authenticated.");
+
+//        var contract = await _context.ContractDetails.FindAsync(new object[] { request.ContractId }, cancellationToken);
+//        if (contract == null)
+//            return Result<int>.Failure(StatusCodes.Status404NotFound, "Contract not found.");
+
+//        // ✅ Dispute validation logic
+//        if (contract.Status != nameof(ContractStatus.Escrow))
+//            return Result<int>.Failure(StatusCodes.Status400BadRequest, "Dispute can only be raised when contract is in 'Escrow' status.");
+
+//        if (contract.EscrowStatusUpdatedAt == null)
+//            return Result<int>.Failure(StatusCodes.Status400BadRequest, "Escrow timestamp not available to verify dispute window.");
+
+//        //if (contract.EscrowStatusUpdatedAt == null)
+//        //{
+//        //    return Result<int>.Failure(StatusCodes.Status400BadRequest, "Escrow timestamp is not available.");
+//        //}
+
+//        var hoursSinceEscrow = DateTime.UtcNow - contract.EscrowStatusUpdatedAt.Value;
+//        if (hoursSinceEscrow.TotalHours > 48)
+//        {
+//            return Result<int>.Failure(StatusCodes.Status400BadRequest, "Dispute can only be raised within 48 hours of contract entering 'Escrow'.");
+//        }
+
+//        // ✅ Create dispute
+//        var dispute = new Dispute
+//        {
+//            DisputeDateTime = DateTime.UtcNow,
+//            ContractId = request.ContractId,
+//            DisputeRaisedBy = userId,
+//            DisputeReason = request.DisputeReason,
+//            DisputeDescription = request.DisputeDescription,
+//            DisputeDoc = request.DisputeDoc,
+//            Status = nameof(DisputeStatus.Pending)
+//        };
+
+//        _context.Disputes.Add(dispute);
+
+//        // ✅ Update contract status
+//        contract.Status = nameof(ContractStatus.Dispute);
+//        _context.ContractDetails.Update(contract);
+
+//        await _context.SaveChangesAsync(cancellationToken);
+
+//        return Result<int>.Success(StatusCodes.Status200OK, "Dispute created and contract status updated successfully.", dispute.Id);
+//    }
+//}
 
 
 

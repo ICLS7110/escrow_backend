@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.Common.Models;
+﻿using Escrow.Api.Application.Common.Constants;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Disputes.Commands;
 using Escrow.Api.Application.Disputes.Queries;
 using Escrow.Api.Application.DTOs;
@@ -37,14 +38,32 @@ public class DisputeManagement : EndpointGroupBase
 
     }
 
+
     [Authorize]
-    public async Task<IResult> GetAllDisputes(ISender sender, [AsParameters] GetDisputesQuery request)
+    public async Task<IResult> GetAllDisputes(ISender sender,[AsParameters] GetDisputesQuery request,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(request);
-        return result.Items.Any()
-            ? TypedResults.Ok(Result<PaginatedList<DisputeDTO>>.Success(StatusCodes.Status200OK, "Success", result))
-            : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No disputes found."));
+
+        if (result.Items.Any())
+        {
+            var successMessage = AppMessages.Get("DisputesRetrieved", language);
+            return TypedResults.Ok(Result<PaginatedList<DisputeDTO>>.Success(StatusCodes.Status200OK, successMessage, result));
+        }
+
+        var notFoundMessage = AppMessages.Get("NoDisputesFound", language);
+        return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, notFoundMessage));
     }
+
+    //[Authorize]
+    //public async Task<IResult> GetAllDisputes(ISender sender, [AsParameters] GetDisputesQuery request)
+    //{
+    //    var result = await sender.Send(request);
+    //    return result.Items.Any()
+    //        ? TypedResults.Ok(Result<PaginatedList<DisputeDTO>>.Success(StatusCodes.Status200OK, "Success", result))
+    //        : TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "No disputes found."));
+    //}
 
     //[Authorize]
     //public async Task<IResult> GetDisputeById(ISender sender, int disputeId)
@@ -79,18 +98,43 @@ public class DisputeManagement : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
+
     [Authorize]
-    public async Task<IResult> CreateDispute(ISender sender, [FromBody] CreateDisputeCommand command)
+    public async Task<IResult> CreateDispute(ISender sender,[FromBody] CreateDisputeCommand command,IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(command);
 
         if (result.Status is >= StatusCodes.Status200OK)
         {
-            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Dispute created successfully.", new { DisputeId = result.Data }));
+            var successMessage = AppMessages.Get("DisputeCreated", language);
+            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, successMessage, new { DisputeId = result.Data }));
         }
 
-        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message ?? "Failed to create dispute."));
+        var failureMessage = AppMessages.Get(result.Message ?? "DisputeCreationFailed", language);
+        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, failureMessage));
     }
+
+
+
+
+
+
+
+
+    //[Authorize]
+    //public async Task<IResult> CreateDispute(ISender sender, [FromBody] CreateDisputeCommand command)
+    //{
+    //    var result = await sender.Send(command);
+
+    //    if (result.Status is >= StatusCodes.Status200OK)
+    //    {
+    //        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status201Created, "Dispute created successfully.", new { DisputeId = result.Data }));
+    //    }
+
+    //    return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message ?? "Failed to create dispute."));
+    //}
 
 
     [Authorize]

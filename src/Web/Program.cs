@@ -153,8 +153,12 @@ builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddHttpClient<UnifonicSmsService>();
 builder.Services.AddHttpClient();
 
-builder.Services.Configure<ANBSettings>(builder.Configuration.GetSection("ANBSettings"));
 
+
+
+
+//builder.Services.Configure<ANBSettings>(builder.Configuration.GetSection("ANBSettings"));
+builder.Services.Configure<ANBSettings>(builder.Configuration.GetSection("ANBSettings"));
 builder.Services.AddHttpClient<IAnbService, AnbService>();
 builder.Services.AddMediatR(cfg =>
 {

@@ -1,50 +1,148 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 
-namespace Escrow.Api.Application.UserPanel.Commands;
-public class UpdateNotificationStatusCommand : IRequest<Result<object>>
-
+namespace Escrow.Api.Application.UserPanel.Commands
 {
-    // NOTHING HERE
-}
-
-public class UpdateNotificationStatusCommandHandler : IRequestHandler<UpdateNotificationStatusCommand, Result<object>>
-{
-    private readonly IApplicationDbContext _context;
-    private readonly IJwtService _jwtService;
-
-    public UpdateNotificationStatusCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+    public class UpdateNotificationStatusCommand : IRequest<Result<object>>
     {
-        _context = context;
-        _jwtService = jwtService;
+        // NOTHING HERE
     }
 
-    public async Task<Result<object>> Handle(UpdateNotificationStatusCommand request, CancellationToken cancellationToken)
+    public class UpdateNotificationStatusCommandHandler : IRequestHandler<UpdateNotificationStatusCommand, Result<object>>
     {
-        var userId = _jwtService.GetUserId().ToInt();
-        var userDetail = await _context.UserDetails
-            .FirstOrDefaultAsync(n => n.Id == userId, cancellationToken);
+        private readonly IApplicationDbContext _context;
+        private readonly IJwtService _jwtService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        if (userDetail == null)
+        public UpdateNotificationStatusCommandHandler(
+            IApplicationDbContext context,
+            IJwtService jwtService,
+            IHttpContextAccessor httpContextAccessor)
         {
-            return Result<object>.Failure(StatusCodes.Status404NotFound, "User not found.");
+            _context = context;
+            _jwtService = jwtService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        //userDetail.IsNotified = request.IsNotified;
-        //userDetail.IsNotified = userDetail.IsNotified == null ? true : !userDetail.IsNotified;
-        userDetail.IsNotified = !(userDetail.IsNotified ?? false);
-        userDetail.LastModifiedBy = userId.ToString();
-        userDetail.LastModified = DateTime.UtcNow;
+        public async Task<Result<object>> Handle(UpdateNotificationStatusCommand request, CancellationToken cancellationToken)
+        {
+            var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+            var userId = _jwtService.GetUserId().ToInt();
 
-        await _context.SaveChangesAsync(cancellationToken);
+            var userDetail = await _context.UserDetails
+                .FirstOrDefaultAsync(n => n.Id == userId, cancellationToken);
 
-        return Result<object>.Success(StatusCodes.Status200OK, "Notification status updated successfully.", new { userId = userId, IsNotified = userDetail.IsNotified });
+            if (userDetail == null)
+            {
+                return Result<object>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("UserNotFound", language));
+            }
+
+            userDetail.IsNotified = !(userDetail.IsNotified ?? false);
+            userDetail.LastModifiedBy = userId.ToString();
+            userDetail.LastModified = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("NotificationStatusUpdated", language), new { userId = userId, IsNotified = userDetail.IsNotified });
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//using System;
+//using System.Collections.Generic;
+//using System.Diagnostics.Contracts;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using Escrow.Api.Application.Common.Interfaces;
+//using Escrow.Api.Application.DTOs;
+//using Microsoft.AspNetCore.Http;
+
+//namespace Escrow.Api.Application.UserPanel.Commands;
+//public class UpdateNotificationStatusCommand : IRequest<Result<object>>
+
+//{
+//    // NOTHING HERE
+//}
+
+//public class UpdateNotificationStatusCommandHandler : IRequestHandler<UpdateNotificationStatusCommand, Result<object>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IJwtService _jwtService;
+
+//    public UpdateNotificationStatusCommandHandler(IApplicationDbContext context, IJwtService jwtService)
+//    {
+//        _context = context;
+//        _jwtService = jwtService;
+//    }
+
+//    public async Task<Result<object>> Handle(UpdateNotificationStatusCommand request, CancellationToken cancellationToken)
+//    {
+//        var userId = _jwtService.GetUserId().ToInt();
+//        var userDetail = await _context.UserDetails
+//            .FirstOrDefaultAsync(n => n.Id == userId, cancellationToken);
+
+//        if (userDetail == null)
+//        {
+//            return Result<object>.Failure(StatusCodes.Status404NotFound, "User not found.");
+//        }
+
+//        //userDetail.IsNotified = request.IsNotified;
+//        //userDetail.IsNotified = userDetail.IsNotified == null ? true : !userDetail.IsNotified;
+//        userDetail.IsNotified = !(userDetail.IsNotified ?? false);
+//        userDetail.LastModifiedBy = userId.ToString();
+//        userDetail.LastModified = DateTime.UtcNow;
+
+//        await _context.SaveChangesAsync(cancellationToken);
+
+//        return Result<object>.Success(StatusCodes.Status200OK, "Notification status updated successfully.", new { userId = userId, IsNotified = userDetail.IsNotified });
+//    }
+//}

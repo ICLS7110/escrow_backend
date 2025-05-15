@@ -123,7 +123,267 @@ namespace Escrow.Api.Application.Common.Constants
             ["EmailExists"] = ("Email already exists.", "البريد الإلكتروني موجود بالفعل."),
             ["ContactMessageSent"] = ("Contact message sent successfully.", "تم إرسال رسالة الاتصال بنجاح."),
 
+            ["ArbitratorAssigned"] = ("Arbitrator assigned successfully.", "تم تعيين المحكم بنجاح."),
+            ["Disputenotfound"] = ("Dispute not found.", "النزاع غير موجود."),
+            ["ContractsRetrieved"] = ("Contracts retrieved successfully.", "تم استرجاع العقود بنجاح."),
+
+
+            ["UserNotAuthenticated"] = ("User is not authenticated.", "المستخدم غير مصادق عليه."),
+            ["ContractNotFound"] = ("Contract not found.", "العقد غير موجود."),
+            ["DisputeInvalidStatus"] = ("Dispute can only be raised when contract is in 'Escrow' status.", "يمكن رفع النزاع فقط عندما يكون العقد في حالة 'عهدة'."),
+            ["EscrowTimestampUnavailable"] = ("Escrow timestamp not available to verify dispute window.", "طابع الوقت للعهدة غير متوفر للتحقق من نافذة النزاع."),
+            ["DisputeWindowExpired"] = ("Dispute can only be raised within 48 hours of contract entering 'Escrow'.", "يمكن رفع النزاع فقط خلال 48 ساعة من دخول العقد حالة 'عهدة'."),
+            ["DisputeCreated"] = ("Dispute created and contract status updated successfully.", "تم إنشاء النزاع وتحديث حالة العقد بنجاح."),
+
+
+            ["InvalidReleaseRecipient"] = ("Invalid release recipient. Must be 'Buyer' or 'Seller'.", "المستلم غير صالح. يجب أن يكون 'المشتري' أو 'البائع'."),
+            ["EscrowDecisionApplied"] = ("Escrow decision applied successfully.", "تم تطبيق قرار العهدة بنجاح."),
+
+            ["EscrowDecisionAppliedFormatted"] = ("Escrow decision applied successfully. {0} released to {1}.", "تم تطبيق قرار العهدة بنجاح. تم تحرير {0} إلى {1}."),
+
+
+
+
+
+            ["DisputeAlreadyResolved"] = ("Dispute has already been resolved.", "تم حل النزاع بالفعل."),
+            ["AssociatedContractNotFound"] = ("Associated contract not found.", "العقد المرتبط غير موجود."),
+            ["ReleaseToRequired"] = ("ReleaseTo is required when resolving a dispute.", "مطلوب 'ReleaseTo' عند حل النزاع."),
+            ["ReleaseAmountRequired"] = ("ReleaseAmount is required when resolving a dispute.", "مطلوب 'ReleaseAmount' عند حل النزاع."),
+            ["DisputeStatusUpdatedSubject"] = ("Dispute Status Updated", "تم تحديث حالة النزاع"),
+            ["DisputeStatusUpdatedBody"] = ("Dear {0},\n\nThe dispute for contract #{1} has been updated to '{2}'.\n\nThank you.", "عزيزي {0},\n\nتم تحديث النزاع للعقد رقم #{1} إلى الحالة '{2}'.\n\nشكراً لك."),
+            ["NotifyUserFailed"] = ("Failed to notify {0}: {1}", "فشل في إعلام {0}: {1}"),
+            ["DisputeStatusUpdatedSuccess"] = ("Dispute status successfully updated to '{0}'.", "تم تحديث حالة النزاع إلى '{0}' بنجاح."),
+            ["WithNotificationErrors"] = ("However, the following notification errors occurred:", "ومع ذلك، حدثت أخطاء إشعار التالية:"),
+
+
+
+
+
+            ["EmailTemplateNotFound"] = ("Email Template not found.", "قالب البريد الإلكتروني غير موجود."),
+            ["EmailTemplateUpdatedSuccessfully"] = ("Email Template updated successfully.", "تم تحديث قالب البريد الإلكتروني بنجاح."),
+            ["EmailTemplateRetrievedSuccessfully"] = ("Email template retrieved successfully.", "تم استرجاع قالب البريد الإلكتروني بنجاح."),
+
+
+            ["ManualNotificationCreatedAndSent"] = ("Manual notification created and sent successfully.", "تم إنشاء الإشعار اليدوي وإرساله بنجاح."),
+            ["InvalidRequestData"] = ("Invalid request data.", "بيانات الطلب غير صالحة."),
+
+            ["ManualNotificationCreatedSuccessfully"] = ("Manual notification created and sent successfully.", "تم إنشاء الإشعار اليدوي وإرساله بنجاح."),
+            ["ManualNotificationValidationFailed"] = ("Invalid request data.", "بيانات الطلب غير صالحة."),
+            ["NotificationCreatedSuccessfully"] = ("Notification created successfully (including admin).", "تم إنشاء الإشعار بنجاح (بما في ذلك المسؤول)."),
+            ["NotificationUnauthorizedUser"] = ("Unauthorized user context.", "سياق المستخدم غير مصرح به."),
+            ["NotificationContractIdInvalid"] = ("Invalid ContractId.", "معرّف العقد غير صالح."),
+            ["NotificationPhoneNumbersRequired"] = ("Phone numbers are required.", "أرقام الهواتف مطلوبة."),
+            ["NotificationServerError"] = ("Unexpected Server Error.", "خطأ غير متوقع في الخادم."),
+
+
+            ["PhoneNumberRequired"] = ("Phone numbers are required.", "أرقام الهاتف مطلوبة."),
+            ["InvalidContractId"] = ("Invalid contract ID.", "معرّف العقد غير صالح."),
+            ["NotificationSentSuccessfully"] = ("Notification sent successfully.", "تم إرسال الإشعار بنجاح."),
+
+            ["InvalidNotificationId"] = ("Invalid notification ID. ID must be greater than zero.", "معرّف الإشعار غير صالح. يجب أن يكون أكبر من صفر."),
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationDeletedSuccessfully"] = ("Notification deleted successfully.", "تم حذف الإشعار بنجاح."),
+            ["NoNotificationsFound"] = ("No notifications found for this user.", "لا توجد إشعارات لهذا المستخدم."),
+            ["AllNotificationsDeletedSuccessfully"] = ("All notifications deleted successfully.", "تم حذف جميع الإشعارات بنجاح."),
+
+
+
+            ["InvalidNotificationId"] = ("Invalid notification ID. ID must be greater than zero.", "معرف الإشعار غير صالح. يجب أن يكون أكبر من الصفر."),
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationDeletedSuccessfully"] = ("Notification deleted successfully.", "تم حذف الإشعار بنجاح."),
+            ["NoNotificationsFound"] = ("No notifications found for this user.", "لا توجد إشعارات لهذا المستخدم."),
+            ["AllNotificationsDeletedSuccessfully"] = ("All notifications deleted successfully.", "تم حذف جميع الإشعارات بنجاح."),
+
+
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationMarkedAsReadSuccessfully"] = ("Notification marked as read successfully.", "تم وضع الإشعار كمقروء بنجاح."),
+            ["NotificationMarkedAsUnreadSuccessfully"] = ("Notification marked as unread successfully.", "تم وضع الإشعار كغير مقروء بنجاح."),
+            ["NoNotificationsFoundToUpdate"] = ("No notifications found to update.", "لا توجد إشعارات للتحديث."),
+            ["AllNotificationsMarkedAsReadSuccessfully"] = ("All notifications marked as read successfully.", "تم وضع جميع الإشعارات كمقروءة بنجاح."),
+            ["AllNotificationsMarkedAsUnreadSuccessfully"] = ("All notifications marked as unread successfully.", "تم وضع جميع الإشعارات كغير مقروءة بنجاح."),
+
+            ["InvalidInputIdsMustBeGreaterThanZero"] = ("Invalid input. IDs must be greater than zero.", "المدخلات غير صالحة. يجب أن تكون المعرفات أكبر من الصفر."),
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationUpdatedSuccessfully"] = ("Notification updated successfully.", "تم تحديث الإشعار بنجاح."),
+
+            ["InvalidInputIdsMustBeGreaterThanZero"] = ("Invalid input. IDs must be greater than zero.", "المدخلات غير صالحة. يجب أن تكون المعرفات أكبر من الصفر."),
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationUpdatedSuccessfully"] = ("Notification updated successfully.", "تم تحديث الإشعار بنجاح."),
+            ["FailedToRetrieveNotifications"] = ("Failed to retrieve notifications.", "فشل في استرداد الإشعارات."),
+            ["NotificationsRetrievedSuccessfully"] = ("Notifications retrieved successfully. Unread count: {0}", "تم استرداد الإشعارات بنجاح. عدد الغير مقروءة: {0}"),
+
+            ["ManualNotificationsRetrievedSuccessfully"] = ("Manual notifications retrieved successfully.", "تم استرداد الإشعارات اليدوية بنجاح."),
+
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationRetrievedSuccessfully"] = ("Notification retrieved successfully.", "تم استرداد الإشعار بنجاح."),
+
+            ["PermissionsAssignedSuccessfully"] = ("Permissions assigned successfully", "تم تعيين الأذونات بنجاح"),
+
+            ["RolesFetchedSuccessfully"] = ("Roles fetched successfully.", "تم جلب الأدوار بنجاح."),
+            ["NoRolesFound"] = ("No roles found.", "لم يتم العثور على أدوار."),
+
+            ["MenusFetchedSuccessfully"] = ("Menus fetched successfully.", "تم جلب القوائم بنجاح."),
+            ["NoMenusFound"] = ("No menus found.", "لم يتم العثور على قوائم."),
+
+
+            ["PermissionsFetchedSuccessfully"] = ("Permissions fetched successfully.", "تم جلب الأذونات بنجاح."),
+            ["NoPermissionsFound"] = ("No permissions found.", "لم يتم العثور على أذونات."),
+
+            ["NoPagesProvided"] = ("No pages provided for update.", "لم يتم تقديم صفحات للتحديث."),
+            ["NoValidPageIds"] = ("No valid page IDs provided.", "لم يتم تقديم معرفات صفحات صحيحة."),
+            ["NoMatchingPagesFound"] = ("No matching pages found for update.", "لم يتم العثور على صفحات مطابقة للتحديث."),
+            ["PagesUpdatedSuccessfully"] = ("Pages updated successfully.", "تم تحديث الصفحات بنجاح."),
+
+            ["ConfigurationUpdatedSuccessfully"] = ("Configuration updated successfully.", "تم تحديث الإعدادات بنجاح."),
+            ["ConfigurationCreatedSuccessfully"] = ("Configuration created successfully.", "تم إنشاء الإعدادات بنجاح."),
+
+            ["ConfigurationUpdatedSuccessfully"] = ("Configuration updated successfully.", "تم تحديث الإعدادات بنجاح."),
+            ["ConfigurationCreatedSuccessfully"] = ("Configuration created successfully.", "تم إنشاء الإعدادات بنجاح."),
+
+
+            ["TeamNameRequired"] = ("Team name is required.", "اسم الفريق مطلوب."),
+            ["RoleTypeRequired"] = ("Role type is required.", "نوع الدور مطلوب."),
+            ["Unauthorized"] = ("Unauthorized request.", "طلب غير مصرح به."),
+            ["EmailAndPhoneMismatch"] = ("A user with this email and another with this phone number already exist. Please verify the details.",
+                             "يوجد مستخدم بهذا البريد الإلكتروني وآخر برقم الهاتف هذا. يرجى التحقق من التفاصيل."),
+            ["EmailAlreadyExists"] = ("A user with this email already exists.", "يوجد مستخدم بهذا البريد الإلكتروني بالفعل."),
+            ["PhoneAlreadyExists"] = ("A user with this phone number already exists.", "يوجد مستخدم بهذا رقم الهاتف بالفعل."),
+            ["UserIdRetrievalFailed"] = ("Failed to retrieve UserId.", "فشل في الحصول على معرف المستخدم."),
+            ["AlreadyTeamMember"] = ("This user is already a team member.", "هذا المستخدم عضو في الفريق بالفعل."),
+            ["TeamSuccess"] = ("Team member created successfully.", "تم إنشاء عضو الفريق بنجاح."),
+
+            ["TeamDeletedSuccessfully"] = ("Team deleted successfully.", "تم حذف الفريق بنجاح."),
+            ["TeamNotFoundOrUnauthorized"] = ("Team not found or you do not have permission to delete it.", "لم يتم العثور على الفريق أو لا تملك صلاحية الحذف."),
+
+            ["UserIdAndTeamIdRequired"] = ("User ID and Team ID are required.", "مطلوب معرف المستخدم ومعرف الفريق."),
+            ["UserNotFound"] = ("User not found.", "المستخدم غير موجود."),
+            ["TeamNotFound"] = ("Team member not found for the given Team ID.", "لم يتم العثور على عضو الفريق بمعرف الفريق المحدد."),
+            ["TeamUpdatedSuccessfully"] = ("Team updated successfully.", "تم تحديث الفريق بنجاح."),
+
+            ["TeamNotFound"] = ("Team not found.", "الفريق غير موجود."),
+            ["FailedToUpdateTeamStatus"] = ("Failed to update team status.", "فشل في تحديث حالة الفريق."),
+            ["TeamStatusUpdatedSuccessfully"] = ("Team status updated successfully.", "تم تحديث حالة الفريق بنجاح."),
+
+
+            ["UserNotAuthenticated"] = ("User is not authenticated.", "المستخدم غير مصرح به."),
+            ["ContractNotFound"] = ("Contract not found.", "العقد غير موجود."),
+            ["BuyerOrSellerNotFound"] = ("Buyer or Seller not found.", "المشتري أو البائع غير موجود."),
+            ["UnauthorizedTransaction"] = ("Unauthorized transaction.", "عملية غير مصرح بها."),
+            ["TransactionCreatedEmailSubject"] = ("Transaction Created", "تم إنشاء المعاملة"),
+            ["TransactionCreatedEmailBody"] = ("Dear {0},\n\nA new transaction has been created for your contract (ID: {1}).", "عزيزي {0},\n\nتم إنشاء معاملة جديدة لعقدك (رقم: {1})."),
+            ["FailedToNotifyUser"] = ("Failed to notify user", "فشل في إخطار المستخدم"),
+            ["TransactionCreatedSuccessfully"] = ("Transaction created successfully.", "تم إنشاء المعاملة بنجاح."),
+            ["WithWarnings"] = ("However, the following issues occurred:", "ومع ذلك، حدثت المشكلات التالية:"),
+
+
+            ["UserNotAuthenticated"] = ("User is not authenticated.", "المستخدم غير مصادق عليه."),
+            ["InvalidUserId"] = ("Invalid user ID.", "معرف المستخدم غير صالح."),
+            ["UserRoleNotFound"] = ("User role not found.", "دور المستخدم غير موجود."),
+            ["TransactionNotFound"] = ("Transaction not found.", "لم يتم العثور على المعاملة."),
+            ["TransactionRetrievedSuccessfully"] = ("Transaction retrieved successfully.", "تم استرداد المعاملة بنجاح."),
+
+
+            ["TransactionNotFound"] = ("Transaction not found.", "لم يتم العثور على المعاملة."),
+            ["TransactionRetrievedSuccessfully"] = ("Transaction retrieved successfully.", "تم استرداد المعاملة بنجاح."),
+
+            // Add the missing ones you used in the handler:
+            ["PageNumberGreaterThanZero"] = ("Page number must be greater than zero.", "يجب أن يكون رقم الصفحة أكبر من صفر."),
+            ["PageSizeGreaterThanZero"] = ("Page size must be greater than zero.", "يجب أن يكون حجم الصفحة أكبر من صفر."),
+            ["InvalidRequest"] = ("Invalid request.", "طلب غير صالح."),
+
+
+            ["UserDetailsNotFound"] = ("User details not found.", "لم يتم العثور على تفاصيل المستخدم."),
+            ["UserDeletedSuccessfully"] = ("User deleted successfully.", "تم حذف المستخدم بنجاح."),
+
+            ["UserUpdatedSuccessfully"] = ("User updated successfully.", "تم تحديث بيانات المستخدم بنجاح."),
+
+            ["DeviceTokenUpdatedSuccessfully"] = ("Device token updated successfully.", "تم تحديث رمز الجهاز بنجاح."),
+
+            ["InvalidRequestData"] = ("Invalid request data.", "بيانات الطلب غير صالحة."),
+            ["UserNotFound"] = ("User not found.", "المستخدم غير موجود."),
+            ["InvalidPhoneNumberFormat"] = ("Invalid phone number format.", "تنسيق رقم الهاتف غير صالح."),
+            ["OtpSentToMobile"] = ("OTP has been sent to the mobile number.", "تم إرسال رمز التحقق إلى رقم الهاتف."),
+
+
+            ["InvalidRequestData"] = ("Invalid request data.", "بيانات الطلب غير صالحة."),
+            ["InvalidPhoneNumberFormat"] = ("Invalid phone number format.", "تنسيق رقم الهاتف غير صالح."),
+            ["OtpSentToMobile"] = ("OTP has been sent to the mobile number.", "تم إرسال رمز التحقق إلى رقم الهاتف."),
+
+            ["NotificationStatusUpdated"] = ("Notification status updated successfully.", "تم تحديث حالة الإشعار بنجاح."),
+
+
+            ["LoginFailed"] = ("Login failed. Please check your credentials.", "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك."),
+            ["ForgotPasswordFailed"] = ("Failed to initiate password reset.", "فشل في بدء إعادة تعيين كلمة المرور."),
+            ["VerifyOTPFailed"] = ("OTP verification failed.", "فشل التحقق من رمز التحقق."),
+            ["ResetPasswordFailed"] = ("Failed to reset password.", "فشل في إعادة تعيين كلمة المرور."),
+            ["ChangePasswordFailed"] = ("Failed to change password.", "فشل في تغيير كلمة المرور."),
+            ["GetAdminDetailsFailed"] = ("Failed to retrieve admin details.", "فشل في استرجاع تفاصيل المسؤول."),
+            ["UpdateDetailsFailed"] = ("Failed to update admin details.", "فشل في تحديث تفاصيل المسؤول."),
+            ["UpdateDetailsSuccess"] = ("Admin details updated successfully.", "تم تحديث تفاصيل المسؤول بنجاح."),
+            ["GetAdminListingsFailed"] = ("Failed to fetch admin listings.", "فشل في جلب قائمة المسؤولين."),
+            ["NotificationStatusUpdated"] = ("Notification status updated successfully.", "تم تحديث حالة الإشعار بنجاح."),
+
+
+            ["SubAdminCreated"] = ("Sub-admin created successfully.", "تم إنشاء المشرف الفرعي بنجاح."),
+            ["SubAdminCreationFailed"] = ("Failed to create sub-admin.", "فشل في إنشاء المشرف الفرعي."),
+
+            ["SubAdminDeleted"] = ("Sub-admin deleted successfully.", "تم حذف المشرف الفرعي بنجاح."),
+            ["SubAdminDeletionFailed"] = ("Failed to delete sub-admin.", "فشل في حذف المشرف الفرعي."),
+
+            ["SubAdminStatusUpdated"] = ("Sub-admin status updated successfully.", "تم تحديث حالة المشرف الفرعي بنجاح."),
+            ["SubAdminStatusUpdateFailed"] = ("Failed to update sub-admin status.", "فشل في تحديث حالة المشرف الفرعي."),
+
+            ["DeleteSuccess"] = ("Deleted successfully.", "تم الحذف بنجاح."),
+
+            ["StatusUpdateSuccess"] = ("Status updated successfully.", "تم تحديث الحالة بنجاح."),
+            ["StatusUpdateFailed"] = ("Failed to update status.", "فشل في تحديث الحالة."),
+
+            ["NoFlaggedTransactionsFound"] = ("No flagged transactions found.", "لم يتم العثور على معاملات مميزة."),
+            ["FlaggedTransactionsRetrieved"] = ("Flagged transactions retrieved successfully.", "تم استرجاع المعاملات المميزة بنجاح."),
+
+            ["NoAMLSettingsFound"] = ("No AML settings found.", "لم يتم العثور على إعدادات مكافحة غسيل الأموال."),
+            ["AMLSettingsUpdated"] = ("AML settings updated successfully.", "تم تحديث إعدادات مكافحة غسيل الأموال بنجاح."),
+            ["TransactionVerificationUpdated"] = ("Transaction verification status updated.", "تم تحديث حالة التحقق من المعاملة."),
+            ["NoAMLNotificationsFound"] = ("No AML notifications found.", "لم يتم العثور على إشعارات مكافحة غسيل الأموال."),
+            ["AMLNotificationsRetrieved"] = ("AML notifications retrieved successfully.", "تم استرجاع إشعارات مكافحة غسيل الأموال بنجاح."),
+
+            ["BankDetailsRetrieved"] = ("Bank details retrieved successfully.", "تم استرجاع تفاصيل البنك بنجاح."),
+            ["BankDetailCreated"] = ("Bank detail created successfully.", "تم إنشاء تفاصيل البنك بنجاح."),
+            ["BankDetailUpdated"] = ("Bank detail updated successfully.", "تم تحديث تفاصيل البنك بنجاح."),
+            ["BankDetailDeleted"] = ("Bank detail deleted successfully.", "تم حذف تفاصيل البنك بنجاح."),
+
+            ["CustomersRetrieved"] = ("Customers retrieved successfully.", "تم استرجاع العملاء بنجاح."),
+
+            ["DisputeCreated"] = ("Dispute created and contract status updated successfully.", "تم إنشاء النزاع وتحديث حالة العقد بنجاح."),
+            ["DisputeCreationFailed"] = ("Failed to create dispute.", "فشل في إنشاء النزاع."),
+
+
+            ["DisputesRetrieved"] = ("Disputes retrieved successfully.", "تم استرجاع النزاعات بنجاح."),
+            ["NoDisputesFound"] = ("No disputes found.", "لم يتم العثور على أي نزاعات."),
+
+            ["EmailTemplatesRetrieved"] = ("Email templates retrieved successfully.", "تم استرجاع قوالب البريد الإلكتروني بنجاح."),
+            ["NoEmailTemplatesFound"] = ("No email templates found.", "لم يتم العثور على أي قوالب بريد إلكتروني."),
+            ["EmailTemplateRetrieved"] = ("Email template retrieved successfully.", "تم استرجاع قالب البريد الإلكتروني بنجاح."),
+            ["EmailTemplateNotFound"] = ("Email template not found.", "لم يتم العثور على قالب البريد الإلكتروني."),
+
+            ["NoDataFound"] = ("No data found.", "لم يتم العثور على بيانات."),
+            ["AssignPermissionsFailed"] = ("Failed to assign permissions.", "فشل في تعيين الأذونات."),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         };
+
 
 
         public static string Get(string key, Language language)
@@ -136,7 +396,7 @@ namespace Escrow.Api.Application.Common.Constants
             // Fallback to key name if not found
             return key;
         }
-       
+
     }
     public static class HttpContextExtensions
     {

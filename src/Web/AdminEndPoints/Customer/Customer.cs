@@ -9,6 +9,7 @@ using Escrow.Api.Application.Customers.Commands;
 using Escrow.Api.Application.Customers.Queries;
 using Escrow.Api.Application.Customer.Command;
 using Escrow.Api.Application.Customer.Queries;
+using Escrow.Api.Application.Common.Constants;
 
 namespace Escrow.Api.Web.AdminEndPoints.Customers;
 
@@ -39,15 +40,15 @@ public class Customers : EndpointGroupBase
     [Authorize]
     public async Task<IResult> AddCustomer(ISender sender, CreateCustomerCommand command)
     {
-        var id = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Customer created successfully.", new { CustomerId = id }));
+        var result = await sender.Send(command);
+        return TypedResults.Ok(result);
     }
 
     [Authorize]
     public async Task<IResult> EditCustomer(ISender sender, UpdateCustomerCommand command)
     {
         var result = await sender.Send(command);
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Customer updated successfully.", new()));
+        return TypedResults.Ok(result);
     }
 
     [Authorize]
@@ -58,25 +59,48 @@ public class Customers : EndpointGroupBase
 
         if (result.Status == StatusCodes.Status404NotFound)
         {
-            return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Customer not found."));
+            return TypedResults.NotFound(result);
         }
 
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Customer deleted successfully."));
+        return TypedResults.Ok(result);
     }
+
+
 
     [Authorize]
-    public async Task<IResult> GetCustomers(ISender sender, [AsParameters] GetCustomerQuery request)
+    public async Task<IResult> GetCustomers(
+    ISender sender,
+    [AsParameters] GetCustomerQuery request,
+    IHttpContextAccessor _httpContextAccessor)
     {
+        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(request);
+        var message = AppMessages.Get("CustomersRetrieved", language);
 
-        if (result == null || result.Items.Count == 0)
-        {
-            return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(StatusCodes.Status200OK, "Customers retrieved successfully.", result));
-            //return TypedResults.NotFound(Result<object>.Success(StatusCodes.Status200OK, "", result));
-        }
-
-        return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(StatusCodes.Status200OK, "Customers retrieved successfully.", result));
+        return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(
+            StatusCodes.Status200OK, message, result));
     }
+
+
+
+
+
+
+
+    //[Authorize]
+    //public async Task<IResult> GetCustomers(ISender sender, [AsParameters] GetCustomerQuery request)
+    //{
+    //    var result = await sender.Send(request);
+
+    //    if (result == null || result.Items.Count == 0)
+    //    {
+    //        return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(StatusCodes.Status200OK, "Customers retrieved successfully.", result));
+    //        //return TypedResults.NotFound(Result<object>.Success(StatusCodes.Status200OK, "", result));
+    //    }
+
+    //    return TypedResults.Ok(Result<PaginatedList<CustomerDto>>.Success(StatusCodes.Status200OK, "Customers retrieved successfully.", result));
+    //}
 
     [Authorize]
     public async Task<IResult> ChangeCustomerStatus(ISender sender, int id, int updatedBy)
@@ -86,10 +110,10 @@ public class Customers : EndpointGroupBase
 
         if (result.Status == StatusCodes.Status404NotFound)
         {
-            return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Customer not found."));
+            return TypedResults.NotFound(result);
         }
 
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Customer status updated successfully."));
+        return TypedResults.Ok(result);
     }
 
 
@@ -112,7 +136,7 @@ public class Customers : EndpointGroupBase
         // Check the result status and handle accordingly
         if (result.Status == StatusCodes.Status404NotFound)
         {
-            return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "No contracts found for the given customer."));
+            return TypedResults.NotFound(result);
         }
 
         return TypedResults.Ok(result);

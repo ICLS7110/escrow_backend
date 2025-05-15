@@ -10,6 +10,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile1.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile2.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile3.pubxml" />
+    <None Remove="Properties\PublishProfiles\FolderProfile4.pubxml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
@@ -43,7 +51,6 @@
 
   <ItemGroup>
     <Folder Include="AdminEndPoints\UserPanel\" />
-    <Folder Include="wwwroot\api\" />
   </ItemGroup>
 
 

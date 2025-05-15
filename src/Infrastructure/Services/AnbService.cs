@@ -25,61 +25,50 @@ public class AnbService : IAnbService
         _settings = settings.Value; // ✅ Fix the type conversion
     }
 
-    private async Task<string> GetAccessTokenAsync()
+    public async Task<string?> GetAccessTokenAsync()
     {
-        try
+        if (string.IsNullOrWhiteSpace(_settings.BaseUrl) ||
+            string.IsNullOrWhiteSpace(_settings.TokenEndpoint) ||
+            string.IsNullOrWhiteSpace(_settings.ClientId) ||
+            string.IsNullOrWhiteSpace(_settings.ClientSecret))
         {
-            var tokenUrl = _configuration["AnbConnect:TokenUrl"]
-                ?? throw new InvalidOperationException("ANB token URL is missing.");
-
-            var clientId = _configuration["AnbConnect:ClientId"]
-                ?? throw new InvalidOperationException("ANB Client ID is missing.");
-
-            var clientSecret = _configuration["AnbConnect:ClientSecret"]
-                ?? throw new InvalidOperationException("ANB Client Secret is missing.");
-
-            var request = new HttpRequestMessage(HttpMethod.Post, tokenUrl)
-            {
-                Content = new FormUrlEncodedContent(new[]
-                {
-                new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                new KeyValuePair<string, string>("client_id", clientId),
-                new KeyValuePair<string, string>("client_secret", clientSecret)
-            })
-            };
-
-            var response = await _httpClient.SendAsync(request);
-            var json = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new ApplicationException($"Failed to retrieve access token. Status: {response.StatusCode}, Body: {json}");
-            }
-
-            Console.WriteLine("Access Token Response: " + json);
-
-            var doc = System.Text.Json.JsonDocument.Parse(json); // ✅ Disambiguated
-            return doc.RootElement.GetProperty("access_token").GetString()
-                ?? throw new InvalidOperationException("Access token not returned.");
+            throw new InvalidOperationException("ANB settings are not properly configured.");
         }
-        catch (HttpRequestException ex)
+
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri(new Uri(_settings.BaseUrl), _settings.TokenEndpoint));
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var content = new FormUrlEncodedContent(new[]
         {
-            throw new ApplicationException("HTTP request failed while fetching access token.", ex);
-        }
-        catch (TaskCanceledException ex)
+            new KeyValuePair<string, string>("grant_type", "client_credentials"),
+            new KeyValuePair<string, string>("client_id", _settings.ClientId),
+            new KeyValuePair<string, string>("client_secret", _settings.ClientSecret)
+        });
+
+        request.Content = content;
+
+        var response = await _httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
         {
-            throw new ApplicationException("Timeout occurred while fetching access token.", ex);
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Token request failed: {response.StatusCode} - {errorBody}");
         }
-        catch (System.Text.Json.JsonException ex) // ✅ Fully qualified
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var tokenResponse = System.Text.Json.JsonSerializer.Deserialize<AnbTokenResponse>(responseContent, new JsonSerializerOptions
         {
-            throw new ApplicationException("Invalid JSON returned while parsing access token.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new ApplicationException("Unexpected error occurred while retrieving access token.", ex);
-        }
+            PropertyNameCaseInsensitive = true
+        });
+
+        return tokenResponse?.AccessToken;
     }
 
+    private class AnbTokenResponse
+    {
+        public string? AccessToken { get; set; }
+        public int? ExpiresIn { get; set; }
+        public string? TokenType { get; set; }
+    }
 
     public async Task<string> GetAccountBalanceAsync(string accountNumber)
     {
