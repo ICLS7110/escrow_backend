@@ -4817,6 +4817,9 @@
           "type": {
             "type": "string"
           },
+          "status": {
+            "type": "string"
+          },
           "contractId": {
             "type": "integer",
             "format": "int32"

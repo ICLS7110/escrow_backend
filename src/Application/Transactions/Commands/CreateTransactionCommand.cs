@@ -19,7 +19,9 @@ public record CreateTransactionCommand : IRequest<Result<object>>
 {
     public decimal Amount { get; set; }
     public string Type { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
     public int ContractId { get; set; }
+
 }
 
 public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand, Result<object>>
@@ -94,6 +96,7 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             Created = DateTime.UtcNow,
             TransactionDateTime = DateTime.UtcNow,
             FromPayee = userId,
+            Status = request.Status.ToLower(),
             ToRecipient = recipientId.ToString(),
             CreatedBy = userId
         };
