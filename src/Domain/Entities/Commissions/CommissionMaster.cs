@@ -11,4 +11,6 @@ public class CommissionMaster : BaseAuditableEntity
     public bool AppliedGlobally { get; set; }
     public string? TransactionType { get; set; } // Service, Product, etc.
     public decimal TaxRate { get; set; } // Tax rate per transaction type
+    public string? MinAmount { get; set; } // Tax rate per transaction type
+
 }

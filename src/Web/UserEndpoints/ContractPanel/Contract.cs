@@ -12,6 +12,7 @@ using Escrow.Api.Application.ContractPanel.MilestoneQueries;
 using Escrow.Api.Domain.Enums;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Application;
+using Twilio.TwiML.Voice;
 
 namespace Escrow.Api.Web.Endpoints.ContractPanel;
 
@@ -149,8 +150,10 @@ public class Contract : EndpointGroupBase
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, result.Message, new()));
     }
 
+
+
     [Authorize]
-    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, int? priceFilter, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
+    public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, int? startPrice, int? endPrice, DateTime? startDate, DateTime? endDate, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
     {
         var actualUserId = jwtService.GetUserId().ToInt();
 
@@ -159,7 +162,10 @@ public class Contract : EndpointGroupBase
             UserId = IsAdmin(httpContextAccessor) ? null : actualUserId,
             Status = status,
             SearchKeyword = searchKeyword,
-            PriceFilter = priceFilter,
+            StartPrice = startPrice,
+            EndPrice = endPrice,
+            StartDate = startDate,
+            EndDate = endDate,
             IsActive = isActive,
             IsMilestone = isMilestone,
             PageNumber = pageNumber,
@@ -168,9 +174,39 @@ public class Contract : EndpointGroupBase
 
         var result = await sender.Send(query);
 
-        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(
-            StatusCodes.Status200OK, "Contracts retrieved successfully.", result));
+        return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(StatusCodes.Status200OK, "Contracts retrieved successfully.", result));
     }
+
+
+
+
+
+
+
+
+
+    //[Authorize]
+    //public async Task<IResult> GetContracts(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ContractStatus? status, string? searchKeyword, int? priceFilter, bool? isMilestone, bool? isActive, int pageNumber = 1, int pageSize = 10)
+    //{
+    //    var actualUserId = jwtService.GetUserId().ToInt();
+
+    //    var query = new GetContractsQuery
+    //    {
+    //        UserId = IsAdmin(httpContextAccessor) ? null : actualUserId,
+    //        Status = status,
+    //        SearchKeyword = searchKeyword,
+    //        PriceFilter = priceFilter,
+    //        IsActive = isActive,
+    //        IsMilestone = isMilestone,
+    //        PageNumber = pageNumber,
+    //        PageSize = pageSize
+    //    };
+
+    //    var result = await sender.Send(query);
+
+    //    return TypedResults.Ok(Result<PaginatedList<ContractDetailsDTO>>.Success(
+    //        StatusCodes.Status200OK, "Contracts retrieved successfully.", result));
+    //}
 
     [Authorize]
     public async Task<IResult> ModifyContract(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, ModifyContractCommand command)

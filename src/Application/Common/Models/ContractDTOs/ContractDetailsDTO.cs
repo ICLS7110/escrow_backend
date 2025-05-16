@@ -37,6 +37,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? SellerPayableAmount { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastModified { get; set; }
+        public DateTime? EscrowStatusUpdatedAt { get; set; }
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
         public SellerBuyerInvitation? InvitationDetails { get; set; }
@@ -49,6 +50,8 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public int Id { get; set; }
         public int DisputeId { get; set; }
         public string Role { get; set; } = string.Empty;
+        public string BuyerConfidenceRate { get; set; } = string.Empty;
+        public string SellerConfidenceRate { get; set; } = string.Empty;
         public string ContractTitle { get; set; } = string.Empty;
         public string ServiceType { get; set; } = string.Empty;
         public string ServiceDescription { get; set; } = string.Empty;
@@ -76,6 +79,7 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public string? SellerPayableAmount { get; set; }
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset LastModified { get; set; }
+        public DateTime? EscrowStatusUpdatedAt { get; set; }
 
         public List<MileStoneDTO> MileStones { get; set; } = new List<MileStoneDTO>();
         public SellerBuyerInvitation? InvitationDetails { get; set; }
@@ -83,3 +87,10 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
 
     }
 }
+
+
+
+
+
+
+
