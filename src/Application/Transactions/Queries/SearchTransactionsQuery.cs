@@ -73,10 +73,19 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
 
-        var query = from t in _context.Transactions
+        var transactionQuery = _context.Transactions.AsQueryable();
+
+        if (!string.IsNullOrEmpty(request.TransactionStatus))
+        {
+            transactionQuery = transactionQuery.Where(x => x.Status != null &&
+                                                           x.Status.ToLower().Contains(request.TransactionStatus.ToLower()));
+        }
+
+        var query = from t in transactionQuery
                     join c in _context.ContractDetails on t.ContractId equals c.Id into contractGroup
                     from c in contractGroup.DefaultIfEmpty()
                     select new { Transaction = t, Contract = c };
+
 
         var currentUserId = _jwtService.GetUserId().ToInt();
 
@@ -105,15 +114,15 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
             query = query.Where(x => x.Transaction.TransactionType == request.TransactionType);
         }
 
-        if (!string.IsNullOrEmpty(request.TransactionStatus))
-        {
-            //query = query.Where(x => x.Transaction.Status == request.TransactionStatus);
+        //if (!string.IsNullOrEmpty(request.TransactionStatus))
+        //{
+        //    //query = query.Where(x => x.Transaction.Status == request.TransactionStatus);
 
-            query = query.Where(x => x.Transaction != null &&
-                                     x.Transaction.Status != null &&
-                                     x.Transaction.Status.ToString().ToLower().Contains(request.TransactionStatus.ToLower()));
+        //    query = query.Where(x => x.Transaction != null &&
+        //                             x.Transaction.Status != null &&
+        //                             x.Transaction.Status.ToString().ToLower().Contains(request.TransactionStatus.ToLower()));
 
-        }
+        //}
 
         if (request.StartDate.HasValue)
         {
