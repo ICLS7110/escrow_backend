@@ -30,7 +30,7 @@ public class CommissionMaster : EndpointGroupBase
         var result = await sender.Send(new GetCommissionRateQuery());
 
         if (result == null || result.Data == null)
-            return TypedResults.NotFound(Result<CommissionDTO>.Failure(StatusCodes.Status404NotFound, "No commission data found."));
+            return TypedResults.NotFound(Result<List<CommissionDTO>>.Failure(StatusCodes.Status404NotFound, "No commission data found."));
 
         return TypedResults.Ok(result);
     }
