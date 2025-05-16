@@ -107,7 +107,12 @@ public class SearchTransactionsQueryHandler : IRequestHandler<SearchTransactions
 
         if (!string.IsNullOrEmpty(request.TransactionStatus))
         {
-            query = query.Where(x => x.Transaction.Status == request.TransactionStatus);
+            //query = query.Where(x => x.Transaction.Status == request.TransactionStatus);
+
+            query = query.Where(x => x.Transaction != null &&
+                                     x.Transaction.Status != null &&
+                                     x.Transaction.Status.ToString().ToLower().Contains(request.TransactionStatus.ToLower()));
+
         }
 
         if (request.StartDate.HasValue)

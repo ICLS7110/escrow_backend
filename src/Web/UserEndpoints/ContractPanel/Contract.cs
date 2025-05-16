@@ -192,20 +192,7 @@ public class Contract : EndpointGroupBase
     }
 
     [Authorize]
-    public async Task<IResult> GetContracts(
-        ISender sender,
-        IJwtService jwtService,
-        IHttpContextAccessor httpContextAccessor,
-        ContractStatus? status,
-        string? searchKeyword,
-        int? startPrice,
-        int? endPrice,
-        DateTime? startDate,
-        DateTime? endDate,
-        bool? isMilestone,
-        bool? isActive,
-        int pageNumber = 1,
-        int pageSize = 10)
+    public async Task<IResult> GetContracts(ISender sender,IJwtService jwtService,IHttpContextAccessor httpContextAccessor,ContractStatus? status,string? searchKeyword,int? startPrice,int? endPrice,DateTime? startDate,DateTime? endDate,bool? isMilestone,bool? isActive,int pageNumber = 1,int pageSize = 10)
     {
         var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
         var actualUserId = jwtService.GetUserId().ToInt();
@@ -247,22 +234,6 @@ public class Contract : EndpointGroupBase
         var successMessage = AppMessages.Get("ContractModified", language);
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, successMessage, new()));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //    [Authorize]

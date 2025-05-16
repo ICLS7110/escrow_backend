@@ -54,7 +54,7 @@ public class GetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, P
         }
 
         // Calculate confidence rate for the user
-        var confidenceRate = await ConfidenceRateHelper.CalculateConfidenceRate(user.Id, _context);
+        //var confidenceRate = await ConfidenceRateHelper.CalculateConfidenceRate(user.Id, _context);
 
         // Create the UserDetailDto with the confidence rate
         var userDetailDto = new UserDetailDto
@@ -79,7 +79,7 @@ public class GetUserDetailsQueryHandler : IRequestHandler<GetUserDetailsQuery, P
             IsNotified = user.IsNotified,
             SocialId = user.SocialId,
             ProfileCompletionPercentage = ProfileCompletionHelper.Calculate(user), // Profile Completion Helper
-            ConfidenceRate = confidenceRate // Confidence Rate
+            //ConfidenceRate = confidenceRate // Confidence RatebuyerSellerIds
         };
 
         // Wrapping the user detail DTO in a PaginatedList for consistency

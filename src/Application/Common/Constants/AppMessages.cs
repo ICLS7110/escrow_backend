@@ -455,6 +455,26 @@ namespace Escrow.Api.Application.Common.Constants
             ["UserDetailsUpdated"] = ("User details updated successfully.", "تم تحديث تفاصيل المستخدم بنجاح."),
             ["UserDeleted"] = ("User deleted successfully.", "تم حذف المستخدم بنجاح."),
 
+            ["InvalidMobileNumber"] = ("Invalid mobile number.", "رقم الجوال غير صالح."),
+            ["PleaseContactAdministrator"] = ("Please contact the administrator.", "يرجى التواصل مع المسؤول."),
+            ["OtpSentSuccessfully"] = ("OTP sent successfully.", "تم إرسال رمز التحقق بنجاح."),
+
+            ["TransactionTypeCommissionExists"] = ("Commission for this transaction type already exists.", "العمولة لهذا النوع من المعاملات موجودة بالفعل."),
+            ["GlobalCommissionExists"] = ("Global commission settings already exist.", "إعدادات العمولة العامة موجودة بالفعل."),
+            ["CommissionCreated"] = ("Commission created successfully.", "تم إنشاء العمولة بنجاح."),
+            ["AtLeastOneGlobalCommissionRequired"] = ("At least one global commission setting is required.", "مطلوب إعداد عمولة عامة واحدة على الأقل."),
+            ["CommissionUpdated"] = ("Commission updated successfully.", "تم تحديث العمولة بنجاح."),
+
+
+
+
+
+
+
+
+
+
+
         };
 
 

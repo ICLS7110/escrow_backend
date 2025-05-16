@@ -71,9 +71,17 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
 
             // Fetch related dispute data
 
+            if (request.Status.ToString() == nameof(ContractStatus.Completed))
+            {
+                query = query.Where(c => c.Status == nameof(ContractStatus.Completed) || c.Status == nameof(ContractStatus.Released));
+            }
+            else if (Enum.TryParse<ContractStatus>(request.Status.ToString(), out var status))
+            {
+                query = query.Where(c => c.Status == nameof(status));
+            }
 
-            if (request.Status.HasValue)
-                query = query.Where(c => c.Status == request.Status.ToString());
+            //if (request.Status.HasValue)
+            //    query = query.Where(c => c.Status == (request.Status.ToString() == nameof(ContractStatus.Completed) ? );
 
             if (!string.IsNullOrEmpty(request.SearchKeyword))
                 query = query.Where(c =>

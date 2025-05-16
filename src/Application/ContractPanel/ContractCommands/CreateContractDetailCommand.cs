@@ -105,7 +105,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             int sellerId = await _firebaseNotification.GetOrCreateUserId(request.SellerName, request.SellerMobile, cancellationToken);
 
             var commission = await _context.CommissionMasters
-                .Where(c => c.AppliedGlobally || c.TransactionType == "Service")
+                .Where(c => c.AppliedGlobally == true)
                 .OrderByDescending(c => c.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 

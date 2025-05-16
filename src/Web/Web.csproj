@@ -51,6 +51,7 @@
 
   <ItemGroup>
     <Folder Include="AdminEndPoints\UserPanel\" />
+    <Folder Include="wwwroot\api\" />
   </ItemGroup>
 
 

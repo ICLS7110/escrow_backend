@@ -113,10 +113,27 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             .Where(tm => tm.ContractId != null && tm.IsDeleted != true)
             .ToListAsync(cancellationToken);
 
-        var buyerSellerIds = contracts
-            .SelectMany(c => new[] { c.BuyerDetailsId, c.SellerDetailsId })
-            .Distinct()
-            .ToList();
+        //var buyerSellerIds = contracts
+        //    .SelectMany(c => new[] { c.BuyerDetailsId, c.SellerDetailsId })
+        //    .Distinct()
+        //    .ToList();
+
+    //    var buyerSellerIds = contracts
+    //.SelectMany(c => new[] { c.BuyerDetailsId, c.SellerDetailsId })
+    //.Where(id => id.HasValue)
+    //.Select(id => id)
+    //.Distinct()
+    //.ToList();
+
+        var buyerSellerIds = (
+    from c in contracts
+    from id in new[] { c.BuyerDetailsId, c.SellerDetailsId }
+    where id.HasValue
+    select id.Value
+).Distinct().ToList();
+
+
+
 
         var userProfiles = await _context.UserDetails
             .Where(u => buyerSellerIds.Contains(u.Id))
@@ -125,6 +142,12 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
 
         var profilePicDict = userProfiles
             .ToDictionary(u => u.Id, u => u.ProfilePicture ?? string.Empty);
+
+        var confidenceRates = await ConfidenceRateHelper.CalculateConfidenceRates(buyerSellerIds, _context);
+
+
+
+
 
         var contractDTOs = contracts.Select(c => new ContractDTO
         {
@@ -156,6 +179,8 @@ public class GetContractForUserQueryHandler : IRequestHandler<GetContractForUser
             SellerPayableAmount = c.SellerPayableAmount,
             BuyerPayableAmount = c.BuyerPayableAmount,
             EscrowStatusUpdatedAt = c.EscrowStatusUpdatedAt,
+            BuyerConfidenceRate = confidenceRates.TryGetValue(c.BuyerDetailsId ?? 0, out var buyerRate)? buyerRate.ToString() : "100",
+            SellerConfidenceRate = confidenceRates.TryGetValue(c.SellerDetailsId ?? 0, out var sellerRate)? sellerRate.ToString() : "100",
 
             BuyerProfilePicture = c.BuyerDetailsId.HasValue
                 ? profilePicDict.GetValueOrDefault(c.BuyerDetailsId.Value)

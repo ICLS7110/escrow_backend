@@ -92,6 +92,7 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             TransactionType = request.Type,
             ContractId = request.ContractId,
             Created = DateTime.UtcNow,
+            TransactionDateTime = DateTime.UtcNow,
             FromPayee = userId,
             ToRecipient = recipientId.ToString(),
             CreatedBy = userId

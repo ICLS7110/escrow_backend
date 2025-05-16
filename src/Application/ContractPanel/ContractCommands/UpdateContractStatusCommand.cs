@@ -106,7 +106,7 @@ public class UpdateContractStatusCommandHandler : IRequestHandler<UpdateContract
             }
 
             // Update contract status
-            contract.Status = request.Status;
+            contract.Status = request.Status == nameof(ContractStatus.Released) ? nameof(ContractStatus.Completed) : request.Status;
             contract.StatusReason = request.StatusReason;
             contract.LastModified = DateTime.UtcNow;
             contract.LastModifiedBy = userId.ToString();

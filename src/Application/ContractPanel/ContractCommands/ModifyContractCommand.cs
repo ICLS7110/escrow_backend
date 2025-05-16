@@ -90,7 +90,7 @@ public class ModifyContractCommandHandler : IRequestHandler<ModifyContractComman
 
             // --- Begin calculation for escrow, tax, buyer/seller payable amounts ---
             var commission = await _context.CommissionMasters
-                .Where(c => c.AppliedGlobally || c.TransactionType == "Service")
+                .Where(c => c.AppliedGlobally == true)
                 .OrderByDescending(c => c.Id)
                 .FirstOrDefaultAsync(cancellationToken);
 

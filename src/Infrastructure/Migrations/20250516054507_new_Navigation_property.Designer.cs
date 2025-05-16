@@ -3,6 +3,7 @@ using System;
 using Escrow.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Escrow.Api.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250516054507_new_Navigation_property")]
+    partial class new_Navigation_property
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,7 +91,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AMLFlaggedTransactions", (string)null);
+                    b.ToTable("AMLFlaggedTransactions");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.AMLPanel.AMLNotification", b =>
@@ -137,7 +140,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AMLNotifications", (string)null);
+                    b.ToTable("AMLNotifications");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.AMLPanel.AMLSettings", b =>
@@ -181,7 +184,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AMLSettings", (string)null);
+                    b.ToTable("AMLSettings");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.AMLPanel.AMLTransactionVerification", b =>
@@ -230,7 +233,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AMLTransactionVerifications", (string)null);
+                    b.ToTable("AMLTransactionVerifications");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.AdminPanel.AdminUser", b =>
@@ -292,7 +295,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdminUsers", (string)null);
+                    b.ToTable("AdminUsers");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.AnbConnectWebhook.AnbWebhookLog", b =>
@@ -340,7 +343,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AnbWebhookLogs", (string)null);
+                    b.ToTable("AnbWebhookLogs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Commissions.CommissionMaster", b =>
@@ -389,7 +392,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CommissionMasters", (string)null);
+                    b.ToTable("CommissionMasters");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContactUsPanel.ContactUs", b =>
@@ -438,7 +441,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContactUs", (string)null);
+                    b.ToTable("ContactUs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.ContractDetails", b =>
@@ -556,7 +559,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasIndex("UserDetailId");
 
-                    b.ToTable("ContractDetails", (string)null);
+                    b.ToTable("ContractDetails");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.ContractDetailsLog", b =>
@@ -614,7 +617,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContractDetailsLogs", (string)null);
+                    b.ToTable("ContractDetailsLogs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.MileStone", b =>
@@ -678,7 +681,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("MileStones", (string)null);
+                    b.ToTable("MileStones");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractPanel.SellerBuyerInvitation", b =>
@@ -739,7 +742,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasIndex("ContractDetailsId");
 
-                    b.ToTable("SellerBuyerInvitations", (string)null);
+                    b.ToTable("SellerBuyerInvitations");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.ContractReviews.ContractReview", b =>
@@ -794,7 +797,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContractReviews", (string)null);
+                    b.ToTable("ContractReviews");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Disputes.Dispute", b =>
@@ -866,7 +869,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasIndex("ContractDetailsId");
 
-                    b.ToTable("Disputes", (string)null);
+                    b.ToTable("Disputes");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Disputes.DisputeMessage", b =>
@@ -912,7 +915,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DisputeMessages", (string)null);
+                    b.ToTable("DisputeMessages");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.EmailTemplates.EmailTemplate", b =>
@@ -964,7 +967,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmailTemplates", (string)null);
+                    b.ToTable("EmailTemplates");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Notifications.ManualNotificationLog", b =>
@@ -1016,7 +1019,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ManualNotificationLogs", (string)null);
+                    b.ToTable("ManualNotificationLogs");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Notifications.Notification", b =>
@@ -1077,7 +1080,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Pages.Page", b =>
@@ -1132,7 +1135,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pages", (string)null);
+                    b.ToTable("Pages");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.RoleMenuPermissions.Menu", b =>
@@ -1169,7 +1172,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Menus", (string)null);
+                    b.ToTable("Menus");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.RoleMenuPermissions.Permission", b =>
@@ -1206,7 +1209,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.RoleMenuPermissions.RoleMenuPermission", b =>
@@ -1249,7 +1252,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RoleMenuPermissions", (string)null);
+                    b.ToTable("RoleMenuPermissions");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.SystemConfigurations.SystemConfiguration", b =>
@@ -1289,7 +1292,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SystemConfigurations", (string)null);
+                    b.ToTable("SystemConfigurations");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.TeamMembers.TeamMember", b =>
@@ -1344,7 +1347,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasIndex("ContractDetailsId");
 
-                    b.ToTable("TeamMembers", (string)null);
+                    b.ToTable("TeamMembers");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.Transactions.Transaction", b =>
@@ -1399,7 +1402,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.UserPanel.BankDetail", b =>
@@ -1458,7 +1461,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasIndex("UserDetailId");
 
-                    b.ToTable("BankDetails", (string)null);
+                    b.ToTable("BankDetails");
                 });
 
             modelBuilder.Entity("Escrow.Api.Domain.Entities.UserPanel.UserDetail", b =>
@@ -1563,7 +1566,7 @@ namespace Escrow.Api.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserDetails", (string)null);
+                    b.ToTable("UserDetails");
                 });
 
             modelBuilder.Entity("Escrow.Api.Infrastructure.Identity.ApplicationUser", b =>

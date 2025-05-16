@@ -2435,6 +2435,15 @@
               "nullable": true
             },
             "x-position": 1
+          },
+          {
+            "name": "isGloballyApplied",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 2
           }
         ],
         "responses": {

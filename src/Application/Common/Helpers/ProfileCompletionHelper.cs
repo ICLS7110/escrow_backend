@@ -91,28 +91,62 @@ public static class ProfileCompletionHelper
 
 public static class ConfidenceRateHelper
 {
-    /// <summary>
-    /// Calculates the confidence rate for a user based on their contracts.
-    /// </summary>
-    /// <param name="userId">The user whose confidence rate is being calculated.</param>
-    /// <param name="context">The database context to retrieve contract data.</param>
-    /// <param name="excludedStatuses">List of contract statuses to be excluded from total contracts.</param>
-    /// <returns>The confidence rate as a percentage.</returns>
-    public static async Task<int> CalculateConfidenceRate(int userId, IApplicationDbContext context)
+
+
+    public static async Task<Dictionary<int, int>> CalculateConfidenceRates(IEnumerable<int> userIds, IApplicationDbContext context)
     {
         var excludedStatuses = new List<string> { nameof(ContractStatus.Draft), nameof(ContractStatus.Pending), nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired) };
-        // Fetch contracts for the given user, excluding specific statuses
+
         var contracts = await context.ContractDetails
             .AsNoTracking()
-            .Where(c => (c.BuyerDetailsId == userId || c.SellerDetailsId == userId || c.CreatedBy == userId.ToString()) && !excludedStatuses.Contains(c.Status) && c.IsDeleted == false)
+            .Where(c =>
+                (userIds.Contains(c.BuyerDetailsId ?? 0) || userIds.Contains(c.SellerDetailsId ?? 0))
+                && !excludedStatuses.Contains(c.Status)
+                && c.IsDeleted == false)
             .ToListAsync();
 
-        int totalContracts = contracts.Count();
-        int disputeContracts = contracts.Count(c => c.Status == "dispute");
+        var result = new Dictionary<int, int>();
 
-        // Calculate confidence rate
-        return CalculateConfidenceRateFromContracts(totalContracts, disputeContracts);
+        foreach (var userId in userIds)
+        {
+            var userContracts = contracts.Where(c =>
+                c.BuyerDetailsId == userId || c.SellerDetailsId == userId);
+
+            int total = userContracts.Count();
+            int dispute = userContracts.Count(c => c.Status == "dispute");
+
+            var confidenceRate = total > 0 ? (int)Math.Round((1 - (dispute / (double)total)) * 100) : 100;
+            result[userId] = confidenceRate;
+        }
+
+        return result;
     }
+
+
+
+
+    ///// <summary>
+    ///// Calculates the confidence rate for a user based on their contracts.
+    ///// </summary>
+    ///// <param name="userId">The user whose confidence rate is being calculated.</param>
+    ///// <param name="context">The database context to retrieve contract data.</param>
+    ///// <param name="excludedStatuses">List of contract statuses to be excluded from total contracts.</param>
+    ///// <returns>The confidence rate as a percentage.</returns>
+    //public static async Task<int> CalculateConfidenceRate(int userId, IApplicationDbContext context)
+    //{
+    //    var excludedStatuses = new List<string> { nameof(ContractStatus.Draft), nameof(ContractStatus.Pending), nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired) };
+    //    // Fetch contracts for the given user, excluding specific statuses
+    //    var contracts = await context.ContractDetails
+    //        .AsNoTracking()
+    //        .Where(c => (c.BuyerDetailsId == userId || c.SellerDetailsId == userId || c.CreatedBy == userId.ToString()) && !excludedStatuses.Contains(c.Status) && c.IsDeleted == false)
+    //        .ToListAsync();
+
+    //    int totalContracts = contracts.Count();
+    //    int disputeContracts = contracts.Count(c => c.Status == "dispute");
+
+    //    // Calculate confidence rate
+    //    return CalculateConfidenceRateFromContracts(totalContracts, disputeContracts);
+    //}
 
     /// <summary>
     /// Helper method to calculate confidence rate from total and disputed contracts.

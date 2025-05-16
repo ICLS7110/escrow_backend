@@ -34,11 +34,11 @@ public class CommissionMaster : EndpointGroupBase
     public async Task<IResult> GetCommissionRate(
     [FromServices] ISender sender,
     [FromServices] IHttpContextAccessor httpContextAccessor,
-    [FromQuery] int? id)
+    [FromQuery] int? id, [FromQuery] bool? isGloballyApplied)
     {
         var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
-        var result = await sender.Send(new GetCommissionRateQuery { Id = id });
+        var result = await sender.Send(new GetCommissionRateQuery { Id = id, IsGloballyApplied = isGloballyApplied });
 
         if (result?.Data == null || !result.Data.Any())
         {
@@ -72,16 +72,6 @@ public class CommissionMaster : EndpointGroupBase
         var successMessage = AppMessages.Get("CommissionUpserted", language);
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, successMessage, result.Data));
     }
-
-
-
-
-
-
-
-
-
-
 
 
 

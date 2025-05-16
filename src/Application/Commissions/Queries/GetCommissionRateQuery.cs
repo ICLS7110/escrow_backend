@@ -18,6 +18,7 @@ namespace Escrow.Api.Application.Commissions.Queries
     public record GetCommissionRateQuery : IRequest<Result<List<CommissionDTO>>>
     {
         public int? Id { get; init; }
+        public bool? IsGloballyApplied { get; init; }
     }
 
     public class GetCommissionRateQueryHandler : IRequestHandler<GetCommissionRateQuery, Result<List<CommissionDTO>>>
@@ -41,6 +42,10 @@ namespace Escrow.Api.Application.Commissions.Queries
             if (request.Id.HasValue)
             {
                 query = query.Where(c => c.Id == request.Id.Value);
+            } 
+            if (request.IsGloballyApplied.HasValue)
+            {
+                query = query.Where(c => c.AppliedGlobally == request.IsGloballyApplied);
             }
 
             var commissionList = await query

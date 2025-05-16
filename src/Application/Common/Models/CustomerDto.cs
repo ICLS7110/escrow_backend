@@ -31,4 +31,11 @@ namespace Escrow.Api.Application.Common.Models
         public decimal TotalFeesAmount { get; set; }
 
     }
+
+    public class CustomerStatusDto
+    {
+        public int CustomerId { get; set; }
+        public bool? IsActive { get; set; }
+    }
+
 }

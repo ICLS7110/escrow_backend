@@ -50,6 +50,8 @@ namespace Escrow.Api.Application.Common.Models.ContractDTOs
         public int Id { get; set; }
         public int DisputeId { get; set; }
         public string Role { get; set; } = string.Empty;
+        public string BuyerConfidenceRate { get; set; } = string.Empty;
+        public string SellerConfidenceRate { get; set; } = string.Empty;
         public string ContractTitle { get; set; } = string.Empty;
         public string ServiceType { get; set; } = string.Empty;
         public string ServiceDescription { get; set; } = string.Empty;
