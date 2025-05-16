@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.Common.Interfaces;
+﻿using Escrow.Api.Application.Common.Constants;
+using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.ContractPanel.ContractCommands;
 using Escrow.Api.Application.DTOs;
@@ -23,13 +24,32 @@ public class SellerBuyer : EndpointGroupBase
         userGroup.MapPost("/", CreateSellerBuyerInvitation).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
     }
 
+
+
+
     [Authorize]
-    public async Task<IResult> CreateSellerBuyerInvitation(ISender sender, CreateBuyerSellerCommand command)
+    public async Task<IResult> CreateSellerBuyerInvitation(ISender sender, IHttpContextAccessor httpContextAccessor, CreateBuyerSellerCommand command)
     {
-        // Send the command to process seller-buyer creation
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var invitationLink = await sender.Send(command);
 
-        // Return response with generated ID
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Invitation Created Successfully.", new { Id = invitationLink }));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("InvitationCreatedSuccessfully", language), new { Id = invitationLink }));
     }
+
+
+
+
+
+
+
+    //[Authorize]
+    //public async Task<IResult> CreateSellerBuyerInvitation(ISender sender, CreateBuyerSellerCommand command)
+    //{
+    //    // Send the command to process seller-buyer creation
+    //    var invitationLink = await sender.Send(command);
+
+    //    // Return response with generated ID
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Invitation Created Successfully.", new { Id = invitationLink }));
+    //}
 }

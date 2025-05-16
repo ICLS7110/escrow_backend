@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
@@ -26,13 +27,113 @@ public class Team : EndpointGroupBase
         adminGroup.MapDelete("/delete", DeleteTeam);
     }
 
-    /// <summary>
-    /// Retrieves all teams or a specific team by ID or UserId.
-    /// Supports pagination and filtering by RoleType, IsActive, and LastDays.
-    /// </summary>
+    ///// <summary>
+    ///// Retrieves all teams or a specific team by ID or UserId.
+    ///// Supports pagination and filtering by RoleType, IsActive, and LastDays.
+    ///// </summary>
+    //[Authorize]
+    //public async Task<IResult> GetAllTeams(ISender sender, int pageNumber = 1, int pageSize = 10, string? roleType = null, bool? isActive = null, int? lastDays = null)
+    //{
+    //    var result = await sender.Send(new GetAllTeamsQuery
+    //    {
+    //        PageNumber = pageNumber,
+    //        PageSize = pageSize,
+    //        RoleType = roleType,
+    //        IsActive = isActive,
+    //        LastDays = lastDays
+    //    });
+
+    //    if (result == null || result.Data == null)
+    //    {
+    //        return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status200OK, "No teams found."));
+    //    }
+
+    //    return TypedResults.Ok(Result<PaginatedList<TeamDTO>>.Success(
+    //        StatusCodes.Status200OK,
+    //        "Teams retrieved successfully.",
+    //        result.Data
+    //    ));
+    //} 
+
+    ///// <summary>
+    ///// Creates a new team with UserId from JWT.
+    ///// </summary>
+    //[Authorize]
+    //public async Task<IResult> CreateTeam(ISender sender, CreateTeamCommand command)
+    //{
+    //    if (command == null)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request payload."));
+    //    }
+
+    //    try
+    //    {
+    //        var result = await sender.Send(command);
+
+    //        if (result.Status != StatusCodes.Status200OK) // Check if the operation was unsuccessful
+    //        {
+    //            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message ?? "Team creation failed."));
+    //        }
+
+    //        return TypedResults.Ok(result);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        // Log the error (replace with actual logging if available)
+    //        Console.WriteLine($"Error creating team: {ex.Message}");
+
+    //        return TypedResults.Json(
+    //            Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected server error occurred."),
+    //            statusCode: StatusCodes.Status500InternalServerError
+    //        );
+    //    }
+    //}
+
+
+
+    //[Authorize]
+    //public async Task<IResult> UpdateTeamStatus(ISender sender, UpdateTeamStatusCommand command)
+    //{
+    //    if (command == null || command.TeamId <= 0)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid team ID or request payload."));
+    //    }
+
+    //    var result = await sender.Send(command);
+
+
+
+    //    if (result.Status == StatusCodes.Status404NotFound)
+    //    {
+    //        return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Team not found or status update failed."));
+    //    }
+
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Team status updated successfully."));
+    //}
+
+    //[Authorize]
+    //public async Task<IResult> DeleteTeam(ISender sender, int teamId)
+    //{
+    //    if (teamId <= 0)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid team ID."));
+    //    }
+    //    var result = await sender.Send(new DeleteTeamCommand { TeamId = teamId });
+
+
+    //    if (result.Status == StatusCodes.Status404NotFound)
+    //    {
+    //        return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Team not found"));
+    //    }
+
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Team Deleted successfully."));
+    //}
+
     [Authorize]
-    public async Task<IResult> GetAllTeams(ISender sender, int pageNumber = 1, int pageSize = 10, string? roleType = null, bool? isActive = null, int? lastDays = null)
+    public async Task<IResult> GetAllTeams(ISender sender, IHttpContextAccessor httpContextAccessor, int pageNumber = 1, int pageSize = 10, string? roleType = null, bool? isActive = null, int? lastDays = null)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(new GetAllTeamsQuery
         {
             PageNumber = pageNumber,
@@ -44,49 +145,115 @@ public class Team : EndpointGroupBase
 
         if (result == null || result.Data == null)
         {
-            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status200OK, "No teams found."));
+            return TypedResults.NotFound(Result<object>.Failure(
+                StatusCodes.Status404NotFound,
+                AppMessages.Get("NoTeamsFound", language)
+            ));
         }
 
         return TypedResults.Ok(Result<PaginatedList<TeamDTO>>.Success(
             StatusCodes.Status200OK,
-            "Teams retrieved successfully.",
+            AppMessages.Get("TeamsRetrievedSuccessfully", language),
             result.Data
         ));
-    } 
+    }
 
-    /// <summary>
-    /// Creates a new team with UserId from JWT.
-    /// </summary>
     [Authorize]
-    public async Task<IResult> CreateTeam(ISender sender, CreateTeamCommand command)
+    public async Task<IResult> CreateTeam(ISender sender, IHttpContextAccessor httpContextAccessor, CreateTeamCommand command)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         if (command == null)
         {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request payload."));
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                AppMessages.Get("InvalidRequestPayload", language)
+            ));
         }
 
         try
         {
             var result = await sender.Send(command);
 
-            if (result.Status != StatusCodes.Status200OK) // Check if the operation was unsuccessful
+            if (result.Status != StatusCodes.Status200OK)
             {
-                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message ?? "Team creation failed."));
+                return TypedResults.BadRequest(Result<object>.Failure(
+                    StatusCodes.Status400BadRequest,
+                    result.Message ?? AppMessages.Get("TeamCreationFailed", language)
+                ));
             }
 
             return TypedResults.Ok(result);
         }
         catch (Exception ex)
         {
-            // Log the error (replace with actual logging if available)
             Console.WriteLine($"Error creating team: {ex.Message}");
 
             return TypedResults.Json(
-                Result<object>.Failure(StatusCodes.Status500InternalServerError, "An unexpected server error occurred."),
+                Result<object>.Failure(StatusCodes.Status500InternalServerError, AppMessages.Get("UnexpectedServerError", language)),
                 statusCode: StatusCodes.Status500InternalServerError
             );
         }
     }
+
+    [Authorize]
+    public async Task<IResult> UpdateTeamStatus(ISender sender, IHttpContextAccessor httpContextAccessor, UpdateTeamStatusCommand command)
+    {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+        if (command == null || command.TeamId <= 0)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                AppMessages.Get("InvalidTeamIdOrPayload", language)
+            ));
+        }
+
+        var result = await sender.Send(command);
+
+        if (result.Status == StatusCodes.Status404NotFound)
+        {
+            return TypedResults.NotFound(Result<object>.Failure(
+                result.Status,
+                result.Message ?? AppMessages.Get("TeamNotFoundOrStatusUpdateFailed", language)
+            ));
+        }
+
+        return TypedResults.Ok(Result<object>.Success(
+            StatusCodes.Status200OK,
+            AppMessages.Get("TeamStatusUpdatedSuccessfully", language)
+        ));
+    }
+
+    [Authorize]
+    public async Task<IResult> DeleteTeam(ISender sender, IHttpContextAccessor httpContextAccessor, int teamId)
+    {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+        if (teamId <= 0)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                AppMessages.Get("InvalidTeamId", language)
+            ));
+        }
+
+        var result = await sender.Send(new DeleteTeamCommand { TeamId = teamId });
+
+        if (result.Status == StatusCodes.Status404NotFound)
+        {
+            return TypedResults.NotFound(Result<object>.Failure(
+                result.Status,
+                result.Message ?? AppMessages.Get("TeamNotFound", language)
+            ));
+        }
+
+        return TypedResults.Ok(Result<object>.Success(
+            StatusCodes.Status200OK,
+            AppMessages.Get("TeamDeletedSuccessfully", language)
+        ));
+    }
+
 
     /// <summary>
     /// Updates an existing team. UserId is retrieved from JWT.
@@ -108,43 +275,4 @@ public class Team : EndpointGroupBase
 
         return TypedResults.Ok(result);
     }
-
-    [Authorize]
-    public async Task<IResult> UpdateTeamStatus(ISender sender, UpdateTeamStatusCommand command)
-    {
-        if (command == null || command.TeamId <= 0)
-        {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid team ID or request payload."));
-        }
-
-        var result = await sender.Send(command);
-
-
-
-        if (result.Status == StatusCodes.Status404NotFound)
-        {
-            return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Team not found or status update failed."));
-        }
-
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Team status updated successfully."));
-    }
-
-    [Authorize]
-    public async Task<IResult> DeleteTeam(ISender sender, int teamId)
-    {
-        if (teamId <= 0)
-        {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid team ID."));
-        }
-        var result = await sender.Send(new DeleteTeamCommand { TeamId = teamId });
-
-
-        if (result.Status == StatusCodes.Status404NotFound)
-        {
-            return TypedResults.NotFound(Result<object>.Failure(result.Status, result.Message ?? "Team not found"));
-        }
-
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Team Deleted successfully."));
-    }
-
 }

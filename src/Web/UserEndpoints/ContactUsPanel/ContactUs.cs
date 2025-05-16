@@ -29,39 +29,40 @@ public class ContactUs : EndpointGroupBase
     }
 
 
-
-    public async Task<IResult> SendContactMessage(ISender sender, IHttpContextAccessor httpContextAccessor, [FromBody] SendContactMessageCommand request)
+    public async Task<IResult> SendContactMessage(
+    ISender sender,
+    IHttpContextAccessor httpContextAccessor,
+    [FromBody] SendContactMessageCommand request)
     {
-        if (request == null)
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data."));
-
         var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+        if (request == null)
+        {
+            var message = AppMessages.Get("InvalidContactRequest", language);
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, message));
+        }
 
         var result = await sender.Send(request);
 
         if (result.Status != StatusCodes.Status200OK)
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message));
+        {
+            var message = AppMessages.Get("ContactMessageFailed", language);
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, message));
+        }
 
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ContactMessageSent", language)));
+        var successMessage = AppMessages.Get("ContactMessageSent", language);
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, successMessage));
     }
 
-
-    //public async Task<IResult> SendContactMessage(ISender sender, [FromBody] SendContactMessageCommand request)
-    //{
-    //    if (request == null)
-    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data."));
-
-    //    var result = await sender.Send(request);
-
-    //    if (result.Status != StatusCodes.Status200OK)  // ✅ Using Status instead of IsSuccess
-    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message));
-
-    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contact message sent successfully."));
-    //}
-
     [Authorize(Roles = nameof(Roles.Admin))]
-    public async Task<IResult> GetContactMessages(ISender sender, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+    public async Task<IResult> GetContactMessages(
+        ISender sender,
+        IHttpContextAccessor httpContextAccessor,
+        [FromQuery] int? pageNumber = 1,
+        [FromQuery] int? pageSize = 10)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var query = new GetContactMessagesQuery
         {
             PageNumber = pageNumber ?? 1,
@@ -71,8 +72,67 @@ public class ContactUs : EndpointGroupBase
         var result = await sender.Send(query);
 
         if (result == null || result.Items == null || !result.Items.Any())
-            return TypedResults.NotFound(Result<PaginatedList<ContactUsDTO>>.Failure(StatusCodes.Status404NotFound, "No contact messages found."));
+        {
+            var message = AppMessages.Get("NoContactMessagesFound", language);
+            return TypedResults.NotFound(Result<PaginatedList<ContactUsDTO>>.Failure(StatusCodes.Status404NotFound, message));
+        }
 
-        return TypedResults.Ok(Result<PaginatedList<ContactUsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+        var successMessage = AppMessages.Get("ContactMessagesRetrieved", language);
+        return TypedResults.Ok(Result<PaginatedList<ContactUsDTO>>.Success(StatusCodes.Status200OK, successMessage, result));
     }
+
+
+
+
+
+
+
+
+
+
+    //public async Task<IResult> SendContactMessage(ISender sender, IHttpContextAccessor httpContextAccessor, [FromBody] SendContactMessageCommand request)
+    //{
+    //    if (request == null)
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data."));
+
+    //    var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+    //    var result = await sender.Send(request);
+
+    //    if (result.Status != StatusCodes.Status200OK)
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message));
+
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ContactMessageSent", language)));
+    //}
+
+
+    ////public async Task<IResult> SendContactMessage(ISender sender, [FromBody] SendContactMessageCommand request)
+    ////{
+    ////    if (request == null)
+    ////        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid request data."));
+
+    ////    var result = await sender.Send(request);
+
+    ////    if (result.Status != StatusCodes.Status200OK)  // ✅ Using Status instead of IsSuccess
+    ////        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, result.Message));
+
+    ////    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Contact message sent successfully."));
+    ////}
+
+    //[Authorize(Roles = nameof(Roles.Admin))]
+    //public async Task<IResult> GetContactMessages(ISender sender, [FromQuery] int? pageNumber = 1, [FromQuery] int? pageSize = 10)
+    //{
+    //    var query = new GetContactMessagesQuery
+    //    {
+    //        PageNumber = pageNumber ?? 1,
+    //        PageSize = pageSize ?? 10
+    //    };
+
+    //    var result = await sender.Send(query);
+
+    //    if (result == null || result.Items == null || !result.Items.Any())
+    //        return TypedResults.NotFound(Result<PaginatedList<ContactUsDTO>>.Failure(StatusCodes.Status404NotFound, "No contact messages found."));
+
+    //    return TypedResults.Ok(Result<PaginatedList<ContactUsDTO>>.Success(StatusCodes.Status200OK, "Success", result));
+    //}
 }

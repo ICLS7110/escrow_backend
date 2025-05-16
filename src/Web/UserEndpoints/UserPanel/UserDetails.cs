@@ -1,5 +1,6 @@
 ﻿using Escrow.Api.Application;
 using Escrow.Api.Application.BankDetails.Queries;
+using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
@@ -42,7 +43,7 @@ public class UserDetails : EndpointGroupBase
         userGroup.MapPost("/set-notified-status", UpdateNotificationStatus).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
         // Social logins
-        userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMeadiaLogin).AllowAnonymous();
+        userGroup.MapPost("/auth/SocialMeadiaLogin", SocialMediaLogin).AllowAnonymous();
 
         userGroup.MapPost("/update-mobile-number", UpdateMobileNumber).AllowAnonymous();
         userGroup.MapPost("/send-sms", SendSMS).AllowAnonymous();
@@ -50,89 +51,244 @@ public class UserDetails : EndpointGroupBase
 
     }
 
+    //[Authorize]
+    //public async Task<IResult> GetUserDetails(ISender sender, IJwtService jwtService)
+    //{
+    //    try
+    //    {
+    //        // 🔹 Ensure we get a valid user ID from the token
+    //        int? userId = jwtService.GetUserId()?.ToInt();
+
+    //        if (userId == null || userId <= 0)
+    //        {
+    //            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid user ID"));
+    //        }
+
+    //        var query = new GetUserDetailsQuery { Id = userId, PageNumber = 1, PageSize = 1 };
+    //        var result = await sender.Send(query);
+
+    //        if (result == null)
+    //        {
+    //            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "User not found"));
+    //        }
+
+    //        return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(StatusCodes.Status200OK, "Success", result));
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+    //    }
+    //}
+
+    //[Authorize]
+    //public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
+    //{
+    //    try
+    //    {
+    //        await sender.Send(command);
+    //        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details updated successfully.", new()));
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+    //    }
+    //}
+
+    //[Authorize]
+    //public async Task<IResult> DeleteUser(ISender sender, IJwtService jwtService)
+    //{
+    //    try
+    //    {
+    //        var userId = jwtService.GetUserId().ToInt();
+    //        await sender.Send(new DeleteUserCommand(userId));
+    //        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details deleted successfully.", new()));
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+    //    }
+    //}
+
+    //[AllowAnonymous]
+    //public async Task<IResult> SocialMeadiaLogin(ISender sender, SocialLoginCommand command)
+    //{
+    //    return await HandleSocialLogin(sender, command, command.Provider, "Google login successful");
+    //}
+    //private async Task<IResult> HandleSocialLogin(ISender sender, SocialLoginCommand command, string provider, string successMessage)
+    //{
+    //    try
+    //    {
+
+    //        command.Provider = provider;
+    //        var result = await sender.Send(command);
+
+    //        if (result.Data == null)
+    //        {
+    //            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid login attempt."));
+    //        }
+
+    //        return TypedResults.Ok(Result<UserLoginDto>.Success(StatusCodes.Status200OK, successMessage, result.Data));
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, $"Login failed: {ex.Message}"));
+    //    }
+    //}
+
+
     [Authorize]
-    public async Task<IResult> GetUserDetails(ISender sender, IJwtService jwtService)
+    public async Task<IResult> GetUserDetails(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         try
         {
-            // 🔹 Ensure we get a valid user ID from the token
             int? userId = jwtService.GetUserId()?.ToInt();
 
             if (userId == null || userId <= 0)
             {
-                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid user ID"));
+                return TypedResults.BadRequest(Result<object>.Failure(
+                    StatusCodes.Status400BadRequest,
+                    AppMessages.Get("InvalidUserId", language)
+                ));
             }
 
-            var query = new GetUserDetailsQuery { Id = userId, PageNumber = 1, PageSize = 1 };
+            var query = new GetUserDetailsQuery { Id = userId.Value, PageNumber = 1, PageSize = 1 };
             var result = await sender.Send(query);
 
             if (result == null)
             {
-                return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "User not found"));
+                return TypedResults.NotFound(Result<object>.Failure(
+                    StatusCodes.Status404NotFound,
+                    AppMessages.Get("UserNotFound", language)
+                ));
             }
 
-            return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(StatusCodes.Status200OK, "Success", result));
+            return TypedResults.Ok(Result<PaginatedList<UserDetailDto>>.Success(
+                StatusCodes.Status200OK,
+                AppMessages.Get("Success", language),
+                result
+            ));
         }
         catch (Exception ex)
         {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                ex.Message
+            ));
         }
     }
 
     [Authorize]
-    public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command)
+    public async Task<IResult> UpdateUserDetail(ISender sender, UpdateUserCommand command, IHttpContextAccessor httpContextAccessor)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         try
         {
             await sender.Send(command);
-            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details updated successfully.", new()));
+
+            return TypedResults.Ok(Result<object>.Success(
+                StatusCodes.Status204NoContent,
+                AppMessages.Get("UserDetailsUpdated", language),
+                new()
+            ));
         }
         catch (Exception ex)
         {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                ex.Message
+            ));
         }
     }
 
     [Authorize]
-    public async Task<IResult> DeleteUser(ISender sender, IJwtService jwtService)
+    public async Task<IResult> DeleteUser(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         try
         {
-            var userId = jwtService.GetUserId().ToInt();
-            await sender.Send(new DeleteUserCommand(userId));
-            return TypedResults.Ok(Result<object>.Success(StatusCodes.Status204NoContent, "User details deleted successfully.", new()));
+            var userId = jwtService.GetUserId()?.ToInt();
+
+            if (userId == null || userId <= 0)
+            {
+                return TypedResults.BadRequest(Result<object>.Failure(
+                    StatusCodes.Status400BadRequest,
+                    AppMessages.Get("InvalidUserId", language)
+                ));
+            }
+
+            await sender.Send(new DeleteUserCommand(userId.Value));
+
+            return TypedResults.Ok(Result<object>.Success(
+                StatusCodes.Status204NoContent,
+                AppMessages.Get("UserDeleted", language),
+                new()
+            ));
         }
         catch (Exception ex)
         {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                ex.Message
+            ));
         }
     }
 
     [AllowAnonymous]
-    public async Task<IResult> SocialMeadiaLogin(ISender sender, SocialLoginCommand command)
+    public async Task<IResult> SocialMediaLogin(ISender sender, SocialLoginCommand command)
     {
-        return await HandleSocialLogin(sender, command, command.Provider, "Google login successful");
+        return await HandleSocialLogin(sender, command, command.Provider, "SocialLoginSuccess");
     }
-    private async Task<IResult> HandleSocialLogin(ISender sender, SocialLoginCommand command, string provider, string successMessage)
+
+    private async Task<IResult> HandleSocialLogin(ISender sender, SocialLoginCommand command, string provider, string successMessageKey)
     {
         try
         {
-
             command.Provider = provider;
             var result = await sender.Send(command);
 
-            if (result.Data == null)
+            if (result?.Data == null)
             {
-                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Invalid login attempt."));
+                return TypedResults.BadRequest(Result<object>.Failure(
+                    StatusCodes.Status400BadRequest,
+                    "Invalid login attempt."
+                ));
             }
 
-            return TypedResults.Ok(Result<UserLoginDto>.Success(StatusCodes.Status200OK, successMessage, result.Data));
+            return TypedResults.Ok(Result<UserLoginDto>.Success(
+                StatusCodes.Status200OK,
+                successMessageKey,
+                result.Data
+            ));
         }
         catch (Exception ex)
         {
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, $"Login failed: {ex.Message}"));
+            return TypedResults.BadRequest(Result<object>.Failure(
+                StatusCodes.Status400BadRequest,
+                $"Login failed: {ex.Message}"
+            ));
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     [Authorize]
     public async Task<IResult> StoreDeviceToken(ISender sender, StoreDeviceTokenCommand command)

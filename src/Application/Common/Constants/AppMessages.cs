@@ -369,18 +369,91 @@ namespace Escrow.Api.Application.Common.Constants
             ["NoDataFound"] = ("No data found.", "لم يتم العثور على بيانات."),
             ["AssignPermissionsFailed"] = ("Failed to assign permissions.", "فشل في تعيين الأذونات."),
 
+            ["NoConfigurationsFound"] = ("No configurations found.", "لم يتم العثور على الإعدادات."),
+            ["ConfigurationsRetrieved"] = ("Configurations retrieved successfully.", "تم استرجاع الإعدادات بنجاح."),
+            ["ConfigurationUpdated"] = ("Configuration updated successfully.", "تم تحديث الإعداد بنجاح."),
+            ["ConfigurationUpdateFailed"] = ("Failed to update configuration.", "فشل في تحديث الإعداد."),
+
+            ["BankDetailsRetrieved"] = ("Bank details retrieved successfully.", "تم استرجاع تفاصيل البنك بنجاح."),
+            ["BankDetailCreated"] = ("Bank detail created successfully.", "تم إنشاء تفاصيل البنك بنجاح."),
+            ["BankDetailUpdated"] = ("Bank detail updated successfully.", "تم تحديث تفاصيل البنك بنجاح."),
+            ["BankDetailDeleted"] = ("Bank detail deleted successfully.", "تم حذف تفاصيل البنك بنجاح."),
+
+            ["NoCommissionDataFound"] = ("No commission data found.", "لم يتم العثور على بيانات العمولة."),
+            ["CommissionDataRetrieved"] = ("Commission data retrieved successfully.", "تم استرجاع بيانات العمولة بنجاح."),
+            ["CommissionUpsertFailed"] = ("Failed to add or update commission data.", "فشل في إضافة أو تحديث بيانات العمولة."),
+            ["CommissionUpserted"] = ("Commission data added or updated successfully.", "تمت إضافة أو تحديث بيانات العمولة بنجاح."),
+
+            ["InvalidContactRequest"] = ("Invalid contact request.", "طلب الاتصال غير صالح."),
+            ["ContactMessageFailed"] = ("Failed to send contact message.", "فشل في إرسال رسالة الاتصال."),
+            ["ContactMessageSent"] = ("Contact message sent successfully.", "تم إرسال رسالة الاتصال بنجاح."),
+            ["NoContactMessagesFound"] = ("No contact messages found.", "لم يتم العثور على رسائل اتصال."),
+            ["ContactMessagesRetrieved"] = ("Contact messages retrieved successfully.", "تم استرجاع رسائل الاتصال بنجاح."),
+
+            ["ContractsRetrieved"] = ("Contracts retrieved successfully.", "تم استرجاع العقود بنجاح."),
+            ["ContractUpdateFailed"] = ("Failed to update contract.", "فشل في تحديث العقد."),
+            ["ContractStatusUpdated"] = ("Contract status updated successfully.", "تم تحديث حالة العقد بنجاح."),
+            ["ContractDetailsUpdated"] = ("Contract details updated successfully.", "تم تحديث تفاصيل العقد بنجاح."),
+            ["ContractCreated"] = ("Contract created successfully.", "تم إنشاء العقد بنجاح."),
+            ["ContractNotFound"] = ("Contract not found.", "العقد غير موجود."),
+            ["ContractRetrieved"] = ("Contract retrieved successfully.", "تم استرجاع العقد بنجاح."),
+            ["AccessDenied"] = ("Access denied.", "تم رفض الوصول."),
+            ["ContractModifyFailed"] = ("Failed to modify contract.", "فشل في تعديل العقد."),
+            ["ContractModified"] = ("Contract modified successfully.", "تم تعديل العقد بنجاح."),
+
+            ["InvalidContractId"] = ("Invalid contract ID.", "معرّف العقد غير صالح."),
+            ["Success"] = ("Success.", "نجاح."),
+            ["MilestoneDetailsRequired"] = ("Milestone details are required.", "تفاصيل المرحلة مطلوبة."),
+            ["NoMilestonesCreatedOrUpdated"] = ("No milestones were created or updated.", "لم يتم إنشاء أو تحديث أي مراحل."),
+            ["MilestonesCreatedSuccessfully"] = ("Milestones created successfully.", "تم إنشاء المراحل بنجاح."),
+            ["UnexpectedServerError"] = ("Unexpected server error occurred.", "حدث خطأ غير متوقع في الخادم."),
+            ["MilestoneUpdatesRequired"] = ("Milestone updates are required.", "تحديثات المرحلة مطلوبة."),
+            ["MilestonesUpdatedSuccessfully"] = ("Milestones updated successfully.", "تم تحديث المراحل بنجاح."),
+            ["NoMilestonesUpdated"] = ("No milestones were updated.", "لم يتم تحديث أي مراحل."),
+
+            ["InvitationCreatedSuccessfully"] = ("Invitation created successfully.", "تم إنشاء الدعوة بنجاح."),
+
+            ["NoReviewsFound"] = ("No reviews found.", "لم يتم العثور على مراجعات."),
+            ["ReviewCreationFailed"] = ("Failed to create review.", "فشل في إنشاء المراجعة."),
+            ["ReviewCreatedSuccessfully"] = ("Review created successfully.", "تم إنشاء المراجعة بنجاح."),
+            ["ReviewUpdateFailed"] = ("Failed to update review.", "فشل في تحديث المراجعة."),
+            ["ReviewUpdatedSuccessfully"] = ("Review updated successfully.", "تم تحديث المراجعة بنجاح."),
+
+            ["InvalidPageNumberPageSize"] = ("Invalid page number or page size.", "رقم الصفحة أو حجم الصفحة غير صالح."),
+            ["NoNotificationsFound"] = ("No notifications found.", "لم يتم العثور على إشعارات."),
+            ["NotificationsRetrievedSuccessfully"] = ("Notifications retrieved successfully.", "تم استرداد الإشعارات بنجاح."),
+            ["InvalidNotificationId"] = ("Invalid notification ID.", "معرف الإشعار غير صالح."),
+            ["NotificationNotFound"] = ("Notification not found.", "الإشعار غير موجود."),
+            ["NotificationRetrievedSuccessfully"] = ("Notification retrieved successfully.", "تم استرداد الإشعار بنجاح."),
+            ["UnexpectedError"] = ("An unexpected error occurred.", "حدث خطأ غير متوقع."),
+            ["NoManualNotificationsFound"] = ("No manual notifications found.", "لم يتم العثور على إشعارات يدوية."),
+            ["ManualNotificationsRetrievedSuccessfully"] = ("Manual notifications retrieved successfully.", "تم استرداد الإشعارات اليدوية بنجاح."),
 
 
+            ["NoTeamsFound"] = ("No teams found.", "لم يتم العثور على فرق."),
+            ["TeamsRetrievedSuccessfully"] = ("Teams retrieved successfully.", "تم استرداد الفرق بنجاح."),
+            ["InvalidRequestPayload"] = ("Invalid request payload.", "حمولة الطلب غير صالحة."),
+            ["TeamCreationFailed"] = ("Failed to create team.", "فشل في إنشاء الفريق."),
+            ["UnexpectedServerError"] = ("An unexpected server error occurred.", "حدث خطأ غير متوقع في الخادم."),
+            ["InvalidTeamIdOrPayload"] = ("Invalid team ID or request payload.", "معرف الفريق أو حمولة الطلب غير صالحة."),
+            ["TeamNotFoundOrStatusUpdateFailed"] = ("Team not found or failed to update status.", "الفريق غير موجود أو فشل تحديث الحالة."),
+            ["TeamStatusUpdatedSuccessfully"] = ("Team status updated successfully.", "تم تحديث حالة الفريق بنجاح."),
+            ["InvalidTeamId"] = ("Invalid team ID.", "معرف الفريق غير صالح."),
+            ["TeamNotFound"] = ("Team not found.", "الفريق غير موجود."),
+            ["TeamDeletedSuccessfully"] = ("Team deleted successfully.", "تم حذف الفريق بنجاح."),
+
+            ["TransactionNotFound"] = ("Transaction not found.", "المعاملة غير موجودة."),
+            ["NoTransactionsFound"] = ("No transactions found.", "لم يتم العثور على معاملات."),
+            ["InvalidRequestPayload"] = ("Invalid request payload.", "حمولة الطلب غير صالحة."),
+            ["TransactionCreationFailed"] = ("Failed to create transaction.", "فشل في إنشاء المعاملة."),
+            ["UnexpectedServerError"] = ("An unexpected server error occurred.", "حدث خطأ غير متوقع في الخادم."),
 
 
-
-
-
-
-
-
-
-
+            ["InvalidUserId"] = ("Invalid user ID.", "معرف المستخدم غير صالح."),
+            ["UserNotFound"] = ("User not found.", "المستخدم غير موجود."),
+            ["Success"] = ("Operation completed successfully.", "تمت العملية بنجاح."),
+            ["UserDetailsUpdated"] = ("User details updated successfully.", "تم تحديث تفاصيل المستخدم بنجاح."),
+            ["UserDeleted"] = ("User deleted successfully.", "تم حذف المستخدم بنجاح."),
 
         };
 

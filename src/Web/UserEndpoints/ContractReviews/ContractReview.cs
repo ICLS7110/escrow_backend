@@ -1,4 +1,5 @@
-﻿using Escrow.Api.Application.Common.Models;
+﻿using Escrow.Api.Application.Common.Constants;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.ContractReviews.Command;
 using Escrow.Api.Application.ContractReviews.Queries;
 using Escrow.Api.Application.DTOs;
@@ -25,26 +26,29 @@ public class ContractReview : EndpointGroupBase
         httpContextAccessor.HttpContext?.User.IsInRole(nameof(Roles.Admin)) ?? false;
 
     [Authorize]
-    public async Task<IResult> GetReviews(ISender sender)
+    public async Task<IResult> GetReviews(ISender sender, IHttpContextAccessor httpContextAccessor)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(new GetContractReviewsQuery());
 
         if (result == null || result.Data == null)
-            return TypedResults.NotFound(Result<IEnumerable<ContractReviewDTO>>.Failure(StatusCodes.Status404NotFound, "No reviews found."));
+            return TypedResults.NotFound(Result<IEnumerable<ContractReviewDTO>>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("NoReviewsFound", language)));
 
         return TypedResults.Ok(result);
     }
 
     [Authorize]
-    public async Task<IResult> CreateReview(ISender sender, CreateContractReviewCommand command)
+    public async Task<IResult> CreateReview(ISender sender, IHttpContextAccessor httpContextAccessor, CreateContractReviewCommand command)
     {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(command);
 
-
         if (result == null)
-            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Failed to create review."));
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, AppMessages.Get("ReviewCreationFailed", language)));
 
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Review created successfully.", new()));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ReviewCreatedSuccessfully", language), new()));
     }
 
     [Authorize]
@@ -53,11 +57,67 @@ public class ContractReview : EndpointGroupBase
         if (!IsAdmin(httpContextAccessor))
             return TypedResults.Forbid();
 
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
         var result = await sender.Send(command);
 
         if (result == null)
-            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Review update failed."));
+            return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("ReviewUpdateFailed", language)));
 
-        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Review updated successfully.", new()));
+        return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("ReviewUpdatedSuccessfully", language), new()));
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //[Authorize]
+    //public async Task<IResult> GetReviews(ISender sender)
+    //{
+    //    var result = await sender.Send(new GetContractReviewsQuery());
+
+    //    if (result == null || result.Data == null)
+    //        return TypedResults.NotFound(Result<IEnumerable<ContractReviewDTO>>.Failure(StatusCodes.Status404NotFound, "No reviews found."));
+
+    //    return TypedResults.Ok(result);
+    //}
+
+    //[Authorize]
+    //public async Task<IResult> CreateReview(ISender sender, CreateContractReviewCommand command)
+    //{
+    //    var result = await sender.Send(command);
+
+
+    //    if (result == null)
+    //        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Failed to create review."));
+
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Review created successfully.", new()));
+    //}
+
+    //[Authorize]
+    //public async Task<IResult> UpdateReview(ISender sender, IHttpContextAccessor httpContextAccessor, UpdateContractReviewCommand command)
+    //{
+    //    if (!IsAdmin(httpContextAccessor))
+    //        return TypedResults.Forbid();
+
+    //    var result = await sender.Send(command);
+
+    //    if (result == null)
+    //        return TypedResults.NotFound(Result<object>.Failure(StatusCodes.Status404NotFound, "Review update failed."));
+
+    //    return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, "Review updated successfully.", new()));
+    //}
 }
