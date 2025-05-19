@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 
 
@@ -175,6 +176,13 @@ builder.Services.Configure<FormOptions>(options =>
 
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/app-log.txt", rollingInterval: RollingInterval.Day) // Daily file logs
+    .CreateLogger();
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 app.UseCors("AllowAll");

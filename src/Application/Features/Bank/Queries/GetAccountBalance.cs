@@ -27,6 +27,6 @@ public class GetAccountBalanceHandler : IRequestHandler<GetAccountBalanceQuery, 
 
     public async Task<string> Handle(GetAccountBalanceQuery request, CancellationToken cancellationToken)
     {
-        return await _anbService.GetAccountBalanceAsync(request.AccountNumber);
+        return await _anbService.GetAccountVerificationStatusAsync(request.AccountNumber);
     }
 }

@@ -43,7 +43,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
             var activeStatuses = new List<string> { nameof(ContractStatus.Accepted), nameof(ContractStatus.Escrow), nameof(ContractStatus.Pending) };
             var inactiveStatuses = new List<string> { nameof(ContractStatus.Rejected), nameof(ContractStatus.Expired), nameof(ContractStatus.Draft), nameof(ContractStatus.Completed), nameof(ContractStatus.Cancelled) };
             var query = _context.ContractDetails.AsQueryable();
-
+            
             // User-specific filtering
             if (request.UserId.HasValue)
             {
@@ -71,14 +71,18 @@ namespace Escrow.Api.Application.ContractPanel.ContractQueries
 
             // Fetch related dispute data
 
-            if (request.Status.ToString() == nameof(ContractStatus.Completed))
+            if (request.Status.HasValue)
             {
-                query = query.Where(c => c.Status == nameof(ContractStatus.Completed) || c.Status == nameof(ContractStatus.Released));
+                if (request.Status == ContractStatus.Completed)
+                {
+                    query = query.Where(c => c.Status == ContractStatus.Completed.ToString() || c.Status == ContractStatus.Released.ToString());
+                }
+                else
+                {
+                    query = query.Where(c => c.Status == request.Status.ToString());
+                }
             }
-            else if (Enum.TryParse<ContractStatus>(request.Status.ToString(), out var status))
-            {
-                query = query.Where(c => c.Status == nameof(status));
-            }
+
 
             //if (request.Status.HasValue)
             //    query = query.Where(c => c.Status == (request.Status.ToString() == nameof(ContractStatus.Completed) ? );

@@ -1,4 +1,5 @@
 ﻿using Escrow.Api.Application.Common.Interfaces;
+using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.Features.Bank.Queries;
 using Escrow.Api.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,11 +27,18 @@ public class AnbController : ControllerBase
     }
 
     [HttpPost("verify-account")]
-    public async Task<IActionResult> VerifyAccount([FromBody] string accountNumber)
+    public async Task<IActionResult> VerifyAccount([FromBody] VerifyAccountRequest request)
     {
-        var isValid = await _anbService.VerifyAccountAsync(accountNumber);
-        return Ok(new { isValid });
+        if (request == null || string.IsNullOrWhiteSpace(request.Iban) ||
+            string.IsNullOrWhiteSpace(request.NationalId) || string.IsNullOrWhiteSpace(request.DestinationBankBIC))
+        {
+            return BadRequest("All fields are required: iban, nationalId, and destinationBankBIC.");
+        }
+
+        var account = await _anbService.VerifyAccountAsync(request);
+        return Ok(new { account });
     }
+
 
     [HttpGet("token")]
     public async Task<IActionResult> GetToken()
