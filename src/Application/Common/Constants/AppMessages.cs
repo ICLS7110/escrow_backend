@@ -470,6 +470,10 @@ namespace Escrow.Api.Application.Common.Constants
             ["CommissionSetAsGlobal"] = ("Commission has been set as global.", "تم تعيين العمولة كعامة."),
 
 
+            ["TransactionTypeCommissionExists"] = ("A commission for this transaction type already exists.", "العمولة لنوع المعاملة هذا موجودة بالفعل."),
+            ["CommissionCreated"] = ("Commission created successfully.", "تم إنشاء العمولة بنجاح."),
+            ["AtLeastOneGlobalCommissionRequired"] = ("At least one global commission setting is required.", "مطلوب إعداد عمولة عامة واحدة على الأقل."),
+            ["CommissionUpdated"] = ("Commission updated successfully.", "تم تحديث العمولة بنجاح.")
 
 
 
