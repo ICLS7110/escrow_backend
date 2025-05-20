@@ -41,7 +41,6 @@ public class Contract : EndpointGroupBase
     private bool IsAdmin(IHttpContextAccessor httpContextAccessor) =>
         httpContextAccessor.HttpContext?.User.IsInRole(nameof(Roles.Admin)) ?? false;
 
-
     [Authorize]
     public async Task<IResult> GetContractDetails(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, int? contractId)
     {
@@ -234,7 +233,6 @@ public class Contract : EndpointGroupBase
         var successMessage = AppMessages.Get("ContractModified", language);
         return TypedResults.Ok(Result<object>.Success(StatusCodes.Status200OK, successMessage, new()));
     }
-
 
     //    [Authorize]
     //    public async Task<IResult> GetContractDetails(ISender sender, IJwtService jwtService, IHttpContextAccessor httpContextAccessor, int? contractId)

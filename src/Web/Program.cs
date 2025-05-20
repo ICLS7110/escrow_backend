@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
@@ -165,6 +166,18 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(GetAccountBalanceHandler).Assembly);
 });
+var baseUrl = builder.Configuration["MyFatoorah:BaseUrl"]
+              ?? throw new InvalidOperationException("MyFatoorah BaseUrl is not configured.");
+
+builder.Services.AddHttpClient<IMyFatoorahService, MyFatoorahService>(client =>
+{
+    client.BaseAddress = new Uri(baseUrl);
+});
+
+
+
+
+builder.Services.AddScoped<IMyFatoorahService, MyFatoorahService>();
 
 
 

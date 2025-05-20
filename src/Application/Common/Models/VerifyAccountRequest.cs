@@ -10,7 +10,6 @@ public class VerifyAccountRequest
     public string? Iban { get; set; }
     public string? NationalId { get; set; }
     public string? DestinationBankBIC { get; set; }
-    public string? AuthToken { get; set; }
 
 }
 

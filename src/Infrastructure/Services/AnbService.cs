@@ -29,8 +29,6 @@ public class AnbService : IAnbService
         _logger = logger;
     }
 
-
-
     public class AnbTokenResponse
     {
         [JsonPropertyName("token_type")]

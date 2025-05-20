@@ -38,10 +38,10 @@
                 .Where(u => u.PhoneNumber == request.CountryCode + request.MobileNumber && u.Role == nameof(Roles.User))
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (user == null)
-                return Result<string>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("InvalidMobileNumber", language));
+            //if (user == null)
+            //    return Result<string>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("InvalidMobileNumber", language));
 
-            if (user.IsActive == false)
+            if (user != null && user.IsActive == false)
                 return Result<string>.Failure(StatusCodes.Status403Forbidden, AppMessages.Get("PleaseContactAdministrator", language));
 
             var isValid = await _otpManagerService.RequestOtpAsync(request.CountryCode, request.MobileNumber);

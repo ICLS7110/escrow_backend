@@ -23,6 +23,11 @@ public class CommissionMaster : EndpointGroupBase
 
         userGroup.MapPost("/upsert", UpsertCommissionRate)
             .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User)));
+
+        userGroup.MapPut("/set-global", SetCommissionAsGlobal)
+    .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin)));
+
+
     }
 
     private bool IsAdmin(IHttpContextAccessor httpContextAccessor) =>
@@ -34,11 +39,11 @@ public class CommissionMaster : EndpointGroupBase
     public async Task<IResult> GetCommissionRate(
     [FromServices] ISender sender,
     [FromServices] IHttpContextAccessor httpContextAccessor,
-    [FromQuery] int? id, [FromQuery] bool? isGloballyApplied)
+    [FromQuery] int? id, [FromQuery] bool? isGloballyApplied, [FromQuery] string? transactionType)
     {
         var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
-        var result = await sender.Send(new GetCommissionRateQuery { Id = id, IsGloballyApplied = isGloballyApplied });
+        var result = await sender.Send(new GetCommissionRateQuery { Id = id, IsGloballyApplied = isGloballyApplied, TransactionType = transactionType });
 
         if (result?.Data == null || !result.Data.Any())
         {
@@ -75,42 +80,68 @@ public class CommissionMaster : EndpointGroupBase
 
 
 
-    //public async Task<IResult> GetCommissionRate([FromServices] ISender sender, [FromQuery] int? id)
-    //{
-    //    var result = await sender.Send(new GetCommissionRateQuery { Id = id });
+    [Authorize]
+    public async Task<IResult> SetCommissionAsGlobal(
+    [FromServices] ISender sender,
+    [FromServices] IHttpContextAccessor httpContextAccessor,
+    [FromBody] SetCommissionAsGlobalCommand command)
+    {
+        var language = httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
-    //    if (result?.Data == null || !result.Data.Any())
-    //    {
-    //        return TypedResults.NotFound(Result<List<CommissionDTO>>.Failure(
-    //            StatusCodes.Status404NotFound, "No commission data found."));
-    //    }
+        if (!IsAdmin(httpContextAccessor))
+            return TypedResults.Forbid();
 
-    //    return TypedResults.Ok(result);
-    //}
+        var result = await sender.Send(command);
 
-    //public async Task<IResult> UpsertCommissionRate(
-    //    [FromServices] ISender sender,
-    //    [FromServices] IHttpContextAccessor httpContextAccessor,
-    //    [FromBody] UpsertCommissionRateCommand command)
-    //{
+        if (result.Status == StatusCodes.Status404NotFound)
+        {
+            return TypedResults.NotFound(result);
+        }
 
-    //    if (!IsAdmin(httpContextAccessor))
-    //        return TypedResults.Forbid();
+        if (result.Status == StatusCodes.Status400BadRequest)
+        {
+            return TypedResults.BadRequest(result);
+        }
 
-    //    var result = await sender.Send(command);
+        return TypedResults.Ok(result);
+    }
 
-    //    if (result.Status == StatusCodes.Status400BadRequest)
-    //    {
-    //        return TypedResults.BadRequest(Result<object>.Failure(
-    //            StatusCodes.Status400BadRequest, result.Message ?? "Commission rate upsert failed."));
-    //    }
 
-    //    return TypedResults.Ok(result);
-    //}
 }
 
 
+//public async Task<IResult> GetCommissionRate([FromServices] ISender sender, [FromQuery] int? id)
+//{
+//    var result = await sender.Send(new GetCommissionRateQuery { Id = id });
 
+//    if (result?.Data == null || !result.Data.Any())
+//    {
+//        return TypedResults.NotFound(Result<List<CommissionDTO>>.Failure(
+//            StatusCodes.Status404NotFound, "No commission data found."));
+//    }
+
+//    return TypedResults.Ok(result);
+//}
+
+//public async Task<IResult> UpsertCommissionRate(
+//    [FromServices] ISender sender,
+//    [FromServices] IHttpContextAccessor httpContextAccessor,
+//    [FromBody] UpsertCommissionRateCommand command)
+//{
+
+//    if (!IsAdmin(httpContextAccessor))
+//        return TypedResults.Forbid();
+
+//    var result = await sender.Send(command);
+
+//    if (result.Status == StatusCodes.Status400BadRequest)
+//    {
+//        return TypedResults.BadRequest(Result<object>.Failure(
+//            StatusCodes.Status400BadRequest, result.Message ?? "Commission rate upsert failed."));
+//    }
+
+//    return TypedResults.Ok(result);
+//}
 
 
 

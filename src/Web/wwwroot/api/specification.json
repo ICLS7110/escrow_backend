@@ -1765,6 +1765,143 @@
         ]
       }
     },
+    "/api/Payment/initiate": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "PostApiPaymentInitiate",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiatePaymentCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Payment/execute": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "PostApiPaymentExecute",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutePaymentCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Payment/callback": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "GetApiPaymentCallback",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Payment/error": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "GetApiPaymentError",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Payment/status": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "PostApiPaymentStatus",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPaymentStatusCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/Payment/refund": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "operationId": "PostApiPaymentRefund",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundPaymentCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/Pages": {
       "get": {
         "tags": [
@@ -2444,6 +2581,15 @@
               "nullable": true
             },
             "x-position": 2
+          },
+          {
+            "name": "transactionType",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
           }
         ],
         "responses": {
@@ -2470,6 +2616,36 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpsertCommissionRateCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/CommissionMaster/set-global": {
+      "put": {
+        "tags": [
+          "CommissionMaster"
+        ],
+        "operationId": "PutApiCommissionMasterSetGlobal",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetCommissionAsGlobalCommand"
               }
             }
           },
@@ -4898,6 +5074,77 @@
           }
         }
       },
+      "InitiatePaymentCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "invoiceAmount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "currencyIso": {
+            "type": "string"
+          }
+        }
+      },
+      "ExecutePaymentCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "paymentMethodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "invoiceAmount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "currencyIso": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string"
+          },
+          "customerMobile": {
+            "type": "string"
+          }
+        }
+      },
+      "GetPaymentStatusCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "keyType": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundPaymentCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "keyType": {
+            "type": "string"
+          },
+          "refundAmount": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "UpdatePagesCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -5211,6 +5458,16 @@
           "taxRate": {
             "type": "number",
             "format": "decimal"
+          }
+        }
+      },
+      "SetCommissionAsGlobalCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

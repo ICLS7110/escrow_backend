@@ -466,6 +466,9 @@ namespace Escrow.Api.Application.Common.Constants
             ["CommissionUpdated"] = ("Commission updated successfully.", "تم تحديث العمولة بنجاح."),
 
 
+            ["CommissionNotFound"] = ("Commission not found.", "العمولة غير موجودة."),
+            ["CommissionSetAsGlobal"] = ("Commission has been set as global.", "تم تعيين العمولة كعامة."),
+
 
 
 

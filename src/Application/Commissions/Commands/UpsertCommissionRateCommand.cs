@@ -53,6 +53,14 @@ namespace Escrow.Api.Application.Commissions.Commands
 
     }
 
+
+
+
+
+
+
+
+
     public class UpsertCommissionRateCommandHandler : IRequestHandler<UpsertCommissionRateCommand, Result<object>>
     {
         private readonly IApplicationDbContext _context;
@@ -64,14 +72,13 @@ namespace Escrow.Api.Application.Commissions.Commands
             _httpContextAccessor = httpContextAccessor;
         }
 
-
         public async Task<Result<object>> Handle(UpsertCommissionRateCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
-                // Check if a commission already exists for the same TransactionType
+                // Check if a commission already exists for the same TransactionType (except for the current one)
                 var existingTransactionTypeCommission = await _context.CommissionMasters
                     .Where(x => x.TransactionType == request.TransactionType && x.Id != request.Id)
                     .FirstOrDefaultAsync(cancellationToken);
@@ -79,10 +86,10 @@ namespace Escrow.Api.Application.Commissions.Commands
                 if (existingTransactionTypeCommission != null)
                 {
                     return Result<object>.Failure(StatusCodes.Status400BadRequest,
-                        AppMessages.Get("TransactionTypeCommissionExists", language)); // Add this to LanguageMessageHelper
+                        AppMessages.Get("TransactionTypeCommissionExists", language));
                 }
 
-                // Ensure only one global commission can exist
+                // If the request sets AppliedGlobally = true, then unset any existing global commission
                 if (request.AppliedGlobally)
                 {
                     var existingGlobalCommission = await _context.CommissionMasters
@@ -91,8 +98,8 @@ namespace Escrow.Api.Application.Commissions.Commands
 
                     if (existingGlobalCommission != null)
                     {
-                        return Result<object>.Failure(StatusCodes.Status400BadRequest,
-                            AppMessages.Get("GlobalCommissionExists", language));
+                        existingGlobalCommission.AppliedGlobally = false;
+                        existingGlobalCommission.LastModified = DateTime.UtcNow;
                     }
                 }
 
@@ -120,7 +127,7 @@ namespace Escrow.Api.Application.Commissions.Commands
                 }
                 else
                 {
-                    // Check if we are trying to unset the only global commission
+                    // Prevent unsetting the only global commission
                     if (commission.AppliedGlobally && !request.AppliedGlobally)
                     {
                         var otherGlobalExists = await _context.CommissionMasters
@@ -151,180 +158,290 @@ namespace Escrow.Api.Application.Commissions.Commands
                 return Result<object>.Failure(StatusCodes.Status500InternalServerError, $"Unexpected error: {ex.Message}");
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public async Task<Result<object>> Handle(UpsertCommissionRateCommand request, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
-
-        //        if (request.AppliedGlobally)
-        //        {
-        //            var existingGlobalCommission = await _context.CommissionMasters
-        //                .Where(x => x.AppliedGlobally && x.Id != request.Id)
-        //                .FirstOrDefaultAsync(cancellationToken);
-
-        //            if (existingGlobalCommission != null)
-        //            {
-        //                return Result<object>.Failure(StatusCodes.Status400BadRequest,
-        //                    AppMessages.Get("GlobalCommissionExists", language));
-        //            }
-        //        }
-
-        //        var commission = await _context.CommissionMasters.FindAsync(new object[] { request.Id }, cancellationToken);
-
-        //        if (commission == null)
-        //        {
-        //            // Insert logic
-        //            var newCommission = new CommissionMaster
-        //            {
-        //                Id = request.Id,
-        //                CommissionRate = request.CommissionRate,
-        //                AppliedGlobally = request.AppliedGlobally,
-        //                TransactionType = request.TransactionType,
-        //                TaxRate = request.TaxRate,
-        //                MinAmount = request.MinAmount?.ToString(),
-        //                Created = DateTime.UtcNow,
-        //                LastModified = DateTime.UtcNow
-        //            };
-
-        //            _context.CommissionMasters.Add(newCommission);
-        //            await _context.SaveChangesAsync(cancellationToken);
-
-        //            return Result<object>.Success(StatusCodes.Status201Created, AppMessages.Get("CommissionCreated", language), newCommission);
-        //        }
-        //        else
-        //        {
-        //            // Check if we are trying to unset the only global commission
-        //            if (commission.AppliedGlobally && !request.AppliedGlobally)
-        //            {
-        //                var otherGlobalExists = await _context.CommissionMasters
-        //                    .AnyAsync(x => x.AppliedGlobally && x.Id != request.Id, cancellationToken);
-
-        //                if (!otherGlobalExists)
-        //                {
-        //                    return Result<object>.Failure(StatusCodes.Status400BadRequest,
-        //                        AppMessages.Get("AtLeastOneGlobalCommissionRequired", language)); // Define this key
-        //                }
-        //            }
-
-        //            // Update logic
-        //            commission.CommissionRate = request.CommissionRate;
-        //            commission.AppliedGlobally = request.AppliedGlobally;
-        //            commission.TransactionType = request.TransactionType;
-        //            commission.TaxRate = request.TaxRate;
-        //            commission.MinAmount = request.MinAmount?.ToString();
-        //            commission.LastModified = DateTime.UtcNow;
-
-        //            await _context.SaveChangesAsync(cancellationToken);
-
-        //            return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("CommissionUpdated", language), commission);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Result<object>.Failure(StatusCodes.Status500InternalServerError, $"Unexpected error: {ex.Message}");
-        //    }
-        //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public async Task<Result<object>> Handle(UpsertCommissionRateCommand request, CancellationToken cancellationToken)
-        //{
-        //    try
-        //    {
-        //        // Get current language from the HttpContext
-        //        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
-
-        //        if (request.AppliedGlobally)
-        //        {
-        //            var existingGlobalCommission = await _context.CommissionMasters
-        //                .Where(x => x.AppliedGlobally && x.Id != request.Id)
-        //                .FirstOrDefaultAsync(cancellationToken);
-
-        //            if (existingGlobalCommission != null)
-        //            {
-        //                return Result<object>.Failure(StatusCodes.Status400BadRequest,
-        //                    AppMessages.Get("GlobalCommissionExists", language)); // Define this key in your LanguageMessageHelper
-        //            }
-        //        }
-
-
-        //        var commission = await _context.CommissionMasters.FindAsync(new object[] { request.Id }, cancellationToken);
-
-        //        if (commission == null)
-        //        {
-        //            // Insert logic (Upsert)
-        //            var newCommission = new CommissionMaster
-        //            {
-        //                Id = request.Id,
-        //                CommissionRate = request.CommissionRate,
-        //                AppliedGlobally = request.AppliedGlobally,
-        //                TransactionType = request.TransactionType,
-        //                TaxRate = request.TaxRate,
-        //                MinAmount = request.MinAmount?.ToString(),
-        //                Created = DateTime.UtcNow,
-        //                LastModified = DateTime.UtcNow
-        //            };
-
-        //            _context.CommissionMasters.Add(newCommission);
-        //            await _context.SaveChangesAsync(cancellationToken);
-
-        //            return Result<object>.Success(StatusCodes.Status201Created, AppMessages.Get("CommissionCreated", language), newCommission);
-        //        }
-        //        else
-        //        {
-        //            // Update logic
-        //            commission.CommissionRate = request.CommissionRate;
-        //            commission.AppliedGlobally = request.AppliedGlobally;
-        //            commission.TransactionType = request.TransactionType;
-        //            commission.TaxRate = request.TaxRate;
-        //            commission.MinAmount = request.MinAmount?.ToString();
-        //            commission.LastModified = DateTime.UtcNow;
-
-        //            await _context.SaveChangesAsync(cancellationToken);
-
-        //            return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("CommissionUpdated", language), commission);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle exception
-        //        return Result<object>.Failure(StatusCodes.Status500InternalServerError, $"Unexpected error: {ex.Message}");
-        //    }
-        //}
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+//public class UpsertCommissionRateCommandHandler : IRequestHandler<UpsertCommissionRateCommand, Result<object>>
+//{
+//    private readonly IApplicationDbContext _context;
+//    private readonly IHttpContextAccessor _httpContextAccessor;
+
+//    public UpsertCommissionRateCommandHandler(IApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+//    {
+//        _context = context;
+//        _httpContextAccessor = httpContextAccessor;
+//    }
+
+
+//    public async Task<Result<object>> Handle(UpsertCommissionRateCommand request, CancellationToken cancellationToken)
+//    {
+//        try
+//        {
+//            var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+//            // Check if a commission already exists for the same TransactionType
+//            var existingTransactionTypeCommission = await _context.CommissionMasters
+//                .Where(x => x.TransactionType == request.TransactionType && x.Id != request.Id)
+//                .FirstOrDefaultAsync(cancellationToken);
+
+//            if (existingTransactionTypeCommission != null)
+//            {
+//                return Result<object>.Failure(StatusCodes.Status400BadRequest,
+//                    AppMessages.Get("TransactionTypeCommissionExists", language)); // Add this to LanguageMessageHelper
+//            }
+
+//            // Ensure only one global commission can exist
+//            if (request.AppliedGlobally)
+//            {
+//                var existingGlobalCommission = await _context.CommissionMasters
+//                    .Where(x => x.AppliedGlobally && x.Id != request.Id)
+//                    .FirstOrDefaultAsync(cancellationToken);
+
+//                if (existingGlobalCommission != null)
+//                {
+//                    return Result<object>.Failure(StatusCodes.Status400BadRequest,
+//                        AppMessages.Get("GlobalCommissionExists", language));
+//                }
+//            }
+
+//            var commission = await _context.CommissionMasters.FindAsync(new object[] { request.Id }, cancellationToken);
+
+//            if (commission == null)
+//            {
+//                // Insert logic
+//                var newCommission = new CommissionMaster
+//                {
+//                    Id = request.Id,
+//                    CommissionRate = request.CommissionRate,
+//                    AppliedGlobally = request.AppliedGlobally,
+//                    TransactionType = request.TransactionType,
+//                    TaxRate = request.TaxRate,
+//                    MinAmount = request.MinAmount?.ToString(),
+//                    Created = DateTime.UtcNow,
+//                    LastModified = DateTime.UtcNow
+//                };
+
+//                _context.CommissionMasters.Add(newCommission);
+//                await _context.SaveChangesAsync(cancellationToken);
+
+//                return Result<object>.Success(StatusCodes.Status201Created, AppMessages.Get("CommissionCreated", language), newCommission);
+//            }
+//            else
+//            {
+//                // Check if we are trying to unset the only global commission
+//                if (commission.AppliedGlobally && !request.AppliedGlobally)
+//                {
+//                    var otherGlobalExists = await _context.CommissionMasters
+//                        .AnyAsync(x => x.AppliedGlobally && x.Id != request.Id, cancellationToken);
+
+//                    if (!otherGlobalExists)
+//                    {
+//                        return Result<object>.Failure(StatusCodes.Status400BadRequest,
+//                            AppMessages.Get("AtLeastOneGlobalCommissionRequired", language));
+//                    }
+//                }
+
+//                // Update logic
+//                commission.CommissionRate = request.CommissionRate;
+//                commission.AppliedGlobally = request.AppliedGlobally;
+//                commission.TransactionType = request.TransactionType;
+//                commission.TaxRate = request.TaxRate;
+//                commission.MinAmount = request.MinAmount?.ToString();
+//                commission.LastModified = DateTime.UtcNow;
+
+//                await _context.SaveChangesAsync(cancellationToken);
+
+//                return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("CommissionUpdated", language), commission);
+//            }
+//        }
+//        catch (Exception ex)
+//        {
+//            return Result<object>.Failure(StatusCodes.Status500InternalServerError, $"Unexpected error: {ex.Message}");
+//        }
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//public async Task<Result<object>> Handle(UpsertCommissionRateCommand request, CancellationToken cancellationToken)
+//{
+//    try
+//    {
+//        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+//        if (request.AppliedGlobally)
+//        {
+//            var existingGlobalCommission = await _context.CommissionMasters
+//                .Where(x => x.AppliedGlobally && x.Id != request.Id)
+//                .FirstOrDefaultAsync(cancellationToken);
+
+//            if (existingGlobalCommission != null)
+//            {
+//                return Result<object>.Failure(StatusCodes.Status400BadRequest,
+//                    AppMessages.Get("GlobalCommissionExists", language));
+//            }
+//        }
+
+//        var commission = await _context.CommissionMasters.FindAsync(new object[] { request.Id }, cancellationToken);
+
+//        if (commission == null)
+//        {
+//            // Insert logic
+//            var newCommission = new CommissionMaster
+//            {
+//                Id = request.Id,
+//                CommissionRate = request.CommissionRate,
+//                AppliedGlobally = request.AppliedGlobally,
+//                TransactionType = request.TransactionType,
+//                TaxRate = request.TaxRate,
+//                MinAmount = request.MinAmount?.ToString(),
+//                Created = DateTime.UtcNow,
+//                LastModified = DateTime.UtcNow
+//            };
+
+//            _context.CommissionMasters.Add(newCommission);
+//            await _context.SaveChangesAsync(cancellationToken);
+
+//            return Result<object>.Success(StatusCodes.Status201Created, AppMessages.Get("CommissionCreated", language), newCommission);
+//        }
+//        else
+//        {
+//            // Check if we are trying to unset the only global commission
+//            if (commission.AppliedGlobally && !request.AppliedGlobally)
+//            {
+//                var otherGlobalExists = await _context.CommissionMasters
+//                    .AnyAsync(x => x.AppliedGlobally && x.Id != request.Id, cancellationToken);
+
+//                if (!otherGlobalExists)
+//                {
+//                    return Result<object>.Failure(StatusCodes.Status400BadRequest,
+//                        AppMessages.Get("AtLeastOneGlobalCommissionRequired", language)); // Define this key
+//                }
+//            }
+
+//            // Update logic
+//            commission.CommissionRate = request.CommissionRate;
+//            commission.AppliedGlobally = request.AppliedGlobally;
+//            commission.TransactionType = request.TransactionType;
+//            commission.TaxRate = request.TaxRate;
+//            commission.MinAmount = request.MinAmount?.ToString();
+//            commission.LastModified = DateTime.UtcNow;
+
+//            await _context.SaveChangesAsync(cancellationToken);
+
+//            return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("CommissionUpdated", language), commission);
+//        }
+//    }
+//    catch (Exception ex)
+//    {
+//        return Result<object>.Failure(StatusCodes.Status500InternalServerError, $"Unexpected error: {ex.Message}");
+//    }
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//public async Task<Result<object>> Handle(UpsertCommissionRateCommand request, CancellationToken cancellationToken)
+//{
+//    try
+//    {
+//        // Get current language from the HttpContext
+//        var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+
+//        if (request.AppliedGlobally)
+//        {
+//            var existingGlobalCommission = await _context.CommissionMasters
+//                .Where(x => x.AppliedGlobally && x.Id != request.Id)
+//                .FirstOrDefaultAsync(cancellationToken);
+
+//            if (existingGlobalCommission != null)
+//            {
+//                return Result<object>.Failure(StatusCodes.Status400BadRequest,
+//                    AppMessages.Get("GlobalCommissionExists", language)); // Define this key in your LanguageMessageHelper
+//            }
+//        }
+
+
+//        var commission = await _context.CommissionMasters.FindAsync(new object[] { request.Id }, cancellationToken);
+
+//        if (commission == null)
+//        {
+//            // Insert logic (Upsert)
+//            var newCommission = new CommissionMaster
+//            {
+//                Id = request.Id,
+//                CommissionRate = request.CommissionRate,
+//                AppliedGlobally = request.AppliedGlobally,
+//                TransactionType = request.TransactionType,
+//                TaxRate = request.TaxRate,
+//                MinAmount = request.MinAmount?.ToString(),
+//                Created = DateTime.UtcNow,
+//                LastModified = DateTime.UtcNow
+//            };
+
+//            _context.CommissionMasters.Add(newCommission);
+//            await _context.SaveChangesAsync(cancellationToken);
+
+//            return Result<object>.Success(StatusCodes.Status201Created, AppMessages.Get("CommissionCreated", language), newCommission);
+//        }
+//        else
+//        {
+//            // Update logic
+//            commission.CommissionRate = request.CommissionRate;
+//            commission.AppliedGlobally = request.AppliedGlobally;
+//            commission.TransactionType = request.TransactionType;
+//            commission.TaxRate = request.TaxRate;
+//            commission.MinAmount = request.MinAmount?.ToString();
+//            commission.LastModified = DateTime.UtcNow;
+
+//            await _context.SaveChangesAsync(cancellationToken);
+
+//            return Result<object>.Success(StatusCodes.Status200OK, AppMessages.Get("CommissionUpdated", language), commission);
+//        }
+//    }
+//    catch (Exception ex)
+//    {
+//        // Handle exception
+//        return Result<object>.Failure(StatusCodes.Status500InternalServerError, $"Unexpected error: {ex.Message}");
+//    }
+//}
+
 
 
 
