@@ -1,17 +1,8 @@
-﻿
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Escrow.Api.Application.Common.Constants;
+﻿using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
-using Escrow.Api.Application.Common.Models;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Domain.Entities.ContractPanel;
-using Escrow.Api.Domain.Entities.UserPanel;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands
 {
@@ -54,11 +45,49 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
 
             var entity = await _context.ContractDetails
-                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserDetailId == userid, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (entity == null)
             {
                 return Result<int>.Failure(StatusCodes.Status404NotFound, AppMessages.Get("ContractNotFound", language));
+            }
+            var commission = await _context.CommissionMasters
+               .Where(c => c.AppliedGlobally == true)
+               .OrderByDescending(c => c.Id)
+               .FirstOrDefaultAsync(cancellationToken);
+
+            decimal feeAmount = request.FeeAmount ?? 0;
+            decimal escrowTax = commission?.CommissionRate ?? 0;
+            decimal taxRate = commission?.TaxRate ?? 0;
+            decimal escrowAmount = 0;
+            decimal taxAmount = 0;
+            decimal buyerPayableAmount = 0;
+            decimal sellerPayableAmount = 0;
+
+            switch (request.FeesPaidBy.ToLower())
+            {
+                case "buyer":
+                    escrowAmount = (feeAmount * escrowTax) / 100;
+                    taxAmount = (escrowAmount * taxRate) / 100;
+                    buyerPayableAmount = feeAmount + escrowAmount + taxAmount;
+                    sellerPayableAmount = feeAmount;
+                    break;
+                case "seller":
+                    escrowAmount = (feeAmount * escrowTax) / 100;
+                    taxAmount = (escrowAmount * taxRate) / 100;
+                    sellerPayableAmount = feeAmount - taxAmount - escrowAmount;
+                    buyerPayableAmount = feeAmount;
+                    break;
+                case "50":
+                case "halfpayment":
+
+                    escrowAmount = (feeAmount * escrowTax) / 100;
+                    taxAmount = (escrowAmount * taxRate) / 100;
+                    escrowAmount /= 2;
+                    taxAmount /= 2;
+                    buyerPayableAmount = feeAmount + (taxAmount) + (escrowAmount);
+                    sellerPayableAmount = feeAmount - (taxAmount) - (escrowAmount);
+                    break;
             }
 
             // Capture the old data snapshot as JSON
@@ -84,12 +113,16 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
 
             // Update entity
             entity.Role = request.Role;
+            entity.TaxAmount = taxAmount;
+            entity.EscrowTax = escrowAmount;
+            entity.BuyerPayableAmount = $"{buyerPayableAmount}";
+            entity.SellerPayableAmount = $"{sellerPayableAmount}";
             entity.ContractTitle = request.ContractTitle;
             entity.ServiceType = request.ServiceType;
             entity.ServiceDescription = request.ServiceDescription;
             entity.AdditionalNote = request.AdditionalNote;
             entity.FeesPaidBy = request.FeesPaidBy;
-            entity.FeeAmount = request.FeeAmount;
+            entity.FeeAmount = feeAmount;
             entity.BuyerName = request.BuyerName;
             entity.BuyerMobile = request.BuyerMobile;
             entity.SellerMobile = request.SellerMobile;
