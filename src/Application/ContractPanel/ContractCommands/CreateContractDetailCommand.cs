@@ -1,16 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Domain.Entities.ContractPanel;
 using Escrow.Api.Domain.Enums;
-using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using Escrow.Api.Application.DTOs;
 
 namespace Escrow.Api.Application.ContractPanel.ContractCommands
 {
@@ -51,7 +44,7 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
         }
 
         public async Task<int> Handle(CreateContractDetailCommand request, CancellationToken cancellationToken)
-{
+        {
 
 
 
@@ -112,25 +105,34 @@ namespace Escrow.Api.Application.ContractPanel.ContractCommands
             decimal feeAmount = request.FeeAmount ?? 0;
             decimal escrowTax = commission?.CommissionRate ?? 0;
             decimal taxRate = commission?.TaxRate ?? 0;
-            decimal escrowAmount = (feeAmount * escrowTax) / 100;
-            decimal taxAmount = (escrowAmount * taxRate) / 100;
+            decimal escrowAmount = 0;
+            decimal taxAmount = 0;
             decimal buyerPayableAmount = 0;
             decimal sellerPayableAmount = 0;
 
             switch (request.FeesPaidBy.ToLower())
             {
                 case "buyer":
+                    escrowAmount = (feeAmount * escrowTax) / 100;
+                    taxAmount = (escrowAmount * taxRate) / 100;
                     buyerPayableAmount = feeAmount + escrowAmount + taxAmount;
                     sellerPayableAmount = feeAmount;
                     break;
                 case "seller":
+                    escrowAmount = (feeAmount * escrowTax) / 100;
+                    taxAmount = (escrowAmount * taxRate) / 100;
                     sellerPayableAmount = feeAmount - taxAmount - escrowAmount;
                     buyerPayableAmount = feeAmount;
                     break;
                 case "50":
                 case "halfpayment":
-                    buyerPayableAmount = feeAmount + (taxAmount / 2) + (escrowAmount / 2);
-                    sellerPayableAmount = feeAmount - (taxAmount / 2) - (escrowAmount / 2);
+
+                    escrowAmount = (feeAmount * escrowTax) / 100;
+                    taxAmount = (escrowAmount * taxRate) / 100;
+                    escrowAmount /= 2;
+                    taxAmount /= 2;
+                    buyerPayableAmount = feeAmount + (taxAmount) + (escrowAmount);
+                    sellerPayableAmount = feeAmount - (taxAmount) - (escrowAmount);
                     break;
             }
 
