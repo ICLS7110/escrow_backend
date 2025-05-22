@@ -12,6 +12,7 @@ using Escrow.Api.Application.UserPanel.Commands.UpdateUser;
 using Escrow.Api.Application.UserPanel.Queries.GetUsers;
 using Escrow.Api.Domain.Enums;
 using Escrow.Api.Infrastructure.Configuration;
+using Escrow.Api.Web.UserEndpoints.BankDetails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,10 @@ public class UserDetails : EndpointGroupBase
 
         userGroup.MapPost("/update-mobile-number", UpdateMobileNumber).AllowAnonymous();
         userGroup.MapPost("/send-sms", SendSMS).AllowAnonymous();
+
+        // Virtual IBAN and Customer Reference
+        userGroup.MapPost("/generate-iban", GenerateVirtualIban).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
+        userGroup.MapPost("/generate-customer-reference", GenerateCustomerReference).RequireAuthorization(policy => policy.RequireRole(nameof(Roles.User)));
 
 
     }
@@ -273,23 +278,6 @@ public class UserDetails : EndpointGroupBase
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     [Authorize]
     public async Task<IResult> StoreDeviceToken(ISender sender, StoreDeviceTokenCommand command)
     {
@@ -343,4 +331,119 @@ public class UserDetails : EndpointGroupBase
             return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
         }
     }
+
+
+    [Authorize]
+    public async Task<IResult> GenerateVirtualIban([FromBody] VirtualIbanRequest request)
+    {
+        try
+        {
+            var iban = await Task.Run(() =>
+            {
+                var ibanService = new VirtualIbanService(request.CompanyId, request.BankCode);
+                return ibanService.GenerateVirtualIban(request.CustomerId);
+            });
+
+            return TypedResults.Ok(Result<string>.Success(StatusCodes.Status200OK, "Virtual IBAN generated successfully.", iban));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
+    }
+
+    [Authorize]
+    public async Task<IResult> GenerateCustomerReference([FromBody] ReferenceRequest request)
+    {
+        try
+        {
+            var reference = await Task.Run(() =>
+            {
+                var paymentRefService = new PaymentReferenceService();
+                return paymentRefService.GenerateReference(
+                    request.PartyIndicator,
+                    request.CustomerId,
+                    request.ContractId,
+                    request.MilestoneId
+                );
+            });
+
+            if (string.IsNullOrEmpty(reference))
+                return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Failed to generate payment reference."));
+
+            return TypedResults.Ok(Result<string>.Success(StatusCodes.Status200OK, "Payment reference generated successfully.", reference));
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+//[Authorize]
+//public async Task<IResult> GenerateVirtualIban([FromBody] VirtualIbanRequest request)
+//{
+//    try
+//    {
+//        var iban = await Task.Run(() =>
+//        {
+//            var ibanService = new VirtualIbanService(request.CompanyId, request.BankCode);
+//            return ibanService.GenerateVirtualIban(request.CustomerId);
+//        });
+
+//        return TypedResults.Ok(Result<string>.Success(StatusCodes.Status200OK, "Virtual IBAN generated successfully.", iban));
+//    }
+//    catch (Exception ex)
+//    {
+//        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+//    }
+//}
+
+
+//[Authorize]
+//public async Task<IResult> GenerateCustomerReference([FromBody] VirtualIbanRequest request)
+//{
+//    try
+//    {
+//        var subAccount = await Task.Run(() =>
+//        {
+//            var ibanService = new VirtualIbanService(request.CompanyId, request.BankCode);
+
+//            var method = typeof(VirtualIbanService).GetMethod(
+//                "GenerateSubAccountNumber",
+//                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
+//            );
+
+//            return method?.Invoke(ibanService, new object[] { request.CompanyId, request.CustomerId })?.ToString();
+//        });
+
+//        if (subAccount == null)
+//            return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, "Failed to generate customer reference."));
+
+//        return TypedResults.Ok(Result<string>.Success(StatusCodes.Status200OK, "Customer reference generated successfully.", subAccount));
+//    }
+//    catch (Exception ex)
+//    {
+//        return TypedResults.BadRequest(Result<object>.Failure(StatusCodes.Status400BadRequest, ex.Message));
+//    }
+//}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Application.UserPanel.Queries.GetUsers;
 using Escrow.Api.Domain.Entities.UserPanel;
 
@@ -17,4 +18,5 @@ public class TeamDTO
     public bool? IsActive { get; set; }
     public DateTimeOffset? Created { get; set; }
     public virtual UserDetailDto? User { get; set; }
+    public virtual List<ContractDTO>? Contracts { get; set; }
 }

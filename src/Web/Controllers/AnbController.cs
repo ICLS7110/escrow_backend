@@ -1,5 +1,6 @@
 ﻿using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.Common.Models.Payments;
 using Escrow.Api.Application.Features.Bank.Queries;
 using Escrow.Api.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -60,6 +61,30 @@ public class AnbController : ControllerBase
             return StatusCode(500, new { message = "Internal server error", detail = ex.Message });
         }
     }
+
+
+    [HttpPost("transfer")]
+    public async Task<IActionResult> BankToBankTransfer([FromBody] PaymentRequest request)
+    {
+        var result = await _anbService.MakeBankToBankTransferAsync(request);
+        return Ok(result);
+    }
+
+    [HttpGet("payment-status/{id}")]
+    public async Task<IActionResult> GetPaymentStatus(string id)
+    {
+        var result = await _anbService.GetPaymentStatusAsync(id);
+        return Ok(result);
+    }
+
+    [HttpGet("sanctions-check/{nationalId}")]
+    public async Task<IActionResult> CheckSanctions(string nationalId)
+    {
+        var result = await _anbService.CheckSanctionsAsync(nationalId);
+        return Ok(result);
+    }
+
+
 
 
 }

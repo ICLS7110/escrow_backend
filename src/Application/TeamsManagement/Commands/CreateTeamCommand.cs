@@ -62,14 +62,14 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
             {
                 userByEmail = await _context.UserDetails
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.EmailAddress == request.Email, cancellationToken);
+                    .FirstOrDefaultAsync(u => u.EmailAddress == request.Email && u.IsDeleted == false, cancellationToken);
             }
 
             if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
             {
                 userByPhone = await _context.UserDetails
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.PhoneNumber == request.PhoneNumber, cancellationToken);
+                    .FirstOrDefaultAsync(u => u.PhoneNumber == request.PhoneNumber && u.IsDeleted == false, cancellationToken);
             }
 
             if (userByEmail != null && userByPhone != null && userByEmail.Id != userByPhone.Id)
@@ -122,7 +122,7 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
 
             bool isAlreadyTeamMember = await _context.TeamMembers
                 .AsNoTracking()
-                .AnyAsync(tm => tm.UserId == userId, cancellationToken);
+                .AnyAsync(tm => tm.UserId == userId && tm.IsDeleted == false, cancellationToken);
 
             if (isAlreadyTeamMember)
                 return Result<object>.Failure(StatusCodes.Status400BadRequest, AppMessages.Get("AlreadyTeamMember", language));
@@ -130,7 +130,7 @@ namespace Escrow.Api.Application.TeamsManagement.Commands
             var teamMember = new TeamMember
             {
                 UserId = userId,
-                RoleType = request.RoleType,    
+                RoleType = request.RoleType,
                 ContractId = contractIdCsv,
                 Created = DateTime.UtcNow,
                 IsActive = true,

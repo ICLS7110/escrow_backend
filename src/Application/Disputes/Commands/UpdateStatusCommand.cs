@@ -96,6 +96,7 @@ public class UpdateStatusCommandHandler : IRequestHandler<UpdateStatusCommand, R
             .Where(u => userIds.Contains(u.Id))
             .ToListAsync(cancellationToken);
 
+
         foreach (var user in users)
         {
             try
@@ -103,7 +104,25 @@ public class UpdateStatusCommandHandler : IRequestHandler<UpdateStatusCommand, R
                 if (!string.IsNullOrWhiteSpace(user.EmailAddress) && !string.IsNullOrWhiteSpace(user.FullName))
                 {
                     var subject = AppMessages.Get("DisputeStatusUpdatedSubject", language);
-                    var body = string.Format(AppMessages.Get("DisputeStatusUpdatedBody", language), user.FullName, contract.Id, request.NewStatus);
+
+                    // Determine note content based on user's role in the contract
+                    string note = string.Empty;
+                    if (user.Id == contract.BuyerDetailsId)
+                    {
+                        note = request.BuyerNote ?? string.Empty;
+                    }
+                    else if (user.Id == contract.SellerDetailsId)
+                    {
+                        note = request.SellerNote ?? string.Empty;
+                    }
+
+                    // Compose body including the note
+                    var body = string.Format(
+                        AppMessages.Get("DisputeStatusUpdatedBody", language),
+                        user.FullName,
+                        contract.Id,
+                        request.NewStatus,
+                        note);
 
                     await _emailService.SendEmailAsync(user.EmailAddress, subject, user.FullName, body);
                 }
@@ -123,6 +142,44 @@ public class UpdateStatusCommandHandler : IRequestHandler<UpdateStatusCommand, R
                 errorMessages.Add(string.Format(AppMessages.Get("NotifyUserFailed", language), user.FullName, ex.Message));
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+        //foreach (var user in users)
+        //{
+        //    try
+        //    {
+        //        if (!string.IsNullOrWhiteSpace(user.EmailAddress) && !string.IsNullOrWhiteSpace(user.FullName))
+        //        {
+        //            var subject = AppMessages.Get("DisputeStatusUpdatedSubject", language);
+        //            var body = string.Format(AppMessages.Get("DisputeStatusUpdatedBody", language), user.FullName, contract.Id, request.NewStatus);
+
+        //            await _emailService.SendEmailAsync(user.EmailAddress, subject, user.FullName, body);
+        //        }
+
+        //        await _notificationService.SendNotificationAsync(
+        //            creatorId: userId,
+        //            buyerId: 0,
+        //            sellerId: user.Id,
+        //            contractId: contract.Id,
+        //            role: nameof(Roles.User),
+        //            type: "Dispute",
+        //            cancellationToken: cancellationToken
+        //        );
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        errorMessages.Add(string.Format(AppMessages.Get("NotifyUserFailed", language), user.FullName, ex.Message));
+        //    }
+        //}
 
         // Notify Admins
         var adminUsers = await _context.UserDetails

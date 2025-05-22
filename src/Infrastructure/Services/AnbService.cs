@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.Common.Models.Payments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -280,4 +281,177 @@ public class AnbService : IAnbService
             throw new ApplicationException($"Unexpected error while fetching account verification for reference {requestReferenceNumber}: {ex.Message}", ex);
         }
     }
+
+
+    public async Task<SanctionsCheckResponse?> CheckSanctionsAsync(string nationalId)
+    {
+        _logger.LogInformation("Starting CheckSanctionsAsync for National ID: {NationalId}", nationalId);
+
+        var token = await GetAccessTokenAsync(); 
+        if (string.IsNullOrWhiteSpace(_settings.BaseUrl))
+        {
+            throw new InvalidOperationException("BaseUrl is not configured.");
+        }
+        var requestUrl = $"{_settings.BaseUrl.TrimEnd('/')}/abc-list/{nationalId}?max=20&offset=0";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var curlCommand = $"curl --location '{requestUrl}' \\\n" +
+                          $"--header 'Accept: application/json' \\\n" +
+                          $"--header 'Authorization: Bearer {token}'";
+
+        _logger.LogInformation("ANB curl command:\n{Curl}", curlCommand);
+
+        try
+        {
+            var response = await _httpClient.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("Sanctions check failed: {StatusCode} - {Body}", response.StatusCode, content);
+                throw new HttpRequestException($"Error from ANB: {response.StatusCode} - {content}");
+            }
+
+            var result = System.Text.Json.JsonSerializer.Deserialize<SanctionsCheckResponse>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception in CheckSanctionsAsync");
+            throw;
+        }
+    }
+
+    public async Task<PaymentResponse?> MakeBankToBankTransferAsync(PaymentRequest requestPayload)
+    {
+        _logger.LogInformation("Starting MakeBankToBankTransferAsync...");
+
+        var token = await GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_settings.BaseUrl))
+        {
+            throw new InvalidOperationException("BaseUrl is not configured.");
+        }
+
+        var requestUrl = $"{_settings.BaseUrl.TrimEnd('/')}/payment/json";
+
+        var jsonContent = System.Text.Json.JsonSerializer.Serialize(requestPayload);
+        var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        request.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        // Generate curl command
+        var curlCommand = $"curl --location '{requestUrl}' \\\n" +
+                          $"--header 'accept: application/json' \\\n" +
+                          $"--header 'Content-Type: application/json' \\\n" +
+                          $"--header 'Authorization: Bearer {token}' \\\n" +
+                          $"--data '{jsonContent.Replace("'", "\\'")}'";
+
+        _logger.LogInformation("ANB curl command:\n{Curl}", curlCommand);
+        _logger.LogDebug("Transfer request payload: {Payload}", jsonContent);
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request);
+            _logger.LogInformation("Bank transfer request sent. Status Code: {StatusCode}", response.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "HTTP request for bank transfer failed.");
+            throw;
+        }
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Bank transfer failed with status {StatusCode}: {ErrorBody}", response.StatusCode, responseContent);
+            throw new HttpRequestException($"Bank transfer failed: {response.StatusCode} - {responseContent}");
+        }
+
+        try
+        {
+            var result = System.Text.Json.JsonSerializer.Deserialize<PaymentResponse>(responseContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            _logger.LogInformation("Bank transfer successful.");
+            return result;
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize payment response: {ResponseContent}", responseContent);
+            throw;
+        }
+    }
+
+    public async Task<PaymentStatusResponse?> GetPaymentStatusAsync(string paymentId)
+    {
+        _logger.LogInformation("Starting GetPaymentStatusAsync for Payment ID: {PaymentId}", paymentId);
+
+        var token = await GetAccessTokenAsync();
+        if (string.IsNullOrWhiteSpace(_settings.BaseUrl))
+        {
+            throw new InvalidOperationException("BaseUrl is not configured.");
+        }
+
+        var requestUrl = $"{_settings.BaseUrl.TrimEnd('/')}/payment/{paymentId}";
+
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        // Generate curl command
+        var curlCommand = $"curl --location '{requestUrl}' \\\n" +
+                          $"--header 'accept: application/json' \\\n" +
+                          $"--header 'Authorization: Bearer {token}'";
+
+        _logger.LogInformation("ANB curl command:\n{Curl}", curlCommand);
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request);
+            _logger.LogInformation("Payment status request sent. Status Code: {StatusCode}", response.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "HTTP request for payment status failed.");
+            throw;
+        }
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Payment status request failed with status {StatusCode}: {ErrorBody}", response.StatusCode, responseContent);
+            throw new HttpRequestException($"Payment status failed: {response.StatusCode} - {responseContent}");
+        }
+
+        try
+        {
+            var result = System.Text.Json.JsonSerializer.Deserialize<PaymentStatusResponse>(responseContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            _logger.LogInformation("Payment status retrieved successfully.");
+            return result;
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize payment status response: {ResponseContent}", responseContent);
+            throw;
+        }
+    }
+
 }

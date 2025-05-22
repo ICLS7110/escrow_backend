@@ -55,6 +55,16 @@ public class CreateNotificationCommandHandler : IRequestHandler<CreateNotificati
         if (request.ContractId <= 0)
             return Result<object>.Failure(StatusCodes.Status400BadRequest, AppMessages.Get("InvalidContractId", language));
 
+
+        // Fetch contract title
+        var contract = await _context.ContractDetails
+            .Where(c => c.Id == request.ContractId)
+            .Select(c => new { c.Id, c.ContractTitle })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var contractTitle = contract?.ContractTitle ?? "Contract";
+        
+
         var buyer = await _context.UserDetails.FirstOrDefaultAsync(u => u.PhoneNumber == request.BuyerPhoneNumber, cancellationToken);
         if (buyer == null)
         {
@@ -121,8 +131,26 @@ public class CreateNotificationCommandHandler : IRequestHandler<CreateNotificati
         await _context.Notifications.AddAsync(notification, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
+
+        var receiver = toId == buyer.Id ? buyer : seller;
+        var receiverName = receiver.FullName ?? "User";
+        var receiverImage = receiver.ProfilePicture ?? "";
+
         if (!string.IsNullOrEmpty(deviceToken))
         {
+            await _notificationService.SendPushNotificationAsync(
+                                        deviceToken,
+                                        request.Title,
+                                        request.Description,
+                                        new
+                                        {
+                                            GroupId = request.GroupId,
+                                            ContractId = request.ContractId,
+                                            ContractTitle = contractTitle,
+                                            ReceiverName = receiverName,
+                                            ReceiverImage = receiverImage,
+                                            Type = request.Type
+                                        });
             await _notificationService.SendPushNotificationAsync(deviceToken, request.Title, request.Description, new { Type = request.Type });
         }
 

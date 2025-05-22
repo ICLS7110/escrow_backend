@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -19,16 +20,20 @@ namespace Escrow.Api.Application.Common.Helpers
         private readonly string _token;
         private readonly string _callbackUrl;
         private readonly string _errorUrl;
+        private readonly IJwtService _jwtService;
+        private readonly IApplicationDbContext _context;
 
-        public MyFatoorahService(HttpClient httpClient, IConfiguration configuration)
+
+        public MyFatoorahService(HttpClient httpClient, IConfiguration configuration, IJwtService jwtService, IApplicationDbContext context)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _baseUrl = _configuration["MyFatoorah:BaseUrl"] ?? throw new ArgumentNullException("MyFatoorah:BaseUrl");
             _token = _configuration["MyFatoorah:Token"] ?? throw new ArgumentNullException("MyFatoorah:Token");
-            _callbackUrl = _configuration["MyFatoorah:CallBackUrl"] ?? "https://example.com/callback";
-            _errorUrl = _configuration["MyFatoorah:ErrorUrl"] ?? "https://example.com/error";
-
+            _callbackUrl = _configuration["MyFatoorah:CallBackUrl"] ?? "https://welink-sa.com/";
+            _errorUrl = _configuration["MyFatoorah:ErrorUrl"] ?? "https://welink-sa.com/";
+            _jwtService = jwtService;
+            _context = context;
         }
 
         public async Task<List<PaymentMethodDto>> InitiatePaymentAsync(decimal invoiceAmount, string currencyIso)
@@ -79,6 +84,16 @@ namespace Escrow.Api.Application.Common.Helpers
 
         public async Task<ExecutePaymentResultDto> ExecutePaymentAsync(ExecutePaymentCommand command)
         {
+            var userId = _jwtService.GetUserId().ToInt();
+            var user = _context.UserDetails
+                .AsNoTracking()
+                .FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
             try
             {
                 var body = new
@@ -86,11 +101,13 @@ namespace Escrow.Api.Application.Common.Helpers
                     PaymentMethodId = command.PaymentMethodId,
                     InvoiceValue = command.InvoiceAmount,
                     CurrencyIso = command.CurrencyIso,
-                    CustomerName = command.CustomerName,
-                    CustomerEmail = command.CustomerEmail,
-                    CustomerMobile = command.CustomerMobile,
+                    CustomerName = user.FullName ?? "N/A",
+                    CustomerEmail = user.EmailAddress ?? "noemail@example.com",
+                    CustomerMobile = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(user.PhoneNumber) ?? "0000000000",
                     CallBackUrl = _callbackUrl,
-                    ErrorUrl = _errorUrl
+                    ErrorUrl = _errorUrl,
+                    DisplayCurrencyIso = "SAR",
+                    Language = "en",
                 };
 
                 var requestUri = new Uri(new Uri(_baseUrl), "v2/ExecutePayment");
@@ -119,7 +136,7 @@ namespace Escrow.Api.Application.Common.Helpers
                 var dto = JsonSerializer.Deserialize<ExecutePaymentResultDto>(
                     dataElement.GetRawText(),
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
+                 
                 return dto!;
             }
             catch (Exception ex)
@@ -128,10 +145,13 @@ namespace Escrow.Api.Application.Common.Helpers
             }
         }
 
-    
 
-    // Local response models
-    private class MyFatoorahInitiateResponse
+        
+
+
+
+        // Local response models
+        private class MyFatoorahInitiateResponse
         {
             public bool IsSuccess { get; set; }
             public string Message { get; set; } = string.Empty;
@@ -151,3 +171,58 @@ namespace Escrow.Api.Application.Common.Helpers
         }
     }
 }
+
+
+
+
+
+
+
+//public async Task<PaymentMethodDto> GetPaymentMethodByIdAsync(int paymentMethodId)
+//{
+//    try
+//    {
+//        var requestUri = new Uri(new Uri(_baseUrl), $"v2/GetPaymentMethod/{paymentMethodId}");
+//        var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+//        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+//        var response = await _httpClient.SendAsync(request);
+//        response.EnsureSuccessStatusCode();
+//        var result = await response.Content.ReadFromJsonAsync<PaymentMethodDto>();
+//        return result!;
+//    }
+//    catch (Exception ex)
+//    {
+//        throw new Exception($"GetPaymentMethodByIdAsync failed: {ex.Message}", ex);
+//    }
+//}
+
+//public async Task<MyFatoorahPaymentStatusResponse> GetPaymentStatusAsync(string paymentId)
+//{
+//    var requestBody = new
+//    {
+//        Key = paymentId,
+//        KeyType = "PaymentId"
+//    };
+
+//    var requestUri = new Uri(new Uri(_baseUrl), "v2/GetPaymentStatus");
+
+//    var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
+//    {
+//        Content = JsonContent.Create(requestBody)
+//    };
+
+//    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+//    var response = await _httpClient.SendAsync(request);
+//    response.EnsureSuccessStatusCode();
+
+//    var paymentStatus = await response.Content.ReadFromJsonAsync<MyFatoorahPaymentStatusResponse>();
+
+//    if (paymentStatus == null)
+//    {
+//        throw new Exception("Failed to deserialize payment status response from MyFatoorah.");
+//    }
+
+//    return paymentStatus;
+
+//}

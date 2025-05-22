@@ -14,4 +14,5 @@ public class Transaction : BaseAuditableEntity
     public string? ToRecipient { get; set; } // Buyer, Seller, or third-party recipient
     public int? ContractId { get; set; } // Linked contract ID for traceability
     public string? Status { get; set; } // Linked contract ID for traceability
+    public string? PaymentId { get; set; } // Linked contract ID for traceability
 }

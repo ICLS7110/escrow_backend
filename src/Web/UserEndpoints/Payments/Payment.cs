@@ -7,6 +7,8 @@ using MediatR;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Escrow.Api.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Escrow.Api.Web.UserEndpoints.Payments;
 
@@ -14,8 +16,11 @@ public class Payment : EndpointGroupBase
 {
     public override void Map(WebApplication app)
     {
-        var paymentGroup = app.MapGroup(this).AllowAnonymous()
-            .WithOpenApi();
+        var paymentGroup = app.MapGroup(this)
+           .RequireAuthorization(policy => policy.RequireRole(nameof(Roles.Admin), nameof(Roles.User))) // Only Admins & Users
+           .WithOpenApi();
+        //var paymentGroup = app.MapGroup(this).AllowAnonymous()
+        //    .WithOpenApi();
 
         paymentGroup.MapPost("/initiate", InitiatePayment);
         paymentGroup.MapPost("/execute", ExecutePayment);
@@ -26,6 +31,7 @@ public class Payment : EndpointGroupBase
         //paymentGroup.MapPost("/direct", DirectPayment);
     }
 
+    [Authorize]
     public async Task<IResult> InitiatePayment(ISender sender, InitiatePaymentCommand command)
     {
         var result = await sender.Send(command);
@@ -38,6 +44,7 @@ public class Payment : EndpointGroupBase
         return TypedResults.Ok(Result<List<PaymentMethodDto>>.Success(StatusCodes.Status200OK, "Payment methods retrieved successfully.", result.Data));
     }
 
+    [Authorize]
     public async Task<IResult> ExecutePayment(ISender sender, ExecutePaymentCommand command)
     {
         var result = await sender.Send(command);
@@ -55,16 +62,19 @@ public class Payment : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
+    [Authorize]
     public Task<IResult> PaymentCallback([FromQuery] string paymentId)
     {
         return Task.FromResult<IResult>(TypedResults.Ok($"Payment successful. Payment ID: {paymentId}"));
     }
 
+    [Authorize]
     public Task<IResult> PaymentError()
     {
         return Task.FromResult<IResult>(TypedResults.BadRequest("Payment failed or was cancelled by the user."));
     }
 
+    [Authorize]
     public async Task<IResult> GetPaymentStatus(ISender sender, GetPaymentStatusCommand command)
     {
         var result = await sender.Send(command);
@@ -77,6 +87,7 @@ public class Payment : EndpointGroupBase
         return TypedResults.Ok(result);
     }
 
+    [Authorize]
     public async Task<IResult> RefundPayment(ISender sender, RefundPaymentCommand command)
     {
         var result = await sender.Send(command);

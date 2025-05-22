@@ -150,7 +150,8 @@ namespace Escrow.Api.Application.Common.Constants
             ["ReleaseToRequired"] = ("ReleaseTo is required when resolving a dispute.", "مطلوب 'ReleaseTo' عند حل النزاع."),
             ["ReleaseAmountRequired"] = ("ReleaseAmount is required when resolving a dispute.", "مطلوب 'ReleaseAmount' عند حل النزاع."),
             ["DisputeStatusUpdatedSubject"] = ("Dispute Status Updated", "تم تحديث حالة النزاع"),
-            ["DisputeStatusUpdatedBody"] = ("Dear {0},\n\nThe dispute for contract #{1} has been updated to '{2}'.\n\nThank you.", "عزيزي {0},\n\nتم تحديث النزاع للعقد رقم #{1} إلى الحالة '{2}'.\n\nشكراً لك."),
+            ["DisputeStatusUpdatedBody"] = ("Dear {0},\n\nThe dispute for contract #{1} has been updated to '{2}'.\n\nNote: {3}\n\nThank you.","عزيزي {0},\n\nتم تحديث النزاع للعقد رقم #{1} إلى الحالة '{2}'.\n\nملاحظة: {3}\n\nشكراً لك."),
+
             ["NotifyUserFailed"] = ("Failed to notify {0}: {1}", "فشل في إعلام {0}: {1}"),
             ["DisputeStatusUpdatedSuccess"] = ("Dispute status successfully updated to '{0}'.", "تم تحديث حالة النزاع إلى '{0}' بنجاح."),
             ["WithNotificationErrors"] = ("However, the following notification errors occurred:", "ومع ذلك، حدثت أخطاء إشعار التالية:"),

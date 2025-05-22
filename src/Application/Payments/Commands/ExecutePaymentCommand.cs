@@ -14,9 +14,6 @@ public class ExecutePaymentCommand : IRequest<Result<ExecutePaymentResultDto>>
     public int PaymentMethodId { get; set; }
     public decimal InvoiceAmount { get; set; }
     public string CurrencyIso { get; set; } = string.Empty;
-    public string CustomerName { get; set; } = string.Empty;
-    public string CustomerEmail { get; set; } = string.Empty;
-    public string CustomerMobile { get; set; } = string.Empty;
 }
 
 

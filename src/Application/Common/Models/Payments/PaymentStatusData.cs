@@ -88,3 +88,19 @@ public class Supplier
     public decimal ProposedShare { get; set; }
     public decimal DepositShare { get; set; }
 }
+
+
+public class PaymentResponse
+{
+    public string? ResponseCode { get; set; }
+    public string? ResponseMessage { get; set; }
+    public string? TransactionReference { get; set; }
+}
+
+
+public class SanctionsCheckResponse
+{
+    public bool IsSanctioned { get; set; }
+    public string? Message { get; set; }
+}
+

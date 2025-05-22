@@ -3,6 +3,7 @@ using Escrow.Api.Application.Common.Constants;
 using Escrow.Api.Application.Common.Helpers;
 using Escrow.Api.Application.Common.Interfaces;
 using Escrow.Api.Application.Common.Models;
+using Escrow.Api.Application.Common.Models.ContractDTOs;
 using Escrow.Api.Application.DTOs;
 using Escrow.Api.Application.UserPanel.Queries.GetUsers;
 using Escrow.Api.Domain.Entities.TeamMembers;
@@ -38,7 +39,6 @@ public class GetAllTeamsQueryHandler : IRequestHandler<GetAllTeamsQuery, Result<
         _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
-
     public async Task<Result<PaginatedList<TeamDTO>>> Handle(GetAllTeamsQuery request, CancellationToken cancellationToken)
     {
         var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
@@ -65,23 +65,71 @@ public class GetAllTeamsQueryHandler : IRequestHandler<GetAllTeamsQuery, Result<
 
             var rawResults = await baseQuery.ToListAsync(cancellationToken);
 
-            var query = rawResults.Select(x => new TeamDTO
+            var allContracts = await _context.ContractDetails
+                .AsNoTracking()
+                .Where(c => !c.IsDeleted.HasValue || c.IsDeleted == false)
+                .ToListAsync(cancellationToken);
+
+            var query = rawResults.Select(x =>
             {
-                TeamId = x.teamMember.Id.ToString(),
-                UserId = x.teamMember.UserId,
-                RoleType = x.teamMember.RoleType,
-                ContractId = !string.IsNullOrEmpty(x.teamMember.ContractId)
-                    ? x.teamMember.ContractId.Split(',').ToList()
-                    : new List<string>(),
-                IsActive = x.teamMember.IsActive,
-                Created = x.teamMember.Created,
-                User = x.user != null ? new UserDetailDto
+                var contractIds = string.IsNullOrWhiteSpace(x.teamMember.ContractId)
+                    ? new List<string>()
+                    : x.teamMember.ContractId
+                        .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(id => id.Trim())
+                        .ToList();
+
+                var contracts = allContracts
+                    .Where(c => contractIds.Contains(c.Id.ToString()))
+                    .Select(c => new ContractDTO
+                    {
+                        Id = c.Id,
+                        Role = c.Role,
+                        ContractTitle = c.ContractTitle,
+                        ServiceType = c.ServiceType,
+                        ServiceDescription = c.ServiceDescription,
+                        AdditionalNote = c.AdditionalNote,
+                        FeesPaidBy = c.FeesPaidBy,
+                        FeeAmount = c.FeeAmount,
+                        BuyerName = c.BuyerName,
+                        BuyerMobile = c.BuyerMobile,
+                        BuyerId = c.BuyerDetailsId.ToString(),
+                        SellerId = c.SellerDetailsId.ToString(),
+                        SellerName = c.SellerName,
+                        SellerMobile = c.SellerMobile,
+                        CreatedBy = c.CreatedBy,
+                        ContractDoc = c.ContractDoc,
+                        Status = c.Status,
+                        IsActive = c.IsActive,
+                        IsDeleted = c.IsDeleted,
+                        TaxAmount = c.TaxAmount,
+                        EscrowTax = c.EscrowTax,
+                        LastModifiedBy = c.LastModifiedBy,
+                        BuyerPayableAmount = c.BuyerPayableAmount,
+                        SellerPayableAmount = c.SellerPayableAmount,
+                        Created = c.Created,
+                        LastModified = c.LastModified,
+                        EscrowStatusUpdatedAt = c.EscrowStatusUpdatedAt
+                    })
+                    .ToList();
+
+                return new TeamDTO
                 {
-                    FullName = x.user.FullName,
-                    EmailAddress = x.user.EmailAddress,
-                    PhoneNumber = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(x.user.PhoneNumber),
-                    CountryCode = PhoneNumberHelper.ExtractCountryCode(x.user.PhoneNumber),
-                } : null
+                    TeamId = x.teamMember.Id.ToString(),
+                    UserId = x.teamMember.UserId,
+                    RoleType = x.teamMember.RoleType,
+                    ContractId = contractIds,
+                    IsActive = x.teamMember.IsActive,
+                    Created = x.teamMember.Created,
+                    User = x.user != null ? new UserDetailDto
+                    {
+                        FullName = x.user.FullName,
+                        EmailAddress = x.user.EmailAddress,
+                        PhoneNumber = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(x.user.PhoneNumber),
+                        CountryCode = PhoneNumberHelper.ExtractCountryCode(x.user.PhoneNumber),
+                    } : null,
+                    Contracts = contracts
+                };
             });
 
             if (!string.IsNullOrEmpty(request.RoleType))
@@ -131,6 +179,99 @@ public class GetAllTeamsQueryHandler : IRequestHandler<GetAllTeamsQuery, Result<
             return Result<PaginatedList<TeamDTO>>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
+    //public async Task<Result<PaginatedList<TeamDTO>>> Handle(GetAllTeamsQuery request, CancellationToken cancellationToken)
+    //{
+    //    var language = _httpContextAccessor.HttpContext?.GetCurrentLanguage() ?? Language.English;
+    //    var authenticatedUserId = _jwtService.GetUserId().ToInt();
+
+    //    if (authenticatedUserId == 0)
+    //    {
+    //        return Result<PaginatedList<TeamDTO>>.Failure(StatusCodes.Status401Unauthorized, AppMessages.Get("Unauthorized", language));
+    //    }
+
+    //    try
+    //    {
+    //        var baseQuery = from teamMember in _context.TeamMembers.AsNoTracking()
+    //                        where teamMember.CreatedBy == authenticatedUserId.ToString()
+    //                              && teamMember.IsDeleted == false
+    //                        join user in _context.UserDetails.AsNoTracking()
+    //                            on teamMember.UserId equals user.Id.ToString() into userGroup
+    //                        from user in userGroup.DefaultIfEmpty()
+    //                        select new
+    //                        {
+    //                            teamMember,
+    //                            user
+    //                        };
+
+    //        var rawResults = await baseQuery.ToListAsync(cancellationToken);
+
+    //        var query = rawResults.Select(x => new TeamDTO
+    //        {
+    //            TeamId = x.teamMember.Id.ToString(),
+    //            UserId = x.teamMember.UserId,
+    //            RoleType = x.teamMember.RoleType,
+    //            ContractId = !string.IsNullOrEmpty(x.teamMember.ContractId)
+    //                ? x.teamMember.ContractId.Split(',').ToList()
+    //                : new List<string>(),
+    //            IsActive = x.teamMember.IsActive,
+    //            Created = x.teamMember.Created,
+    //            User = x.user != null ? new UserDetailDto
+    //            {
+    //                FullName = x.user.FullName,
+    //                EmailAddress = x.user.EmailAddress,
+    //                PhoneNumber = PhoneNumberHelper.ExtractPhoneNumberWithoutCountryCode(x.user.PhoneNumber),
+    //                CountryCode = PhoneNumberHelper.ExtractCountryCode(x.user.PhoneNumber),
+    //            } : null
+    //        });
+
+    //        if (!string.IsNullOrEmpty(request.RoleType))
+    //        {
+    //            query = query.Where(t => t.RoleType == request.RoleType);
+    //        }
+
+    //        if (request.IsActive.HasValue)
+    //        {
+    //            query = query.Where(t => t.IsActive == request.IsActive.Value);
+    //        }
+
+    //        if (request.LastDays.HasValue)
+    //        {
+    //            var dateLimit = DateTime.UtcNow.AddDays(-request.LastDays.Value);
+    //            query = query.Where(t => t.Created != null && t.Created >= dateLimit);
+    //        }
+
+    //        var teamList = query.ToList();
+    //        var totalCount = teamList.Count;
+
+    //        if (totalCount == 0)
+    //        {
+    //            return Result<PaginatedList<TeamDTO>>.Success(
+    //                StatusCodes.Status200OK,
+    //                AppMessages.Get("NoTeamsFound", language),
+    //                new PaginatedList<TeamDTO>(new List<TeamDTO>(), 0, request.PageNumber, request.PageSize)
+    //            );
+    //        }
+
+    //        var paginatedTeams = teamList
+    //            .OrderByDescending(t => t.TeamId)
+    //            .Skip((request.PageNumber - 1) * request.PageSize)
+    //            .Take(request.PageSize)
+    //            .ToList();
+
+    //        var paginatedList = new PaginatedList<TeamDTO>(paginatedTeams, totalCount, request.PageNumber, request.PageSize);
+
+    //        return Result<PaginatedList<TeamDTO>>.Success(
+    //            StatusCodes.Status200OK,
+    //            AppMessages.Get("TeamsRetrievedSuccessfully", language),
+    //            paginatedList
+    //        );
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Result<PaginatedList<TeamDTO>>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+    //    }
+    //}
 }
 
 
